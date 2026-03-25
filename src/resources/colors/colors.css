@@ -1,0 +1,22 @@
+:root {
+  /* Texto */
+  --color-text: #ffffff;
+
+  /* Botón base */
+  --color-btn-bg: #4a90e2;
+  --color-btn-bg-hover: #357abd;
+
+  /* Botón YES */
+  --color-btn-yes-bg: #28a745;
+  --color-btn-yes-bg-hover: #1e7e34;
+
+  /* Botón NO */
+  --color-btn-no-bg: #dc3545;
+  --color-btn-no-bg-hover: #a71d2a;
+
+  /* Overlay (fondo oscuro/transparente) */
+  --color-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Bordes */
+  --color-border: #ff0000;
+}

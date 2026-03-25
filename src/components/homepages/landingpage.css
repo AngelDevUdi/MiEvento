@@ -1,0 +1,456 @@
+@import "../../resources/colors/colors.css";
+
+/* Página de aterrizaje */
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #0f0f0f;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+/* Contenedor para contenido */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+  width: 100%;
+}
+
+/* Hero Section */
+.hero-section {
+  width: 100%;
+  min-height: 500px;
+  background: linear-gradient(135deg, var(--color-btn-bg) 0%, #357abd 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--color-text);
+  padding: 60px 20px;
+}
+
+.hero-content h1 {
+  font-size: 64px;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.hero-content p {
+  font-size: 24px;
+  margin: 0;
+  opacity: 0.95;
+  letter-spacing: 0.5px;
+}
+
+/* Sección Acerca de Nosotros */
+.about-section {
+  padding: 80px 20px;
+  background: #111;
+}
+
+.about-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.about-header h2 {
+  font-size: 44px;
+  color: var(--color-text);
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.about-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.about-text p {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.8;
+  margin: 0 0 25px 0;
+  text-align: justify;
+  letter-spacing: 0.3px;
+}
+
+.about-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* Sección Misión */
+.mission-section {
+  padding: 80px 20px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #111 100%);
+}
+
+.mission-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.mission-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  border-radius: 12px;
+  padding: 40px 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.mission-card:hover {
+  background: rgba(74, 144, 226, 0.1);
+  border-color: var(--color-btn-bg);
+  transform: translateY(-10px);
+  box-shadow: 0 10px 30px rgba(74, 144, 226, 0.2);
+}
+
+.mission-icon {
+  font-size: 56px;
+  margin-bottom: 20px;
+}
+
+.mission-card h3 {
+  font-size: 24px;
+  color: var(--color-text);
+  margin: 0 0 15px 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.mission-card p {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Sección Por qué elegirnos */
+.why-us-section {
+  padding: 80px 20px;
+  background: #0f0f0f;
+}
+
+.why-us-section h2 {
+  font-size: 44px;
+  color: var(--color-text);
+  text-align: center;
+  margin: 0 0 60px 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+}
+
+.feature-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  border-radius: 12px;
+  padding: 30px 25px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.feature-card:hover {
+  background: rgba(74, 144, 226, 0.1);
+  border-color: var(--color-btn-bg);
+  transform: translateY(-10px);
+  box-shadow: 0 10px 30px rgba(74, 144, 226, 0.2);
+}
+
+.feature-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.feature-card h3 {
+  font-size: 22px;
+  color: var(--color-text);
+  margin: 0 0 10px 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.feature-card p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Sección Descargar */
+.download-section {
+  padding: 80px 20px;
+  background: linear-gradient(135deg, var(--color-btn-bg) 0%, #357abd 100%);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.download-section h2 {
+  font-size: 40px;
+  color: var(--color-text);
+  margin: 0 0 15px 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.download-section p {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 40px 0;
+  letter-spacing: 0.5px;
+}
+
+.download-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.download-btn {
+  padding: 15px 40px;
+  font-size: 16px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--color-text);
+  border: 2px solid var(--color-text);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.download-btn:hover {
+  background: var(--color-text);
+  color: var(--color-btn-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* 📱 Responsive - Tablet */
+@media (max-width: 1024px) {
+  .hero-content h1 {
+    font-size: 48px;
+  }
+
+  .hero-content p {
+    font-size: 18px;
+  }
+
+  .about-header h2,
+  .why-us-section h2 {
+    font-size: 32px;
+  }
+
+  .mission-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mission-card {
+    padding: 30px 25px;
+  }
+}
+
+/* 📱 Responsive - Mobile */
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: 350px;
+    padding: 40px 20px;
+  }
+
+  .hero-content h1 {
+    font-size: 36px;
+    margin-bottom: 15px;
+  }
+
+  .hero-content p {
+    font-size: 16px;
+  }
+
+  .about-section {
+    padding: 60px 15px;
+  }
+
+  .about-header h2,
+  .why-us-section h2 {
+    font-size: 28px;
+    margin-bottom: 40px;
+  }
+
+  .about-text p {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .mission-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .mission-card {
+    padding: 25px 20px;
+  }
+
+  .mission-icon {
+    font-size: 44px;
+  }
+
+  .mission-card h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+
+  .mission-card p {
+    font-size: 14px;
+  }
+
+  .why-us-section {
+    padding: 60px 15px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .feature-card {
+    padding: 20px 15px;
+  }
+
+  .feature-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+  }
+
+  .feature-card h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .feature-card p {
+    font-size: 13px;
+  }
+
+  .download-section {
+    padding: 60px 15px;
+  }
+
+  .download-section h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+
+  .download-section p {
+    font-size: 15px;
+    margin-bottom: 30px;
+  }
+
+  .download-btn {
+    padding: 12px 30px;
+    font-size: 14px;
+  }
+}
+
+/* 📱 Responsive - Small Mobile */
+@media (max-width: 480px) {
+  .landing-page {
+    min-height: auto;
+  }
+
+  .hero-section {
+    min-height: 280px;
+    padding: 30px 15px;
+  }
+
+  .hero-content h1 {
+    font-size: 26px;
+  }
+
+  .hero-content p {
+    font-size: 13px;
+  }
+
+  .about-section {
+    padding: 40px 15px;
+  }
+
+  .about-header h2,
+  .why-us-section h2 {
+    font-size: 22px;
+    margin-bottom: 30px;
+  }
+
+  .about-text p {
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+
+  .mission-icon {
+    font-size: 36px;
+  }
+
+  .mission-card h3 {
+    font-size: 18px;
+  }
+
+  .mission-card p {
+    font-size: 13px;
+  }
+
+  .feature-card {
+    padding: 15px 12px;
+  }
+
+  .feature-icon {
+    font-size: 32px;
+  }
+
+  .feature-card h3 {
+    font-size: 16px;
+  }
+
+  .feature-card p {
+    font-size: 12px;
+  }
+
+  .download-section {
+    padding: 40px 15px;
+  }
+
+  .download-section h2 {
+    font-size: 20px;
+  }
+
+  .download-section p {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  .download-btn {
+    padding: 10px 20px;
+    font-size: 12px;
+  }
+
+  .download-buttons {
+    gap: 10px;
+  }
+}
+

@@ -1,0 +1,813 @@
+@import "../../resources/colors/colors.css";
+
+/* Página de inicio */
+.homepage {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #0f0f0f;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+/* Contenedor */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+  width: 100%;
+}
+
+/* Sección del slider */
+.slider-section {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* Sección Próximamente */
+.coming-soon-section {
+  padding: 80px 20px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #111 100%);
+}
+
+.coming-soon-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.coming-soon-header h2 {
+  font-size: 44px;
+  color: var(--color-text);
+  margin: 0 0 15px 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.coming-soon-header p {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+/* Cards de próximamente */
+.coming-soon-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.coming-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(74, 144, 226, 0.4);
+  border-radius: 12px;
+  padding: 40px 30px;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.coming-card:hover {
+  background: rgba(74, 144, 226, 0.1);
+  border-color: var(--color-btn-bg);
+  transform: translateY(-8px);
+  box-shadow: 0 10px 30px rgba(74, 144, 226, 0.2);
+}
+
+.coming-badge {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--color-btn-bg) 0%, #357abd 100%);
+  color: var(--color-text);
+  padding: 5px 20px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.coming-card h3 {
+  font-size: 22px;
+  color: var(--color-text);
+  margin: 20px 0 15px 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.coming-card p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Sección Eventos Disponibles */
+.available-events-section {
+  padding: 80px 20px;
+  background: #0f0f0f;
+}
+
+.events-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.events-header h2 {
+  font-size: 44px;
+  color: var(--color-text);
+  margin: 0 0 15px 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.events-header p {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+/* Botones de filtro */
+.filter-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 50px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 10px 25px;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text);
+  border: 1px solid rgba(74, 144, 226, 0.3);
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-btn:hover {
+  background: rgba(74, 144, 226, 0.1);
+  border-color: var(--color-btn-bg);
+}
+
+.filter-btn.active {
+  background: var(--color-btn-bg);
+  border-color: var(--color-btn-bg);
+  box-shadow: 0 0 15px rgba(74, 144, 226, 0.5);
+}
+
+/* Grid de eventos */
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+  margin-bottom: 60px;
+}
+
+/* Card de evento */
+.event-card {
+  background: #1a1a1a;
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.event-card:hover {
+  border-color: var(--color-btn-bg);
+  box-shadow: 0 10px 30px rgba(74, 144, 226, 0.2);
+  transform: translateY(-8px);
+}
+
+/* Imagen del evento */
+.event-image {
+  width: 100%;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.event-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.event-card:hover .event-overlay {
+  opacity: 1;
+}
+
+.reserve-btn {
+  padding: 12px 30px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--color-btn-bg);
+  color: var(--color-text);
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reserve-btn:hover {
+  background: var(--color-btn-bg-hover);
+  transform: scale(1.05);
+}
+
+/* Contenido del evento */
+.event-content {
+  padding: 20px;
+}
+
+.event-content h3 {
+  font-size: 18px;
+  color: var(--color-text);
+  margin: 0 0 8px 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.artist {
+  font-size: 13px;
+  color: var(--color-btn-bg);
+  margin: 0 0 15px 0;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Información del evento */
+.event-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.event-info span {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Footer del evento */
+.event-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-btn-yes-bg);
+  letter-spacing: 0.5px;
+}
+
+/* Sin eventos */
+.no-events {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.no-events p {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+/* Sección Acerca de Nosotros */
+.about-section {
+  padding: 80px 20px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #111 100%);
+}
+
+.about-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.about-header h2 {
+  font-size: 44px;
+  color: var(--color-text);
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.about-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.about-text p {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.8;
+  margin: 0 0 25px 0;
+  text-align: justify;
+  letter-spacing: 0.3px;
+}
+
+.about-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* Sección Misión */
+.mission-section {
+  padding: 80px 20px;
+  background: #0f0f0f;
+}
+
+.mission-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.mission-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  border-radius: 12px;
+  padding: 40px 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.mission-card:hover {
+  background: rgba(74, 144, 226, 0.1);
+  border-color: var(--color-btn-bg);
+  transform: translateY(-10px);
+  box-shadow: 0 10px 30px rgba(74, 144, 226, 0.2);
+}
+
+.mission-icon {
+  font-size: 56px;
+  margin-bottom: 20px;
+}
+
+.mission-card h3 {
+  font-size: 24px;
+  color: var(--color-text);
+  margin: 0 0 15px 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.mission-card p {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Sección Por qué elegirnos */
+.why-us-section {
+  padding: 80px 20px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #111 100%);
+}
+
+.why-us-section h2 {
+  font-size: 44px;
+  color: var(--color-text);
+  text-align: center;
+  margin: 0 0 60px 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+}
+
+.feature-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  border-radius: 12px;
+  padding: 30px 25px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.feature-card:hover {
+  background: rgba(74, 144, 226, 0.1);
+  border-color: var(--color-btn-bg);
+  transform: translateY(-10px);
+  box-shadow: 0 10px 30px rgba(74, 144, 226, 0.2);
+}
+
+.feature-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.feature-card h3 {
+  font-size: 22px;
+  color: var(--color-text);
+  margin: 0 0 10px 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.feature-card p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Sección Descargar */
+.download-section {
+  padding: 80px 20px;
+  background: linear-gradient(135deg, var(--color-btn-bg) 0%, #357abd 100%);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.download-section h2 {
+  font-size: 40px;
+  color: var(--color-text);
+  margin: 0 0 15px 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.download-section p {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 40px 0;
+  letter-spacing: 0.5px;
+}
+
+.download-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.download-btn {
+  padding: 15px 40px;
+  font-size: 16px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--color-text);
+  border: 2px solid var(--color-text);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.download-btn:hover {
+  background: var(--color-text);
+  color: var(--color-btn-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* 📱 Responsive - Tablet */
+@media (max-width: 1024px) {
+  .events-header h2,
+  .coming-soon-header h2,
+  .about-header h2,
+  .why-us-section h2 {
+    font-size: 32px;
+  }
+
+  .events-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  .coming-soon-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .mission-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mission-card {
+    padding: 30px 25px;
+  }
+}
+
+/* 📱 Responsive - Mobile */
+@media (max-width: 768px) {
+  .coming-soon-section,
+  .available-events-section,
+  .about-section,
+  .mission-section,
+  .why-us-section,
+  .download-section {
+    padding: 60px 15px;
+  }
+
+  .coming-soon-header h2,
+  .events-header h2,
+  .about-header h2,
+  .why-us-section h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+
+  .coming-soon-header p,
+  .events-header p {
+    font-size: 15px;
+  }
+
+  .coming-soon-cards {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .coming-card {
+    padding: 30px 20px;
+  }
+
+  .filter-buttons {
+    gap: 10px;
+    margin-bottom: 40px;
+  }
+
+  .filter-btn {
+    padding: 8px 18px;
+    font-size: 12px;
+  }
+
+  .events-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 15px;
+    margin-bottom: 40px;
+  }
+
+  .event-image {
+    height: 160px;
+  }
+
+  .event-content {
+    padding: 15px;
+  }
+
+  .event-content h3 {
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+
+  .artist {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .reserve-btn {
+    padding: 10px 20px;
+    font-size: 12px;
+  }
+
+  .about-text p {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .mission-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .mission-card {
+    padding: 25px 20px;
+  }
+
+  .mission-icon {
+    font-size: 44px;
+  }
+
+  .mission-card h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+
+  .mission-card p {
+    font-size: 14px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .feature-card {
+    padding: 20px 15px;
+  }
+
+  .feature-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+  }
+
+  .feature-card h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .feature-card p {
+    font-size: 13px;
+  }
+
+  .download-section h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+
+  .download-section p {
+    font-size: 15px;
+    margin-bottom: 30px;
+  }
+
+  .download-btn {
+    padding: 12px 30px;
+    font-size: 14px;
+  }
+}
+
+/* 📱 Responsive - Small Mobile */
+@media (max-width: 480px) {
+  .homepage {
+    min-height: auto;
+  }
+
+  .coming-soon-section,
+  .available-events-section,
+  .about-section,
+  .mission-section,
+  .why-us-section,
+  .download-section {
+    padding: 40px 15px;
+  }
+
+  .coming-soon-header h2,
+  .events-header h2,
+  .about-header h2,
+  .why-us-section h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+
+  .coming-soon-header p,
+  .events-header p {
+    font-size: 13px;
+  }
+
+  .coming-soon-cards {
+    gap: 15px;
+  }
+
+  .coming-card {
+    padding: 25px 15px;
+  }
+
+  .coming-card h3 {
+    font-size: 16px;
+    margin-top: 15px;
+  }
+
+  .coming-card p {
+    font-size: 12px;
+  }
+
+  .filter-buttons {
+    gap: 8px;
+    margin-bottom: 30px;
+  }
+
+  .filter-btn {
+    padding: 6px 14px;
+    font-size: 11px;
+  }
+
+  .events-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+
+  .event-image {
+    height: 150px;
+  }
+
+  .event-content {
+    padding: 12px;
+  }
+
+  .event-content h3 {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .artist {
+    font-size: 11px;
+  }
+
+  .event-info {
+    gap: 6px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+  }
+
+  .event-info span {
+    font-size: 11px;
+  }
+
+  .price {
+    font-size: 16px;
+  }
+
+  .reserve-btn {
+    padding: 8px 16px;
+    font-size: 11px;
+  }
+
+  .about-text p {
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+
+  .mission-icon {
+    font-size: 36px;
+  }
+
+  .mission-card h3 {
+    font-size: 18px;
+  }
+
+  .mission-card p {
+    font-size: 13px;
+  }
+
+  .feature-card {
+    padding: 15px 12px;
+  }
+
+  .feature-icon {
+    font-size: 32px;
+  }
+
+  .feature-card h3 {
+    font-size: 16px;
+  }
+
+  .feature-card p {
+    font-size: 12px;
+  }
+
+  .download-section h2 {
+    font-size: 20px;
+  }
+
+  .download-section p {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  .download-btn {
+    padding: 10px 20px;
+    font-size: 12px;
+  }
+
+  .download-buttons {
+    gap: 10px;
+  }
+}
