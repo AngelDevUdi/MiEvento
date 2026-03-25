@@ -13,7 +13,7 @@ const LandingPage = () => {
       <section className="hero-section">
         <div className="hero-content">
           <h1>MiEvento</h1>
-          <p>Tu plataforma de confianza para descubrir y reservar los mejores eventos</p>
+          <p>Tus plataforma de confianza para descubrir y reservar los mejores eventos</p>
         </div>
       </section>
 
