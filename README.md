@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
@@ -68,3 +69,7 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+=======
+# MiEvento
+MiEvento es una aplicación web desarrollada como proyecto de grado, enfocada en la autogestión de eventos para pequeñas y medianas empresas (PYMES).  La plataforma permite a las empresas organizar, administrar y dar seguimiento a sus eventos de manera eficiente, centralizando la información en un solo sistema digital.
+>>>>>>> 2c0d850a6ee6e512b6620cf830d4c65edff82b80
