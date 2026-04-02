@@ -126,7 +126,7 @@ const Navbar = () => {
 
           {/* 🔥 Menú */}
           <ul className={`navbar-menu ${open ? "active" : ""}`}>
-            <li><a href="/" onClick={handleMenuClick}>Inicio</a></li>
+            <li><a href="/" onClick={(e) => { e.preventDefault(); window.location.reload(); handleMenuClick(); }}>Inicio</a></li>
             <li><a href="#eventos" onClick={handleMenuClick}>Eventos</a></li>
 
             <li ref={dropdownRef}>
