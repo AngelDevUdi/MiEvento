@@ -1,36 +1,72 @@
 import React, { useState } from "react";
+import "./resetpassword.css";
+import { toast } from "react-toastify";
+import { auth } from "../../api/api";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { FaEnvelope } from "react-icons/fa";
 
-const ResetPassword = () => {
+const ResetPassword = ({ onClose, onSwitchToLogin }) => {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    setEmail(e.target.value.toLowerCase());
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Reset password:", email);
+
+    const cleanEmail = email.trim().toLowerCase();
+
+    if (!cleanEmail) return toast.error("Ingresa tu correo");
+
+    try {
+      setLoading(true);
+
+      await sendPasswordResetEmail(auth, cleanEmail);
+
+      toast.success("Correo enviado con instrucciones");
+      setEmail("");
+      onClose();
+    } catch (error) {
+      toast.error("Error al enviar el correo");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="auth-container">
-      <form className="auth-box" onSubmit={handleSubmit}>
-        <h2>Recuperar contraseña</h2>
+    <div className="auth-overlay" onClick={onClose}>
+      <div className="auth-container" onClick={(e) => e.stopPropagation()}>
+        <button className="close-btn" onClick={onClose}>✕</button>
 
-        <p>
-          Ingresa tu correo y te enviaremos instrucciones para restablecer tu contraseña.
-        </p>
+        <form className="auth-box" onSubmit={handleSubmit}>
+          <h2>Recuperar contraseña</h2>
+          <p className="subtitle">Ingresa tu correo y te enviaremos instrucciones</p>
 
-        <input
-          type="email"
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+          {/* Email */}
+          <div className="input-group">
+            <FaEnvelope className="input-icon" />
+            <input
+              type="email"
+              name="email"
+              placeholder=" "
+              value={email}
+              onChange={handleChange}
+              required
+            />
+            <label>Correo electrónico</label>
+          </div>
 
-        <button type="submit">Enviar</button>
+          <button type="submit" disabled={loading}>
+            {loading ? <span className="loader"></span> : "Enviar"}
+          </button>
 
-        <p className="auth-link">
-          <a href="#">Volver al login</a>
-        </p>
-      </form>
+          <p className="auth-link">
+            <span onClick={onSwitchToLogin}>Volver al login</span>
+          </p>
+        </form>
+      </div>
     </div>
   );
 };

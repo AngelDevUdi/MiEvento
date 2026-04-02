@@ -1,0 +1,208 @@
+/* 🔥 Overlay */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease;
+}
+
+/* 🔥 Contenedor */
+.auth-container {
+  width: 100%;
+  max-width: 380px;
+  animation: scaleIn 0.3s ease;
+}
+
+/* 🔥 Caja */
+.auth-box {
+  background: rgba(20,20,20,0.95);
+  border-radius: 15px;
+  padding: 30px;
+  color: white;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+}
+
+/* 🔥 Título */
+.auth-box h2 {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.7;
+  margin-bottom: 25px;
+}
+
+/* 🔥 INPUT GROUP */
+.input-group {
+  position: relative;
+  margin-bottom: 22px;
+}
+
+/* 🔥 INPUT */
+.input-group input {
+  width: 100%;
+  padding: 18px 12px 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: transparent;
+  color: white;
+  font-size: 14px;
+  outline: none;
+  transition: 0.3s;
+}
+
+/* 🔥 LABEL SMOOTH */
+.input-group label {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%) scale(1);
+  font-size: 15px;
+  color: #aaa;
+  transition: all 0.25s ease;
+  
+  /* 🔥 efecto corte borde */
+  padding: 0 6px;
+  background: rgba(20,20,20,0.95);
+  border-radius: 4px;
+}
+
+/* 🔥 FLOAT LABEL - FOCUS */
+.input-group input:focus + label {
+  top: -9px;
+  left: 10px;
+  font-size: 12px;
+  color: #00d4ff;
+  transform: translateY(0) scale(0.85);
+}
+
+/* 🔥 FLOAT LABEL - FILLED */
+.input-group input:not(:placeholder-shown) + label {
+  top: -9px;
+  left: 10px;
+  font-size: 12px;
+  color: #00d4ff;
+  transform: translateY(0) scale(0.85);
+}
+
+/* 🔥 FOCUS */
+.input-group input:focus {
+  border-color: #00d4ff;
+  box-shadow: 0 0 10px rgba(0,212,255,0.3);
+}
+
+/* 🔥 PASSWORD TOGGLE */
+.password-group {
+  position: relative;
+}
+
+.toggle-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 16px;
+  color: #aaa;
+}
+
+.toggle-btn:hover {
+  color: #00d4ff;
+}
+
+/* 🔥 BOTÓN */
+.auth-box button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, #00d4ff, #007cf0);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.auth-box button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,212,255,0.4);
+}
+
+.auth-box button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* 🔥 LOADER */
+.loader {
+  width: 18px;
+  height: 18px;
+  border: 2px solid white;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+/* 🔥 LINKS */
+.auth-link {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.auth-link span {
+  color: #00d4ff;
+  cursor: pointer;
+}
+
+.auth-link.small {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+/* 🔥 CLOSE */
+.close-btn {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-size: 22px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.close-btn:hover {
+  transform: scale(1.2);
+}
+
+/* 🔥 ANIMACIONES */
+@keyframes fadeIn {
+  from { opacity: 0 }
+  to { opacity: 1 }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

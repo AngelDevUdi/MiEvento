@@ -1,44 +1,210 @@
-/* Navbar base */
+/* 🔥 Navbar base */
 .navbar {
-  background: #111;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(12px);
+  background: rgba(15, 15, 15, 0.7);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
   color: white;
-  padding: 0 20px;
 }
 
 /* Contenedor */
 .navbar-container {
   max-width: 1100px;
   margin: auto;
-  height: 60px;
+  height: 65px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 10px;
 }
 
 /* Logo */
 .navbar-logo {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.navbar-logo:hover {
+  transform: scale(1.05);
+  color: #00d4ff;
 }
 
 /* Menú */
 .navbar-menu {
   display: flex;
   list-style: none;
-  gap: 20px;
+  gap: 25px;
+  align-items: center;
 }
 
+/* Links con animación underline */
 .navbar-menu li a {
+  position: relative;
   color: white;
   text-decoration: none;
-  transition: 0.2s;
+  font-weight: 500;
+  padding: 5px 0;
+  transition: 0.3s;
+}
+
+.navbar-menu li a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 0%;
+  height: 2px;
+  background: #00d4ff;
+  transition: width 0.3s ease;
+}
+
+.navbar-menu li a:hover::after {
+  width: 100%;
 }
 
 .navbar-menu li a:hover {
+  color: #00d4ff;
+}
+
+/* 🔥 Usuario */
+.user-icon-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.welcome-button-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.user-icon {
+  font-size: 20px;
+  transition: 0.3s;
+}
+
+.user-icon:hover {
+  transform: scale(1.2);
+  color: #00d4ff;
+}
+
+/* 🔥 Dropdown animado */
+.dropdown {
+  position: absolute;
+  top: 135%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30,30,30,0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  padding: 10px;
+  min-width: 160px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+  text-align: center;
+
+  opacity: 1;
+  pointer-events: auto;
+  transition: 0.3s ease;
+}
+
+/* Pico del dropdown */
+.dropdown::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid rgba(30,30,30,0.9);
+}
+
+.dropdown div,
+.dropdown button {
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: white;
+  width: 100%;
+  transition: 0.2s;
+}
+
+.dropdown div:hover,
+.dropdown button:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* 🔥 Botón */
+.welcome-button {
+  background: linear-gradient(135deg, #00d4ff, #007cf0);
+  border: none;
+  padding: 12px 24px; /* 🔥 más grande */
+  border-radius: 30px; /* 🔥 más elegante */
+  color: white;
+  font-weight: 600;
+  font-size: 15px; /* 🔥 más legible */
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  display: flex;
+  align-items: center;
+  gap: 8px; /* 🔥 por si agregas icono */
+
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+.welcome-button:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.5);
+}
+
+.welcome-button:active {
+  transform: scale(0.95);
+}
+.welcome-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #00d4ff, #007cf0);
+  filter: blur(15px);
+  opacity: 0;
+  transition: 0.3s;
+  z-index: -1;
+}
+
+.welcome-button:hover::after {
   opacity: 0.7;
 }
 
-/* Hamburguesa */
+/* 🔥 Tooltip mejorado */
+.tooltip {
+  position: absolute;
+  top: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.3s;
+}
+
+.tooltip.show {
+  opacity: 1;
+}
+
+/* 🔥 Hamburguesa */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -53,6 +219,17 @@
   transition: 0.3s;
 }
 
+/* Animación X */
+.hamburger.active span:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+.hamburger.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+
 /* 📱 Responsive */
 @media (max-width: 768px) {
 
@@ -60,32 +237,21 @@
     display: flex;
   }
 
-  .hamburger.active span:nth-child(1) {
-    transform: rotate(45deg) translate(8px, 8px);
-  }
-
-  .hamburger.active span:nth-child(2) {
-    opacity: 0;
-  }
-
-  .hamburger.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -7px);
-  }
-
   .navbar-menu {
     position: fixed;
-    top: 60px;
+    top: 65px;
     right: -100%;
     width: 100%;
-    height: calc(100vh - 60px);
-    background: #111;
+    height: calc(100vh - 65px);
+
+    background: rgba(15,15,15,0.95);
+    backdrop-filter: blur(10px);
+
     flex-direction: column;
     align-items: center;
     padding-top: 40px;
-    z-index: 999;
-    transition: right 0.3s ease-in-out;
-    box-shadow: -2px 0 15px rgba(0, 0, 0, 0.5);
-    overflow-y: auto;
+
+    transition: 0.4s ease;
   }
 
   .navbar-menu.active {
@@ -93,14 +259,25 @@
   }
 
   .navbar-menu li {
-    padding: 20px 0;
-    width: 100%;
-    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.4s forwards;
   }
 
-  .navbar-menu li a {
-    display: block;
-    font-size: 18px;
-    font-weight: 500;
+  .navbar-menu.active li:nth-child(1) { animation-delay: 0.1s; }
+  .navbar-menu.active li:nth-child(2) { animation-delay: 0.2s; }
+  .navbar-menu.active li:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes fadeUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
+}
+/* Navbar cuando haces scroll */
+.navbar.scrolled {
+  background: rgba(10,10,10,0.9);
+  backdrop-filter: blur(15px);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.4);
 }
