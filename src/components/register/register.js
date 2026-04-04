@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import "./register.css";
 import { toast } from "react-toastify";
-import { auth } from "../../api/api";
+import { auth, db } from "../../api/api";
 import {
   createUserWithEmailAndPassword,
   updateProfile,
   setPersistence,
   browserLocalPersistence,
 } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -72,6 +73,12 @@ const Register = ({ onClose, onSwitchToLogin }) => {
 
       await updateProfile(userCredential.user, {
         displayName: name,
+      });
+
+      await setDoc(doc(db, "USUARIOS", userCredential.user.uid), {
+        name: name,
+        email: email,
+        rol: "USUARIO"
       });
 
       toast.success("Cuenta creada");

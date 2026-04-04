@@ -1,0 +1,40 @@
+.reservas-section {
+  margin-top: 2rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.reservas-section h2 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.reservas-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.reserva-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.reserva-card h3 {
+  margin: 0 0 0.5rem 0;
+  color: #28a745;
+}
+
+.reserva-card p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.reservas-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}

@@ -4,7 +4,7 @@ import Navbar from "../navbar/navbar";
 import Sliders from "../sliders/sliders";
 import Footer from "../footer/footer";
 
-const HomePage = () => {
+const HomePage = ({ onViewChange }) => {
   // Estado para filtrar eventos
   const [activeFilter, setActiveFilter] = useState("todos");
 
@@ -80,7 +80,7 @@ const HomePage = () => {
   return (
     <div className="homepage">
       {/* Navbar */}
-      <Navbar />
+      <Navbar onViewChange={onViewChange} />
 
       {/* Slider de Eventos */}
       <section className="slider-section">

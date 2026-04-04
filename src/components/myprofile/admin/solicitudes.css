@@ -1,0 +1,198 @@
+/* OVERLAY */
+.soladm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: soladm-fadeIn 0.3s ease;
+}
+
+/* MODAL */
+.soladm-modal {
+  width: 900px;
+  max-width: 95%;
+  height: 500px;
+  display: flex;
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(24,24,27,0.9);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  animation: soladm-scaleIn 0.3s ease;
+}
+
+/* COLUMNAS */
+.soladm-left {
+  width: 35%;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  padding: 20px;
+}
+
+.soladm-right {
+  flex: 1;
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* INPUT */
+.soladm-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: #18181b;
+  color: white;
+  margin-bottom: 15px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.soladm-input:focus {
+  box-shadow: 0 0 0 2px #3b82f6;
+}
+
+/* RESULTADOS */
+.soladm-results {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+/* ITEM */
+.soladm-result-item {
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #d4d4d8;
+  transition: 0.2s;
+}
+
+.soladm-result-item:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.soladm-result-item.active {
+  background: #3b82f6;
+  color: white;
+}
+
+/* DETALLE */
+.soladm-detail {
+  width: 100%;
+  animation: soladm-fadeIn 0.3s ease;
+}
+
+.soladm-detail h2 {
+  margin-bottom: 10px;
+}
+
+.soladm-detail p {
+  margin: 6px 0;
+  color: #cfcfd4;
+}
+
+/* FECHAS */
+.soladm-dates {
+  display: flex;
+  gap: 12px;
+  margin: 15px 0;
+}
+
+.soladm-date-group {
+  flex: 1;
+}
+
+.soladm-date-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #d4d4d8;
+  font-size: 0.9em;
+}
+
+.soladm-date-input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #18181b;
+  color: white;
+  outline: none;
+  transition: 0.2s;
+}
+
+.soladm-date-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.soladm-months {
+  margin: 10px 0;
+  padding: 10px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 8px;
+  color: #93c5fd;
+}
+
+/* BOTONES */
+.soladm-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.soladm-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  transition: 0.25s;
+}
+
+.soladm-approve {
+  background: linear-gradient(135deg,#22c55e,#16a34a);
+}
+
+.soladm-approve:hover {
+  box-shadow: 0 0 15px rgba(34,197,94,0.6);
+}
+
+.soladm-reject {
+  background: linear-gradient(135deg,#ef4444,#dc2626);
+}
+
+.soladm-reject:hover {
+  box-shadow: 0 0 15px rgba(239,68,68,0.6);
+}
+
+/* VACÍO */
+.soladm-empty {
+  color: #a1a1aa;
+}
+
+/* LOADING */
+.soladm-loading {
+  color: white;
+  text-align: center;
+}
+
+/* ANIMACIONES */
+@keyframes soladm-fadeIn {
+  from {opacity:0}
+  to {opacity:1}
+}
+
+@keyframes soladm-scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

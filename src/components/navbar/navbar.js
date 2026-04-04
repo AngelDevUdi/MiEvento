@@ -9,7 +9,7 @@ import ResetPassword from "../resetpassword/resetpassword.js";
 import EventLoading from "../loading/EventLoading.js";
 import "./navbar.css";
 
-const Navbar = () => {
+const Navbar = ({ onViewChange }) => {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -71,6 +71,10 @@ const Navbar = () => {
       setShowDropdown(false);
       setIsLoggingOut(false);
       toast.success("Sesión cerrada");
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     }, 2000);
   };
 
@@ -139,7 +143,7 @@ const Navbar = () => {
 
                   {showDropdown && (
                     <div className="dropdown">
-                      <div>Perfil</div>
+                      <div onClick={() => { onViewChange('profile'); setShowDropdown(false); }}>Perfil</div>
                       <div onClick={handleLogout}>Cerrar sesión</div>
                     </div>
                   )}

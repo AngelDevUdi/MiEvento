@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import HomePage from './components/homepages/homepage';
+import MyProfile from './components/myprofile/myprofile';
 import EventLoading from './components/loading/EventLoading';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
+  const [currentView, setCurrentView] = useState('home');
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -18,7 +20,13 @@ function App() {
 
   return (
     <div className="App">
-      {isLoading ? <EventLoading /> : <HomePage />}
+      {isLoading ? (
+        <EventLoading />
+      ) : currentView === 'home' ? (
+        <HomePage onViewChange={setCurrentView} />
+      ) : (
+        <MyProfile onViewChange={setCurrentView} />
+      )}
       <ToastContainer
         position="top-right"
         autoClose={3000}

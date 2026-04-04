@@ -1,4 +1,20 @@
-/* Overlay */
+/* Variables dark mode */
+:root {
+  --color-overlay: rgba(0, 0, 0, 0.6);
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-text: #e4e4e7;
+
+  --color-btn-bg: #27272a;
+  --color-btn-bg-hover: #3f3f46;
+
+  --color-btn-yes-bg: linear-gradient(135deg, #22c55e, #16a34a);
+  --color-btn-yes-bg-hover: linear-gradient(135deg, #16a34a, #15803d);
+
+  --color-btn-no-bg: linear-gradient(135deg, #ef4444, #dc2626);
+  --color-btn-no-bg-hover: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+/* Overlay con blur */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -6,58 +22,69 @@
   width: 100%;
   height: 100%;
   background: var(--color-overlay);
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeIn 0.3s ease;
 }
 
-/* Caja del modal */
+/* Caja del modal (glassmorphism) */
 .modal-box {
-  background: #fff;
-  padding: 24px;
-  border-radius: 12px;
+  background: rgba(24, 24, 27, 0.85);
+  backdrop-filter: blur(20px);
+  padding: 28px;
+  border-radius: 16px;
   border: 1px solid var(--color-border);
   width: 90%;
   max-width: 420px;
   text-align: center;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  animation: scaleIn 0.3s ease;
 }
 
 /* Título */
 .modal-box h2 {
   margin-bottom: 10px;
-  color: var(--color-text);
+  color: white;
+  font-size: 1.4rem;
 }
 
 /* Texto */
 .modal-box p {
-  margin-bottom: 20px;
+  margin-bottom: 22px;
   color: var(--color-text);
-  opacity: 0.8;
+  opacity: 0.75;
+  font-size: 0.95rem;
 }
 
 /* Contenedor de botones */
 .modal-buttons {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   justify-content: center;
 }
 
 /* Botón base */
 .btn {
-  padding: 10px 16px;
+  padding: 10px 18px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   color: white;
+  font-weight: 500;
   background: var(--color-btn-bg);
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Hover base */
+/* Efecto glow hover */
 .btn:hover {
+  transform: translateY(-2px) scale(1.03);
   background: var(--color-btn-bg-hover);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
 }
 
 /* Botón confirmar */
@@ -67,6 +94,7 @@
 
 .btn-yes:hover {
   background: var(--color-btn-yes-bg-hover);
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
 }
 
 /* Botón cancelar */
@@ -76,4 +104,26 @@
 
 .btn-no:hover {
   background: var(--color-btn-no-bg-hover);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
 }
