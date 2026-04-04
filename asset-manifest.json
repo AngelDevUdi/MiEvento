@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/MiEvento/static/css/main.5c8d3e80.css",
-    "main.js": "/MiEvento/static/js/main.5ac9c969.js",
+    "main.css": "/MiEvento/static/css/main.48eb7d1e.css",
+    "main.js": "/MiEvento/static/js/main.567e7149.js",
     "static/js/453.ec6ba873.chunk.js": "/MiEvento/static/js/453.ec6ba873.chunk.js",
     "index.html": "/MiEvento/index.html",
-    "main.5c8d3e80.css.map": "/MiEvento/static/css/main.5c8d3e80.css.map",
-    "main.5ac9c969.js.map": "/MiEvento/static/js/main.5ac9c969.js.map",
+    "main.48eb7d1e.css.map": "/MiEvento/static/css/main.48eb7d1e.css.map",
+    "main.567e7149.js.map": "/MiEvento/static/js/main.567e7149.js.map",
     "453.ec6ba873.chunk.js.map": "/MiEvento/static/js/453.ec6ba873.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.5c8d3e80.css",
-    "static/js/main.5ac9c969.js"
+    "static/css/main.48eb7d1e.css",
+    "static/js/main.567e7149.js"
   ]
 }
