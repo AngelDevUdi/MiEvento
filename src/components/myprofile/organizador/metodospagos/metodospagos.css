@@ -1,0 +1,130 @@
+/* Métodos de Pagos */
+.metodos-list {
+  margin-bottom: 30px;
+}
+
+.metodos-list h4 {
+  color: var(--color-text);
+  margin-bottom: 15px;
+}
+
+.metodo-card {
+  background: #1a1a1a;
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.metodo-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.metodo-card-header strong {
+  color: var(--color-text);
+}
+
+.edit-btn {
+  background: var(--color-btn-bg);
+  color: var(--color-text);
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.edit-btn:hover {
+  background: var(--color-btn-bg-hover);
+}
+
+.metodo-card p {
+  color: rgba(255, 255, 255, 0.8);
+  margin: 5px 0;
+}
+
+.qr-preview {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.qr-preview img {
+  max-width: 150px;
+  max-height: 150px;
+  border-radius: 8px;
+}
+
+.transferencia-info {
+  margin-top: 10px;
+}
+
+.transferencia-info p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.metodo-form {
+  background: #1a1a1a;
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.metodo-form .form-group {
+  margin-bottom: 15px;
+}
+
+.metodo-form label {
+  display: block;
+  color: var(--color-text);
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.metodo-form input,
+.metodo-form select,
+.metodo-form textarea {
+  width: 100%;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(74, 144, 226, 0.3);
+  border-radius: 4px;
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+.metodo-form input:focus,
+.metodo-form select:focus,
+.metodo-form textarea:focus {
+  outline: none;
+  border-color: var(--color-btn-bg);
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.metodo-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.submit-btn {
+  background: var(--color-btn-bg);
+  color: var(--color-text);
+  border: none;
+  padding: 12px 30px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  width: 100%;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+  background: var(--color-btn-bg-hover);
+  transform: scale(1.02);
+}

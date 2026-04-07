@@ -1,0 +1,17 @@
+@import "../../../resources/colors/colors.css";
+
+/* Sección Descargar */
+.download-section {
+  padding: 80px 20px;
+  background: linear-gradient(135deg, var(--color-btn-bg) 0%, #357abd 100%);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.download-section h2 {
+  font-size: 40px;
+  color: var(--color-text);
+  margin: 0 0 15px 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+}

@@ -8,7 +8,13 @@ import Entradas from "./users/entradas";
 import Reservas from "./users/reservas";
 import Solicitudes from "./admin/solicitudes";
 import Asignar from "./admin/asignar";
-import { FaClipboardList, FaUserCog } from "react-icons/fa";
+import Eventos from "./organizador/eventos";
+import Lugares from "./organizador/lugares";
+import MetodosPagos from "./organizador/metodospagos/metodospagos";
+import SolicitudesBoletas from "./organizador/solicitudesboletas/solicitudesboletas";
+import Porteros from "./organizador/porteros/porteros";
+import EscanearBoletas from "./porteros/EscanearBoletas";
+import { FaClipboardList, FaUserCog, FaCreditCard, FaTicketAlt, FaDoorOpen } from "react-icons/fa";
 import { toast } from "react-toastify";
 import ConfirmationModal from "../confirmationmodal/confirmationmodal";
 import EventLoading from "../loading/EventLoading";
@@ -113,11 +119,12 @@ const MyProfile = ({ onViewChange }) => {
       <Navbar onViewChange={onViewChange} />
       <div className="myprofile-content">
         <h1>Mi Perfil</h1>
+        <h2>Bienvenido, {(userData?.name || user?.displayName)?.charAt(0).toUpperCase() + (userData?.name || user?.displayName)?.slice(1)}</h2>
         
         
         {userData?.rol === "USUARIO" && (
           <div className="user-sections">
-            <Entradas userEmail={user.email} />
+            <Entradas userId={user.uid} />
             <Reservas userEmail={user.email} />
           </div>
         )}
@@ -144,6 +151,59 @@ const MyProfile = ({ onViewChange }) => {
             {activeSection === 'solicitudes' && <Solicitudes onClose={() => setActiveSection(null)} />}
             {activeSection === 'asignar' && <Asignar onClose={() => setActiveSection(null)} />}
           </div>
+        )}
+
+        {userData?.rol === "ORGANIZADOR" && (
+          <div className="organizador-info">
+            <p>Licencia de organizador vigente hasta 7 de mayo del 2026. <span className="days-remaining">Días restantes: {Math.ceil((new Date("2026-05-07") - new Date()) / (1000 * 60 * 60 * 24))}</span></p>
+            <div className="organizador-buttons">
+              <button 
+                className={`organizador-btn ${activeSection === 'eventos' ? 'active' : ''}`}
+                onClick={() => setActiveSection(activeSection === 'eventos' ? null : 'eventos')}
+              >
+                <FaClipboardList className="organizador-icon" />
+                <span>Crear Evento</span>
+              </button>
+              <button 
+                className={`organizador-btn ${activeSection === 'lugares' ? 'active' : ''}`}
+                onClick={() => setActiveSection(activeSection === 'lugares' ? null : 'lugares')}
+              >
+                <FaUserCog className="organizador-icon" />
+                <span>Gestionar Lugares</span>
+              </button>
+              <button 
+                className={`organizador-btn ${activeSection === 'metodospagos' ? 'active' : ''}`}
+                onClick={() => setActiveSection(activeSection === 'metodospagos' ? null : 'metodospagos')}
+              >
+                <FaCreditCard className="organizador-icon" />
+                <span>Métodos de Pago</span>
+              </button>
+              <button 
+                className={`organizador-btn ${activeSection === 'solicitudesboletas' ? 'active' : ''}`}
+                onClick={() => setActiveSection(activeSection === 'solicitudesboletas' ? null : 'solicitudesboletas')}
+              >
+                <FaTicketAlt className="organizador-icon" />
+                <span>Solicitudes de Boletas</span>
+              </button>
+              <button 
+                className={`organizador-btn ${activeSection === 'porteros' ? 'active' : ''}`}
+                onClick={() => setActiveSection(activeSection === 'porteros' ? null : 'porteros')}
+              >
+                <FaDoorOpen className="organizador-icon" />
+                <span>Gestión de Porteros</span>
+              </button>
+            </div>
+            
+            {activeSection === 'eventos' && <Eventos userId={user.uid} onClose={() => setActiveSection(null)} />}
+            {activeSection === 'lugares' && <Lugares userId={user.uid} onClose={() => setActiveSection(null)} />}
+            {activeSection === 'metodospagos' && <MetodosPagos userId={user.uid} onClose={() => setActiveSection(null)} />}
+            {activeSection === 'solicitudesboletas' && <SolicitudesBoletas userId={user.uid} onClose={() => setActiveSection(null)} />}
+            {activeSection === 'porteros' && <Porteros userId={user.uid} onClose={() => setActiveSection(null)} />}
+          </div>
+        )}
+
+        {userData?.rol === "PORTERO" && (
+          <EscanearBoletas userId={user.uid} />
         )}
 
         {userData?.rol === "USUARIO" && (

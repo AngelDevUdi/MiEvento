@@ -1,0 +1,207 @@
+@import "../../../resources/colors/colors.css";
+
+/* Sección Eventos Disponibles */
+.available-events-section {
+  padding: 80px 20px;
+  background: #0f0f0f;
+}
+
+.events-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.events-header h2 {
+  font-size: 44px;
+  color: var(--color-text);
+  margin: 0 0 15px 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.events-header p {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+/* Botones de filtro */
+.filter-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 50px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 10px 25px;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text);
+  border: 1px solid rgba(74, 144, 226, 0.3);
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-btn:hover {
+  background: rgba(74, 144, 226, 0.1);
+  border-color: var(--color-btn-bg);
+}
+
+.filter-btn.active {
+  background: var(--color-btn-bg);
+  border-color: var(--color-btn-bg);
+  box-shadow: 0 0 15px rgba(74, 144, 226, 0.5);
+}
+
+/* Grid de eventos */
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+  margin-bottom: 60px;
+}
+
+/* Card de evento */
+.event-card {
+  background: #1a1a1a;
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.event-card:hover {
+  border-color: var(--color-btn-bg);
+  box-shadow: 0 10px 30px rgba(74, 144, 226, 0.2);
+  transform: translateY(-8px);
+}
+
+/* Imagen del evento */
+.event-image {
+  width: 100%;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.event-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.event-card:hover .event-overlay {
+  opacity: 1;
+}
+
+.reserve-btn {
+  padding: 12px 30px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--color-btn-bg);
+  color: var(--color-text);
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reserve-btn:hover {
+  background: var(--color-btn-bg-hover);
+  transform: scale(1.05);
+}
+
+/* Contenido del evento */
+.event-content {
+  padding: 20px;
+}
+
+.event-content h3 {
+  font-size: 18px;
+  color: var(--color-text);
+  margin: 0 0 8px 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.artist {
+  font-size: 13px;
+  color: var(--color-btn-bg);
+  margin: 0 0 15px 0;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Información del evento */
+.event-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.event-info span {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.maps-btn {
+  margin-left: 8px;
+  color: var(--color-btn-bg);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.maps-btn:hover {
+  color: var(--color-btn-bg-hover);
+}
+
+/* Footer del evento */
+.event-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.5px;
+}
+
+/* Sin eventos */
+.no-events {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.no-events p {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}

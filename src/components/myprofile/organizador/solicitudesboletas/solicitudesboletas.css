@@ -1,0 +1,112 @@
+/* Solicitudes de Boletas */
+.solicitudes-list {
+  margin-top: 20px;
+}
+
+.solicitud-card {
+  background: #1a1a1a;
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.solicitud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.solicitud-header h4 {
+  color: var(--color-text);
+  margin: 0;
+  font-size: 18px;
+}
+
+.estado-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.estado-pendiente {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.estado-aprobada {
+  background: rgba(40, 167, 69, 0.2);
+  color: #28a745;
+}
+
+.estado-rechazada {
+  background: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+}
+
+.solicitud-info p {
+  color: rgba(255, 255, 255, 0.8);
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.solicitud-info a {
+  color: var(--color-btn-bg);
+  text-decoration: none;
+}
+
+.solicitud-info a:hover {
+  text-decoration: underline;
+}
+
+.solicitud-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.approve-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.approve-btn:hover {
+  background: #218838;
+}
+
+.reject-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.reject-btn:hover {
+  background: #c82333;
+}
+
+.no-solicitudes {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.no-solicitudes p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 16px;
+  margin: 0;
+}

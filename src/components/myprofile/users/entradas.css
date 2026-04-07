@@ -18,23 +18,85 @@
 
 .entrada-card {
   background: white;
-  padding: 1rem;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
 }
 
-.entrada-card h3 {
-  margin: 0 0 0.5rem 0;
+.boleta-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.boleta-header h3 {
+  margin: 0;
   color: #007bff;
+  font-size: 1.2rem;
 }
 
-.entrada-card p {
-  margin: 0.25rem 0;
-  font-size: 0.9rem;
+.boleta-numero {
+  background: #007bff;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.boleta-info p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.estado-activa {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.boleta-qr {
+  margin-top: 1rem;
+  text-align: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.boleta-qr p {
+  margin: 0 0 0.5rem 0;
+  font-weight: bold;
+  color: #333;
+}
+
+.qr-placeholder {
+  display: inline-block;
+  padding: 1rem;
+  background: white;
+  border: 2px solid #007bff;
+  border-radius: 8px;
+}
+
+.qr-code-display {
+  font-family: monospace;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #007bff;
+  letter-spacing: 2px;
 }
 
 .entradas-loading {
   text-align: center;
   padding: 2rem;
   color: #666;
+}
+
+.entradas-error {
+  text-align: center;
+  padding: 2rem;
+  color: #dc3545;
+  font-weight: bold;
 }

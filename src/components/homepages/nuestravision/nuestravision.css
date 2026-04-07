@@ -1,0 +1,51 @@
+@import "../../../resources/colors/colors.css";
+
+/* Sección Misión */
+.mission-section {
+  padding: 80px 20px;
+  background: #0f0f0f;
+}
+
+.mission-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.mission-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(74, 144, 226, 0.2);
+  border-radius: 12px;
+  padding: 40px 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.mission-card:hover {
+  background: rgba(74, 144, 226, 0.1);
+  border-color: var(--color-btn-bg);
+  transform: translateY(-10px);
+  box-shadow: 0 10px 30px rgba(74, 144, 226, 0.2);
+}
+
+.mission-icon {
+  font-size: 56px;
+  margin-bottom: 20px;
+}
+
+.mission-card h3 {
+  font-size: 24px;
+  color: var(--color-text);
+  margin: 0 0 15px 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.mission-card p {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  line-height: 1.6;
+}
