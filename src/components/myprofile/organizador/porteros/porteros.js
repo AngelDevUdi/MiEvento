@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import { db, auth } from "../../../../api/api";
-import { collection, addDoc, getDocs, query, where, updateDoc, doc, deleteDoc, setDoc } from "firebase/firestore";
+import { collection, getDocs, query, where, updateDoc, doc, deleteDoc, setDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-toastify";
 import "./porteros.css";
@@ -153,92 +154,93 @@ const Porteros = ({ userId, onClose }) => {
     }
   };
 
-  return (
-    <div className="organizador-section">
-      <div className="section-header">
+  return ReactDOM.createPortal(
+    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <button className="close-btn" onClick={onClose}>×</button>
         <h3>Gestión de Porteros</h3>
-        <button onClick={onClose} className="close-btn">×</button>
-      </div>
 
-      {porteros.length > 0 && (
-        <div className="porteros-list">
-          <h4>Porteros registrados</h4>
-          {porteros.map(portero => (
-            <div key={portero.id} className="portero-card">
-              <div className="portero-card-header">
-                <strong>{portero.name}</strong>
-                <div className="portero-actions">
-                  <button type="button" onClick={() => handleEditPortero(portero)} className="edit-btn">Editar</button>
-                  <button type="button" onClick={() => handleDeletePortero(portero.id)} className="delete-btn">Eliminar</button>
+        {porteros.length > 0 && (
+          <div className="porteros-list">
+            <h4>Porteros registrados</h4>
+            {porteros.map(portero => (
+              <div key={portero.id} className="portero-card">
+                <div className="portero-card-header">
+                  <strong>{portero.name}</strong>
+                  <div className="portero-actions">
+                    <button type="button" onClick={() => handleEditPortero(portero)} className="edit-btn">Editar</button>
+                    <button type="button" onClick={() => handleDeletePortero(portero.id)} className="delete-btn">Eliminar</button>
+                  </div>
                 </div>
+                <p><strong>Email:</strong> {portero.email}</p>
+                <p><strong>Establecimiento:</strong> {portero.lugarNombre}</p>
+                <p><strong>Rol:</strong> {portero.rol}</p>
               </div>
-              <p><strong>Email:</strong> {portero.email}</p>
-              <p><strong>Establecimiento:</strong> {portero.lugarNombre}</p>
-              <p><strong>Rol:</strong> {portero.rol}</p>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
 
-      {lugares.length === 0 ? (
-        <div className="no-lugares">
-          <p>No tienes lugares registrados. Crea un lugar primero para poder asignar porteros.</p>
-        </div>
-      ) : (
-        <>
-          <button onClick={() => setShowForm(!showForm)} className="create-btn">
-            {showForm ? "Cancelar" : "Agregar Portero"}
-          </button>
+        {lugares.length === 0 ? (
+          <div className="no-lugares">
+            <p>No tienes lugares registrados. Crea un lugar primero para poder asignar porteros.</p>
+          </div>
+        ) : (
+          <>
+            <button onClick={() => setShowForm(!showForm)} className="create-btn">
+              {showForm ? "Cancelar" : "Agregar Portero"}
+            </button>
 
-          {showForm && (
-            <form onSubmit={handleSubmit} className="portero-form">
-              <div className="form-group">
-                <label>Nombre del Portero:</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
+            {showForm && (
+              <form onSubmit={handleSubmit} className="portero-form">
+                <div className="form-group">
+                  <label>Nombre del Portero:</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
 
-              <div className="form-group">
-                <label>Email del Portero:</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
+                <div className="form-group">
+                  <label>Email del Portero:</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
 
-              <div className="form-group">
-                <label>Establecimiento:</label>
-                <select
-                  name="establecimientoId"
-                  value={formData.establecimientoId}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Seleccionar establecimiento</option>
-                  {lugares.map(lugar => (
-                    <option key={lugar.id} value={lugar.id}>
-                      {lugar.nombre} - {lugar.direccion}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <div className="form-group">
+                  <label>Establecimiento:</label>
+                  <select
+                    name="establecimientoId"
+                    value={formData.establecimientoId}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">Seleccionar establecimiento</option>
+                    {lugares.map(lugar => (
+                      <option key={lugar.id} value={lugar.id}>
+                        {lugar.nombre} - {lugar.direccion}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <button type="submit" className="submit-btn">
-                {editingPorteroId ? "Actualizar Portero" : "Crear Portero"}
-              </button>
-            </form>
-          )}
-        </>
-      )}
-    </div>
+                <button type="submit" className="submit-btn">
+                  {editingPorteroId ? "Actualizar Portero" : "Crear Portero"}
+                </button>
+              </form>
+            )}
+          </>
+        )}
+      </div>
+    </div>,
+    document.body
   );
 };
 

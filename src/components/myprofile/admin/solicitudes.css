@@ -1,8 +1,17 @@
+@import "../../../resources/colors/colors.css";
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 /* OVERLAY */
 .soladm-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background: var(--color-overlay);
   backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
@@ -18,15 +27,35 @@
   display: flex;
   border-radius: 18px;
   overflow: hidden;
-  background: rgba(24,24,27,0.9);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
   box-shadow: 0 20px 60px rgba(0,0,0,0.6);
   animation: soladm-scaleIn 0.3s ease;
+  position: relative;
+}
+
+/* BOTÓN CERRAR */
+.soladm-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--color-text);
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10;
+  transition: var(--transition-fast);
+}
+
+.soladm-close-btn:hover {
+  color: var(--color-accent);
 }
 
 /* COLUMNAS */
 .soladm-left {
   width: 35%;
-  border-right: 1px solid rgba(255,255,255,0.08);
+  border-right: 1px solid var(--color-border);
   padding: 20px;
 }
 
@@ -38,21 +67,60 @@
   justify-content: center;
 }
 
+/* 📱 RESPONSIVE */
+@media (max-width: 768px) {
+  .soladm-modal {
+    flex-direction: column;
+    height: 90vh;
+    max-height: 90vh;
+    overflow-y: auto;
+    width: 95%;
+  }
+
+  .soladm-left {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    padding: 15px;
+    flex-shrink: 0;
+  }
+
+  .soladm-right {
+    width: 100%;
+    padding: 20px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .soladm-results {
+    max-height: 150px;
+    overflow-y: auto;
+  }
+
+  .soladm-detail {
+    width: 100%;
+    overflow-y: auto;
+    max-height: none;
+  }
+}
+
 /* INPUT */
 .soladm-input {
   width: 100%;
   padding: 10px;
   border-radius: 10px;
-  border: none;
-  background: #18181b;
-  color: white;
+  border: 1px solid var(--color-input-border);
+  background: var(--color-input-bg);
+  color: var(--color-text);
   margin-bottom: 15px;
   outline: none;
-  transition: 0.2s;
+  transition: var(--transition-fast);
 }
 
 .soladm-input:focus {
-  box-shadow: 0 0 0 2px #3b82f6;
+  box-shadow: 0 0 0 2px var(--color-input-focus);
 }
 
 /* RESULTADOS */
@@ -66,8 +134,8 @@
   padding: 10px;
   border-radius: 8px;
   cursor: pointer;
-  color: #d4d4d8;
-  transition: 0.2s;
+  color: var(--color-text-muted);
+  transition: var(--transition-fast);
 }
 
 .soladm-result-item:hover {
@@ -75,8 +143,8 @@
 }
 
 .soladm-result-item.active {
-  background: #3b82f6;
-  color: white;
+  background: var(--color-btn-bg);
+  color: var(--color-text);
 }
 
 /* DETALLE */
@@ -87,11 +155,17 @@
 
 .soladm-detail h2 {
   margin-bottom: 10px;
+  color: var(--color-text);
+}
+
+.soladm-subtitle {
+  margin-bottom: 15px;
+  color: var(--color-text);
 }
 
 .soladm-detail p {
   margin: 6px 0;
-  color: #cfcfd4;
+  color: var(--color-text-muted);
 }
 
 /* FECHAS */
@@ -108,7 +182,7 @@
 .soladm-date-group label {
   display: block;
   margin-bottom: 5px;
-  color: #d4d4d8;
+  color: var(--color-text-muted);
   font-size: 0.9em;
 }
 
@@ -116,24 +190,24 @@
   width: 100%;
   padding: 8px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: #18181b;
-  color: white;
+  border: 1px solid var(--color-input-border);
+  background: var(--color-input-bg);
+  color: var(--color-text);
   outline: none;
-  transition: 0.2s;
+  transition: var(--transition-fast);
 }
 
 .soladm-date-input:focus {
-  border-color: #3b82f6;
+  border-color: var(--color-input-focus);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 .soladm-months {
   margin: 10px 0;
   padding: 10px;
-  background: rgba(59, 130, 246, 0.1);
+  background: rgba(56, 189, 248, 0.12);
   border-radius: 8px;
-  color: #93c5fd;
+  color: var(--color-info);
 }
 
 /* BOTONES */
@@ -154,7 +228,7 @@
 }
 
 .soladm-approve {
-  background: linear-gradient(135deg,#22c55e,#16a34a);
+  background: var(--color-btn-yes-bg);
 }
 
 .soladm-approve:hover {
@@ -162,7 +236,7 @@
 }
 
 .soladm-reject {
-  background: linear-gradient(135deg,#ef4444,#dc2626);
+  background: var(--color-btn-no-bg);
 }
 
 .soladm-reject:hover {
@@ -171,12 +245,12 @@
 
 /* VACÍO */
 .soladm-empty {
-  color: #a1a1aa;
+  color: var(--color-text-muted);
 }
 
 /* LOADING */
 .soladm-loading {
-  color: white;
+  color: var(--color-text);
   text-align: center;
 }
 

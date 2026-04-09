@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./myprofile.css";
 import { auth, db } from "../../api/api";
 import { onAuthStateChanged } from "firebase/auth";
-import { query, where, collection, getDocs, addDoc, updateDoc, doc, serverTimestamp, deleteDoc } from "firebase/firestore";
+import { query, where, collection, getDocs, addDoc, updateDoc, doc, serverTimestamp, deleteDoc, onSnapshot } from "firebase/firestore";
 import Navbar from "../navbar/navbar";
 import Entradas from "./users/entradas";
 import Reservas from "./users/reservas";
@@ -28,9 +28,11 @@ const MyProfile = ({ onViewChange }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [solicitudId, setSolicitudId] = useState(null);
   const [confirmTitle, setConfirmTitle] = useState("Confirmación");
+  const [countSolicitudesBoletas, setCountSolicitudesBoletas] = useState(0);
   const [confirmMessage, setConfirmMessage] = useState("");
   const [confirmMode, setConfirmMode] = useState("request");
   const [userDocId, setUserDocId] = useState(null);
+  const [countSolicitudes, setCountSolicitudes] = useState(0);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -50,6 +52,58 @@ const MyProfile = ({ onViewChange }) => {
     });
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "SOLICITUDES"), (snapshot) => {
+      setCountSolicitudes(snapshot.size);
+    });
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (!user || userData?.rol !== "ORGANIZADOR") return;
+
+    let unsubscribeBoletas = null;
+    const eventosQuery = query(collection(db, "EVENTOS"), where("organizadorId", "==", user.uid));
+
+    const unsubscribeEventos = onSnapshot(eventosQuery, (eventosSnapshot) => {
+      const eventoIds = eventosSnapshot.docs.map((doc) => doc.id);
+
+      if (unsubscribeBoletas) {
+        unsubscribeBoletas();
+        unsubscribeBoletas = null;
+      }
+
+      if (eventoIds.length === 0) {
+        setCountSolicitudesBoletas(0);
+        return;
+      }
+
+      if (eventoIds.length <= 10) {
+        const boletasQuery = query(
+          collection(db, "SOLICITUDES_BOLETAS"),
+          where("eventoId", "in", eventoIds),
+          where("estado", "==", "PENDIENTE")
+        );
+        unsubscribeBoletas = onSnapshot(boletasQuery, (snapshot) => {
+          setCountSolicitudesBoletas(snapshot.size);
+        });
+      } else {
+        unsubscribeBoletas = onSnapshot(collection(db, "SOLICITUDES_BOLETAS"), (snapshot) => {
+          const count = snapshot.docs.reduce((acc, doc) => {
+            const data = doc.data();
+            return eventoIds.includes(data.eventoId) && data.estado === "PENDIENTE" ? acc + 1 : acc;
+          }, 0);
+          setCountSolicitudesBoletas(count);
+        });
+      }
+    });
+
+    return () => {
+      if (unsubscribeBoletas) unsubscribeBoletas();
+      unsubscribeEventos();
+    };
+  }, [user, userData?.rol]);
 
   const handleOpenConfirm = () => {
     const newId = Math.floor(100000000000 + Math.random() * 900000000000).toString();
@@ -134,14 +188,15 @@ const MyProfile = ({ onViewChange }) => {
             <div className="admin-buttons">
               <button 
                 className={`admin-btn ${activeSection === 'solicitudes' ? 'active' : ''}`}
-                onClick={() => setActiveSection(activeSection === 'solicitudes' ? null : 'solicitudes')}
+                onClick={() => setActiveSection('solicitudes')}
               >
                 <FaClipboardList className="admin-icon" />
                 <span>Solicitudes</span>
+                {countSolicitudes > 0 && <span className="counter">{countSolicitudes}</span>}
               </button>
               <button 
                 className={`admin-btn ${activeSection === 'asignar' ? 'active' : ''}`}
-                onClick={() => setActiveSection(activeSection === 'asignar' ? null : 'asignar')}
+                onClick={() => setActiveSection('asignar')}
               >
                 <FaUserCog className="admin-icon" />
                 <span>Asignar</span>
@@ -159,35 +214,36 @@ const MyProfile = ({ onViewChange }) => {
             <div className="organizador-buttons">
               <button 
                 className={`organizador-btn ${activeSection === 'eventos' ? 'active' : ''}`}
-                onClick={() => setActiveSection(activeSection === 'eventos' ? null : 'eventos')}
+                onClick={() => setActiveSection('eventos')}
               >
                 <FaClipboardList className="organizador-icon" />
                 <span>Crear Evento</span>
               </button>
               <button 
                 className={`organizador-btn ${activeSection === 'lugares' ? 'active' : ''}`}
-                onClick={() => setActiveSection(activeSection === 'lugares' ? null : 'lugares')}
+                onClick={() => setActiveSection('lugares')}
               >
                 <FaUserCog className="organizador-icon" />
                 <span>Gestionar Lugares</span>
               </button>
               <button 
                 className={`organizador-btn ${activeSection === 'metodospagos' ? 'active' : ''}`}
-                onClick={() => setActiveSection(activeSection === 'metodospagos' ? null : 'metodospagos')}
+                onClick={() => setActiveSection('metodospagos')}
               >
                 <FaCreditCard className="organizador-icon" />
                 <span>Métodos de Pago</span>
               </button>
               <button 
                 className={`organizador-btn ${activeSection === 'solicitudesboletas' ? 'active' : ''}`}
-                onClick={() => setActiveSection(activeSection === 'solicitudesboletas' ? null : 'solicitudesboletas')}
+                onClick={() => setActiveSection('solicitudesboletas')}
               >
                 <FaTicketAlt className="organizador-icon" />
                 <span>Solicitudes de Boletas</span>
+                {countSolicitudesBoletas > 0 && <span className="counter">{countSolicitudesBoletas}</span>}
               </button>
               <button 
                 className={`organizador-btn ${activeSection === 'porteros' ? 'active' : ''}`}
-                onClick={() => setActiveSection(activeSection === 'porteros' ? null : 'porteros')}
+                onClick={() => setActiveSection('porteros')}
               >
                 <FaDoorOpen className="organizador-icon" />
                 <span>Gestión de Porteros</span>
@@ -195,7 +251,7 @@ const MyProfile = ({ onViewChange }) => {
             </div>
             
             {activeSection === 'eventos' && <Eventos userId={user.uid} onClose={() => setActiveSection(null)} />}
-            {activeSection === 'lugares' && <Lugares userId={user.uid} onClose={() => setActiveSection(null)} />}
+            {activeSection === 'lugares' && <Lugares userId={user.uid} onClose={() => setActiveSection(null)} initialShowForm={true} />}
             {activeSection === 'metodospagos' && <MetodosPagos userId={user.uid} onClose={() => setActiveSection(null)} />}
             {activeSection === 'solicitudesboletas' && <SolicitudesBoletas userId={user.uid} onClose={() => setActiveSection(null)} />}
             {activeSection === 'porteros' && <Porteros userId={user.uid} onClose={() => setActiveSection(null)} />}

@@ -8,11 +8,14 @@ const Entradas = ({ userId }) => {
   const [boletas, setBoletas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBoleta, setSelectedBoleta] = useState(null);
+  const [boleteriaUnsubscribers, setBoleteriaUnsubscribers] = useState(new Map());
 
   useEffect(() => {
     if (!userId) {
       setBoletas([]);
       setLoading(false);
+      boleteriaUnsubscribers.forEach(unsub => unsub());
+      setBoleteriaUnsubscribers(new Map());
       return;
     }
 
@@ -21,7 +24,7 @@ const Entradas = ({ userId }) => {
     const solicitudesQuery = query(
       collection(db, "SOLICITUDES_BOLETAS"),
       where("usuarioId", "==", userId),
-      where("estado", "==", "APROBADA")
+      where("estado", "==", "ACTIVADA")
     );
 
     const unsubscribe = onSnapshot(
@@ -62,12 +65,43 @@ const Entradas = ({ userId }) => {
               eventoFecha: evento.fecha?.toDate ? evento.fecha.toDate().toLocaleDateString('es-ES') : evento.fecha || "Sin fecha",
               eventoHora: evento.hora || "",
               lugarNombre: lugar?.nombre || "Lugar desconocido",
-              estado: solicitud.estado || boletaUsuario.estado || "APROBADA"
+              estado: boletaUsuario.estado || solicitud.estado || "ACTIVADA"
             };
           });
 
           const boletasCompletas = (await Promise.all(boletasPromises)).filter((boleta) => boleta !== null);
           setBoletas(boletasCompletas);
+
+          // Limpiar listeners anteriores
+          boleteriaUnsubscribers.forEach(unsub => unsub());
+          setBoleteriaUnsubscribers(new Map());
+
+          // Agregar listeners para cada boleteria única
+          const newUnsubscribers = new Map();
+          const eventoIds = [...new Set(boletasCompletas.map(b => b.eventoId))];
+          eventoIds.forEach(eventoId => {
+            const boleteriaRef = doc(db, "BOLETERIA", eventoId);
+            const unsub = onSnapshot(boleteriaRef, (boleteriaDoc) => {
+              if (boleteriaDoc.exists()) {
+                const boleteriaData = boleteriaDoc.data();
+                setBoletas(prevBoletas =>
+                  prevBoletas.map(boleta => {
+                    if (boleta.eventoId === eventoId && boleteriaData.boletas?.[boleta.id]) {
+                      const updatedBoleta = boleteriaData.boletas[boleta.id];
+                      return {
+                        ...boleta,
+                        ...updatedBoleta,
+                        estado: updatedBoleta.estado
+                      };
+                    }
+                    return boleta;
+                  })
+                );
+              }
+            });
+            newUnsubscribers.set(eventoId, unsub);
+          });
+          setBoleteriaUnsubscribers(newUnsubscribers);
         } catch (error) {
           console.error("Error fetching boletas:", error);
         } finally {
@@ -80,7 +114,10 @@ const Entradas = ({ userId }) => {
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      boleteriaUnsubscribers.forEach(unsub => unsub());
+    };
   }, [userId]);
 
   if (loading) {

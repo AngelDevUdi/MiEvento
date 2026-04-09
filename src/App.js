@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
 import HomePage from './components/homepages/homepage';
 import MyProfile from './components/myprofile/myprofile';
 import EventLoading from './components/loading/EventLoading';

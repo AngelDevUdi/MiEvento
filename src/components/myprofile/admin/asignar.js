@@ -8,6 +8,9 @@ import "./asignar.css";
 const Asignar = ({ onClose }) => {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchType, setSearchType] = useState("name");
+  const [searchValue, setSearchValue] = useState("");
+  const [filteredUsuarios, setFilteredUsuarios] = useState([]);
 
   useEffect(() => {
     const fetchUsuarios = async () => {
@@ -28,6 +31,17 @@ const Asignar = ({ onClose }) => {
 
     fetchUsuarios();
   }, []);
+
+  useEffect(() => {
+    const filtered = usuarios.filter(user => {
+      if (searchType === "name") {
+        return user.name?.toLowerCase().includes(searchValue.toLowerCase());
+      } else {
+        return user.email?.toLowerCase().includes(searchValue.toLowerCase());
+      }
+    });
+    setFilteredUsuarios(filtered);
+  }, [searchValue, searchType, usuarios]);
 
   const handleRoleChange = async (userId, newRole) => {
     try {
@@ -58,10 +72,28 @@ const Asignar = ({ onClose }) => {
       }
     }}>
       <div className="asignar-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="asignar-close-btn" onClick={onClose}>×</button>
         <div className="asignar-section">
           <h2>Asignar Roles</h2>
+          <div className="asignar-search">
+            <select
+              value={searchType}
+              onChange={(e) => setSearchType(e.target.value)}
+              className="search-select"
+            >
+              <option value="name">Buscar por nombre</option>
+              <option value="email">Buscar por correo</option>
+            </select>
+            <input
+              type="text"
+              placeholder={`Buscar por ${searchType === "name" ? "nombre" : "correo"}...`}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              className="search-input"
+            />
+          </div>
           <div className="asignar-list">
-            {usuarios.map(usuario => (
+            {filteredUsuarios.map(usuario => (
               <div key={usuario.id} className="usuario-card">
                 <div className="usuario-info">
                   <h3>{usuario.name}</h3>
@@ -76,6 +108,8 @@ const Asignar = ({ onClose }) => {
                   >
                     <option value="USUARIO">USUARIO</option>
                     <option value="ADMINISTRADOR">ADMINISTRADOR</option>
+                    <option value="PORTERO">PORTERO</option>
+                    <option value="ORGANIZADOR">ORGANIZADOR</option>
                   </select>
                 </div>
               </div>

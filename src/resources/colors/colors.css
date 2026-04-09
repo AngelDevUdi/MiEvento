@@ -1,22 +1,94 @@
 :root {
-  /* Texto */
-  --color-text: #ffffff;
+  /* =========================
+     🎨 COLORES BASE (DARK)
+     ========================= */
+  --color-bg-primary: #0f172a;     /* Fondo principal (azul oscuro elegante) */
+  --color-bg-secondary: #1e293b;   /* Cards / contenedores */
+  --color-bg-tertiary: #334155;    /* Elementos secundarios */
 
-  /* Botón base */
-  --color-btn-bg: #4a90e2;
-  --color-btn-bg-hover: #357abd;
+  /* =========================
+     ✍️ TEXTO
+     ========================= */
+  --color-text: #f1f5f9;           /* Texto principal */
+  --color-text-muted: #94a3b8;     /* Texto secundario */
+  --color-text-inverse: #0f172a;   /* Texto sobre botones claros */
 
-  /* Botón YES */
-  --color-btn-yes-bg: #28a745;
-  --color-btn-yes-bg-hover: #1e7e34;
+  /* =========================
+     🔘 BOTONES GENERALES
+     ========================= */
+  --color-btn-bg: #3b82f6;         /* Azul moderno */
+  --color-btn-bg-hover: #2563eb;
+  --color-btn-bg-active: #1d4ed8;
 
-  /* Botón NO */
-  --color-btn-no-bg: #dc3545;
-  --color-btn-no-bg-hover: #a71d2a;
+  --color-btn-text: #ffffff;
 
-  /* Overlay (fondo oscuro/transparente) */
-  --color-overlay: rgba(0, 0, 0, 0.5);
+  /* =========================
+     ✅ BOTÓN YES (ÉXITO)
+     ========================= */
+  --color-btn-yes-bg: #22c55e;
+  --color-btn-yes-bg-hover: #16a34a;
+  --color-btn-yes-bg-active: #15803d;
 
-  /* Bordes */
-  --color-border: #ff0000;
+  /* =========================
+     ❌ BOTÓN NO (ERROR)
+     ========================= */
+  --color-btn-no-bg: #ef4444;
+  --color-btn-no-bg-hover: #dc2626;
+  --color-btn-no-bg-active: #b91c1c;
+
+  /* =========================
+     ⚠️ ALERTAS / WARNING
+     ========================= */
+  --color-warning: #facc15;
+  --color-warning-dark: #ca8a04;
+
+  /* =========================
+     ℹ️ INFO
+     ========================= */
+  --color-info: #38bdf8;
+  --color-info-dark: #0284c7;
+
+  /* =========================
+     🟣 ACENTO (branding)
+     ========================= */
+  --color-accent: #8b5cf6;
+  --color-accent-hover: #7c3aed;
+
+  /* =========================
+     🧱 BORDES
+     ========================= */
+  --color-border: #334155;
+  --color-border-light: #475569;
+
+  /* =========================
+     🌫️ OVERLAY
+     ========================= */
+  --color-overlay: rgba(0, 0, 0, 0.7);
+
+  /* =========================
+     💡 SOMBRAS (Dark UI)
+     ========================= */
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.8);
+
+  /* =========================
+     🔲 INPUTS / FORMULARIOS
+     ========================= */
+  --color-input-bg: #1e293b;
+  --color-input-border: #475569;
+  --color-input-focus: #3b82f6;
+  --color-placeholder: #64748b;
+
+  /* =========================
+     🔘 ESTADOS HOVER
+     ========================= */
+  --hover-brightness: 1.1;
+  --active-scale: 0.97;
+
+  /* =========================
+     ⏱️ TRANSICIONES
+     ========================= */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
 }

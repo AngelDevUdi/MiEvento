@@ -47,7 +47,7 @@ const Solicitudes = ({ onClose }) => {
   // 🔎 BUSCADOR
   useEffect(() => {
     const result = solicitudes.filter((s) =>
-      s.solicitudId.toLowerCase().includes(searchId.toLowerCase())
+      s.name?.toLowerCase().includes(searchId.toLowerCase())
     );
     setFiltered(result);
   }, [searchId, solicitudes]);
@@ -166,14 +166,15 @@ const Solicitudes = ({ onClose }) => {
       }}
     >
       <div className="soladm-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="soladm-close-btn" onClick={onClose}>×</button>
 
         {/* IZQUIERDA */}
         <div className="soladm-left">
-          <h3 className="soladm-subtitle">Buscar por ID</h3>
+          <h3 className="soladm-subtitle">Buscar por nombre</h3>
 
           <input
             className="soladm-input"
-            placeholder="Escribe el ID..."
+            placeholder="Escribe el nombre..."
             value={searchId}
             onChange={(e) => setSearchId(e.target.value)}
           />
@@ -192,7 +193,7 @@ const Solicitudes = ({ onClose }) => {
                   setDuracion({ años: 0, meses: 0, días: 0 });
                 }}
               >
-                {s.solicitudId}
+                {s.name || s.solicitudId}
               </div>
             ))}
           </div>

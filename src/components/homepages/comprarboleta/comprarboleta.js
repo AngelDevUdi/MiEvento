@@ -3,6 +3,7 @@ import { db, auth } from "../../../api/api";
 import { collection, getDocs, query, where, addDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { toast } from "react-toastify";
+import EventLoading from "../../loading/EventLoading";
 import "./comprarboleta.css";
 
 const ComprarBoleta = ({ eventoId, onClose }) => {
@@ -10,6 +11,7 @@ const ComprarBoleta = ({ eventoId, onClose }) => {
   const [evento, setEvento] = useState(null);
   const [metodosPago, setMetodosPago] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [eventoLoading, setEventoLoading] = useState(true);
   const [formData, setFormData] = useState({
     cantidad: 1,
     metodoPagoId: "",
@@ -36,6 +38,8 @@ const ComprarBoleta = ({ eventoId, onClose }) => {
     } catch (error) {
       console.error("Error fetching evento:", error);
       toast.error("Error al cargar el evento");
+    } finally {
+      setEventoLoading(false);
     }
   };
 
@@ -111,14 +115,8 @@ const ComprarBoleta = ({ eventoId, onClose }) => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="comprar-boleta-modal">
-        <div className="modal-content">
-          <p>Cargando...</p>
-        </div>
-      </div>
-    );
+  if (eventoLoading || loading) {
+    return <EventLoading text="Cargando formulario de compra..." />;
   }
 
   if (!evento) {

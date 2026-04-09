@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import { db } from "../../../../api/api";
 import { collection, addDoc, getDocs, query, where, updateDoc, doc } from "firebase/firestore";
 import { toast } from "react-toastify";
@@ -6,7 +7,7 @@ import "./metodospagos.css";
 
 const MetodosPagos = ({ userId, onClose }) => {
   const [metodos, setMetodos] = useState([]);
-  const [showForm, setShowForm] = useState(false);
+  const [activeSection, setActiveSection] = useState("editar");
   const [editingMetodoId, setEditingMetodoId] = useState(null);
   const [formData, setFormData] = useState({
     tipo: "QR",
@@ -53,7 +54,6 @@ const MetodosPagos = ({ userId, onClose }) => {
       titular: ""
     });
     setEditingMetodoId(null);
-    setShowForm(false);
   };
 
   const handleEditMetodo = (metodo) => {
@@ -67,7 +67,7 @@ const MetodosPagos = ({ userId, onClose }) => {
       titular: metodo.titular || ""
     });
     setEditingMetodoId(metodo.id);
-    setShowForm(true);
+    setActiveSection("crear");
   };
 
   const handleSubmit = async (e) => {
@@ -92,6 +92,7 @@ const MetodosPagos = ({ userId, onClose }) => {
       }
 
       resetForm();
+      setActiveSection("editar");
       fetchMetodos();
     } catch (error) {
       console.error("Error saving metodo:", error);
@@ -99,48 +100,65 @@ const MetodosPagos = ({ userId, onClose }) => {
     }
   };
 
-  return (
-    <div className="organizador-section">
-      <div className="section-header">
+  return ReactDOM.createPortal(
+    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <button className="close-btn" onClick={onClose}>×</button>
         <h3>Métodos de Pago</h3>
-        <button onClick={onClose} className="close-btn">×</button>
-      </div>
-
-      {metodos.length > 0 && (
-        <div className="metodos-list">
-          <h4>Métodos registrados</h4>
-          {metodos.map(metodo => (
-            <div key={metodo.id} className="metodo-card">
-              <div className="metodo-card-header">
-                <strong>{metodo.nombre} ({metodo.tipo})</strong>
-                <button type="button" onClick={() => handleEditMetodo(metodo)} className="edit-btn">Editar</button>
-              </div>
-              <p>{metodo.descripcion}</p>
-              {metodo.tipo === "QR" && metodo.urlQr && (
-                <div className="qr-preview">
-                  <img src={metodo.urlQr} alt="Código QR" />
-                </div>
-              )}
-              {metodo.tipo === "TRANSFERENCIA" && (
-                <div className="transferencia-info">
-                  <p><strong>Banco:</strong> {metodo.banco}</p>
-                  <p><strong>Número de cuenta:</strong> {metodo.numeroCuenta}</p>
-                  <p><strong>Titular:</strong> {metodo.titular}</p>
-                </div>
-              )}
-            </div>
-          ))}
+        <div className="section-switch">
+          <button
+            type="button"
+            className={`switch-btn ${activeSection === "editar" ? "active" : ""}`}
+            onClick={() => {
+              setActiveSection("editar");
+              resetForm();
+            }}
+          >
+            Editar métodos
+          </button>
+          <button
+            type="button"
+            className={`switch-btn ${activeSection === "crear" ? "active" : ""}`}
+            onClick={() => {
+              resetForm();
+              setActiveSection("crear");
+            }}
+          >
+            Crear método
+          </button>
         </div>
-      )}
 
-      <button onClick={() => setShowForm(!showForm)} className="create-btn">
-        {showForm ? "Cancelar" : "Agregar Método de Pago"}
-      </button>
+        {activeSection === "editar" && metodos.length > 0 && (
+          <div className="metodos-list">
+            <h4>Métodos registrados</h4>
+            {metodos.map(metodo => (
+              <div key={metodo.id} className="metodo-card">
+                <div className="metodo-card-header">
+                  <strong>{metodo.nombre} ({metodo.tipo})</strong>
+                  <button type="button" onClick={() => handleEditMetodo(metodo)} className="edit-btn">Editar</button>
+                </div>
+                <p>{metodo.descripcion}</p>
+                {metodo.tipo === "QR" && metodo.urlQr && (
+                  <div className="qr-preview">
+                    <img src={metodo.urlQr} alt="Código QR" />
+                  </div>
+                )}
+                {metodo.tipo === "TRANSFERENCIA" && (
+                  <div className="transferencia-info">
+                    <p><strong>Banco:</strong> {metodo.banco}</p>
+                    <p><strong>Número de cuenta:</strong> {metodo.numeroCuenta}</p>
+                    <p><strong>Titular:</strong> {metodo.titular}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
-      {showForm && (
-        <form onSubmit={handleSubmit} className="metodo-form">
-          <div className="form-group">
-            <label>Tipo de Método:</label>
+        {activeSection === "crear" && (
+          <form onSubmit={handleSubmit} className="metodo-form">
+            <div className="form-group">
+              <label>Tipo de Método:</label>
             <select
               name="tipo"
               value={formData.tipo}
@@ -230,7 +248,9 @@ const MetodosPagos = ({ userId, onClose }) => {
           </button>
         </form>
       )}
-    </div>
+      </div>
+    </div>,
+    document.body
   );
 };
 

@@ -46,7 +46,7 @@ const EscanearBoletas = ({ userId }) => {
 
   const fetchBoletaInfo = async (numeroBoleta, usuarioId) => {
     try {
-      const solicitudesQuery = query(collection(db, "SOLICITUDES_BOLETAS"), where("usuarioId", "==", usuarioId), where("estado", "==", "APROBADA"));
+      const solicitudesQuery = query(collection(db, "SOLICITUDES_BOLETAS"), where("usuarioId", "==", usuarioId), where("estado", "==", "ACTIVADA"));
       const solicitudesSnapshot = await getDocs(solicitudesQuery);
 
       for (const solicitudDoc of solicitudesSnapshot.docs) {
@@ -55,8 +55,9 @@ const EscanearBoletas = ({ userId }) => {
         const boleteriaDoc = await getDoc(boleteriaRef);
 
         if (boleteriaDoc.exists()) {
-          const boleta = boleteriaDoc.data().boletas[solicitudDoc.id];
-          if (boleta && boleta.numeroBoleta === numeroBoleta) {
+          const boleterias = boleteriaDoc.data().boletas;
+          const boleta = boleterias?.[solicitudDoc.id];
+          if (boleta && boleta.numeroBoleta === numeroBoleta && boleta.estado === 'ACTIVA') {
             // Obtener información del evento
             const eventoQuery = query(collection(db, "EVENTOS"), where("__name__", "==", solicitud.eventoId));
             const eventoSnapshot = await getDocs(eventoQuery);
@@ -66,8 +67,9 @@ const EscanearBoletas = ({ userId }) => {
                 ...boleta, 
                 solicitudId: solicitudDoc.id, 
                 eventoId: solicitud.eventoId, 
+                usuarioId: usuarioId,
                 ingresados: boleta.ingresados || 0, 
-                faltantes: boleta.faltantes || boleta.cantidad,
+                faltantes: boleta.faltantes !== undefined ? boleta.faltantes : boleta.cantidad,
                 eventoNombre: evento.nombre,
                 eventoFecha: evento.fecha?.toDate ? evento.fecha.toDate().toLocaleDateString('es-ES') : evento.fecha
               });
@@ -91,12 +93,14 @@ const EscanearBoletas = ({ userId }) => {
       await updateDoc(boleteriaRef, {
         [`boletas.${boletaInfo.solicitudId}.estado`]: 'USADA',
         [`boletas.${boletaInfo.solicitudId}.ingresados`]: boletaInfo.cantidad,
-        [`boletas.${boletaInfo.solicitudId}.faltantes`]: 0
+        [`boletas.${boletaInfo.solicitudId}.faltantes`]: 0,
+        [`boletas.${boletaInfo.solicitudId}.updatedAt`]: new Date()
       });
       toast.success('Todos ingresados');
       setShowModal(false);
       setBoletaInfo(null);
     } catch (error) {
+      console.error(error);
       toast.error('Error al actualizar');
     }
   };
@@ -121,12 +125,14 @@ const EscanearBoletas = ({ userId }) => {
       await updateDoc(boleteriaRef, {
         [`boletas.${boletaInfo.solicitudId}.estado`]: nuevoEstado,
         [`boletas.${boletaInfo.solicitudId}.ingresados`]: nuevosIngresados,
-        [`boletas.${boletaInfo.solicitudId}.faltantes`]: nuevosFaltantes
+        [`boletas.${boletaInfo.solicitudId}.faltantes`]: nuevosFaltantes,
+        [`boletas.${boletaInfo.solicitudId}.updatedAt`]: new Date()
       });
       toast.success(`${cantidadIngresar} persona(s) ingresada(s)`);
       setShowModal(false);
       setBoletaInfo(null);
     } catch (error) {
+      console.error(error);
       toast.error('Error al actualizar');
     }
   };

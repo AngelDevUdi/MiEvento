@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import { db } from "../../../../api/api";
-import { collection, getDocs, query, where, updateDoc, doc, addDoc, getDoc, setDoc } from "firebase/firestore";
+import { collection, getDocs, query, where, updateDoc, doc, getDoc, setDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import "./solicitudesboletas.css";
 
@@ -28,7 +29,13 @@ const SolicitudesBoletas = ({ userId, onClose }) => {
       // Obtener solicitudes de boletas para esos eventos
       const solicitudesQuery = query(collection(db, "SOLICITUDES_BOLETAS"), where("eventoId", "in", eventosIds));
       const solicitudesSnapshot = await getDocs(solicitudesQuery);
-      const solicitudesData = solicitudesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const solicitudesData = solicitudesSnapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => {
+          const fechaA = a.fecha?.toDate ? a.fecha.toDate() : a.fecha;
+          const fechaB = b.fecha?.toDate ? b.fecha.toDate() : b.fecha;
+          return fechaB - fechaA;
+        });
 
       // Obtener datos adicionales (usuarios, eventos, lugares)
       const usuariosSnapshot = await getDocs(collection(db, "USUARIOS"));
@@ -45,7 +52,7 @@ const SolicitudesBoletas = ({ userId, onClose }) => {
 
         return {
           ...solicitud,
-          usuarioNombre: usuario ? usuario.nombre : "Usuario desconocido",
+          usuarioNombre: usuario ? (usuario.name || usuario.nombre || "Usuario desconocido") : "Usuario desconocido",
           usuarioEmail: usuario ? usuario.email : "",
           eventoNombre: evento ? evento.nombre : "Evento desconocido",
           lugarNombre: lugar ? lugar.nombre : "Lugar desconocido",
@@ -73,7 +80,7 @@ const SolicitudesBoletas = ({ userId, onClose }) => {
 
       const solicitud = solicitudDoc.data();
 
-      if (nuevoEstado === "APROBADA") {
+      if (nuevoEstado === "ACTIVADA") {
         // Verificar stock disponible
         const eventoDoc = await getDoc(doc(db, "EVENTOS", solicitud.eventoId));
         if (!eventoDoc.exists()) {
@@ -130,7 +137,7 @@ const SolicitudesBoletas = ({ userId, onClose }) => {
         updatedAt: new Date()
       });
 
-      toast.success(`Solicitud ${nuevoEstado.toLowerCase()} exitosamente`);
+      toast.success(`Solicitud ${nuevoEstado === "ACTIVADA" ? "activada" : nuevoEstado.toLowerCase()} exitosamente`);
       fetchSolicitudes(); // Recargar lista
     } catch (error) {
       console.error("Error updating solicitud:", error);
@@ -139,73 +146,75 @@ const SolicitudesBoletas = ({ userId, onClose }) => {
   };
 
   if (loading) {
-    return (
-      <div className="organizador-section">
-        <div className="section-header">
+    return ReactDOM.createPortal(
+      <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
+        <div className="modal" onClick={(e) => e.stopPropagation()}>
+          <button className="close-btn" onClick={onClose}>×</button>
           <h3>Solicitudes de Boletas</h3>
-          <button onClick={onClose} className="close-btn">×</button>
+          <p>Cargando solicitudes...</p>
         </div>
-        <p>Cargando solicitudes...</p>
-      </div>
+      </div>,
+      document.body
     );
   }
 
-  return (
-    <div className="organizador-section">
-      <div className="section-header">
+  return ReactDOM.createPortal(
+    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <button className="close-btn" onClick={onClose}>×</button>
         <h3>Solicitudes de Boletas</h3>
-        <button onClick={onClose} className="close-btn">×</button>
-      </div>
 
-      {solicitudes.length === 0 ? (
-        <div className="no-solicitudes">
-          <p>No hay solicitudes de boletas pendientes</p>
-        </div>
-      ) : (
-        <div className="solicitudes-list">
-          {solicitudes.map(solicitud => (
-            <div key={solicitud.id} className="solicitud-card">
-              <div className="solicitud-header">
-                <h4>{solicitud.eventoNombre}</h4>
-                <span className={`estado-badge estado-${solicitud.estado?.toLowerCase() || 'pendiente'}`}>
-                  {solicitud.estado || 'PENDIENTE'}
-                </span>
-              </div>
+        {solicitudes.length === 0 ? (
+          <div className="no-solicitudes">
+            <p>No hay solicitudes de boletas pendientes</p>
+          </div>
+        ) : (
+          <div className="solicitudes-list">
+            {solicitudes.map(solicitud => (
+              <div key={solicitud.id} className="solicitud-card">
+                <div className="solicitud-header">
+                  <h4>{solicitud.eventoNombre}</h4>
+                  <span className={`estado-badge estado-${solicitud.estado?.toLowerCase() || 'pendiente'}`}>
+                    {solicitud.estado || 'PENDIENTE'}
+                  </span>
+                </div>
 
-              <div className="solicitud-info">
-                <p><strong>Usuario:</strong> {solicitud.usuarioNombre}</p>
-                <p><strong>Email:</strong> {solicitud.usuarioEmail}</p>
-                <p><strong>Lugar:</strong> {solicitud.lugarNombre}</p>
-                <p><strong>Cantidad:</strong> {solicitud.cantidad} boleta(s)</p>
-                <p><strong>Total:</strong> ${solicitud.total?.toLocaleString() || '0'}</p>
-                <p><strong>Método de Pago:</strong> {solicitud.metodoPago}</p>
-                <p><strong>Fecha de Solicitud:</strong> {solicitud.fechaFormatted}</p>
-                {solicitud.comprobanteUrl && (
-                  <p><strong>Comprobante:</strong> <a href={solicitud.comprobanteUrl} target="_blank" rel="noopener noreferrer">Ver Comprobante</a></p>
+                <div className="solicitud-info">
+                  <p><strong>Usuario:</strong> {solicitud.usuarioNombre}</p>
+                  <p><strong>Email:</strong> {solicitud.usuarioEmail}</p>
+                  <p><strong>Lugar:</strong> {solicitud.lugarNombre}</p>
+                  <p><strong>Cantidad:</strong> {solicitud.cantidad} boleta(s)</p>
+                  <p><strong>Total:</strong> ${solicitud.total?.toLocaleString() || '0'}</p>
+                  <p><strong>Método de Pago:</strong> {solicitud.metodoPago}</p>
+                  <p><strong>Fecha de Solicitud:</strong> {solicitud.fechaFormatted}</p>
+                  {solicitud.comprobanteUrl && (
+                    <p><strong>Comprobante:</strong> <a href={solicitud.comprobanteUrl} target="_blank" rel="noopener noreferrer">Ver Comprobante</a></p>
+                  )}
+                </div>
+
+                {solicitud.estado === 'PENDIENTE' && (
+                  <div className="solicitud-actions">
+                    <button
+                      onClick={() => handleEstadoChange(solicitud.id, 'ACTIVADA')}
+                      className="approve-btn"
+                    >
+                      Aprobar
+                    </button>
+                    <button
+                      onClick={() => handleEstadoChange(solicitud.id, 'RECHAZADA')}
+                      className="reject-btn"
+                    >
+                      Rechazar
+                    </button>
+                  </div>
                 )}
               </div>
-
-              {solicitud.estado === 'PENDIENTE' && (
-                <div className="solicitud-actions">
-                  <button
-                    onClick={() => handleEstadoChange(solicitud.id, 'APROBADA')}
-                    className="approve-btn"
-                  >
-                    Aprobar
-                  </button>
-                  <button
-                    onClick={() => handleEstadoChange(solicitud.id, 'RECHAZADA')}
-                    className="reject-btn"
-                  >
-                    Rechazar
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>,
+    document.body
   );
 };
 

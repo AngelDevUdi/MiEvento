@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { db } from "../../../api/api";
 import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
-import "./organizador.css";
+import "./lugares.css";
 
-const Lugares = ({ userId, onClose }) => {
+const Lugares = ({ userId, onClose, initialShowForm = false }) => {
   const [lugares, setLugares] = useState([]);
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(initialShowForm);
   const [editingLugarId, setEditingLugarId] = useState(null);
   const [formData, setFormData] = useState({
     nombre: "",
@@ -23,10 +23,21 @@ const Lugares = ({ userId, onClose }) => {
   const [servicioPrecio, setServicioPrecio] = useState("");
   const [servicioAdicional, setServicioAdicional] = useState(false);
   const [fotoInput, setFotoInput] = useState("");
+  const [activeSection, setActiveSection] = useState("editar");
 
   useEffect(() => {
     fetchLugares();
   }, []);
+
+  const formatNumberWithDots = (value) => {
+    const digits = String(value).replace(/\D/g, "");
+    return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
+
+  const parseNumberValue = (value) => {
+    const cleaned = String(value).replace(/\./g, "");
+    return cleaned ? parseInt(cleaned, 10) : 0;
+  };
 
   const fetchLugares = async () => {
     try {
@@ -42,6 +53,16 @@ const Lugares = ({ userId, onClose }) => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+
+    if (name === "capacidad" || name === "precioDisponible") {
+      const formattedValue = formatNumberWithDots(value);
+      setFormData(prev => ({
+        ...prev,
+        [name]: formattedValue
+      }));
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value
@@ -126,14 +147,15 @@ const Lugares = ({ userId, onClose }) => {
       nombre: lugar.nombre || "",
       direccion: lugar.direccion || "",
       urlMaps: lugar.urlMaps || "",
-      capacidad: lugar.capacidad?.toString() || "",
-      precioDisponible: lugar.precioDisponible?.toString() || "",
+      capacidad: formatNumberWithDots(lugar.capacidad?.toString() || ""),
+      precioDisponible: formatNumberWithDots(lugar.precioDisponible?.toString() || ""),
       descripcion: lugar.descripcion || "",
       serviciosIncluidos: servicios,
       fotos: lugar.fotos || [],
       disponiblePublico: lugar.disponiblePublico || false
     });
     setEditingLugarId(lugar.id);
+    setActiveSection("crear");
     setShowForm(true);
   };
 
@@ -143,8 +165,8 @@ const Lugares = ({ userId, onClose }) => {
       const lugarData = {
         ...formData,
         organizadorId: userId,
-        capacidad: parseInt(formData.capacidad, 10),
-        precioDisponible: parseFloat(formData.precioDisponible),
+        capacidad: parseNumberValue(formData.capacidad),
+        precioDisponible: parseNumberValue(formData.precioDisponible),
         serviciosIncluidos: formData.serviciosIncluidos,
         fotos: formData.fotos,
         disponiblePublico: formData.disponiblePublico
@@ -165,7 +187,6 @@ const Lugares = ({ userId, onClose }) => {
       }
 
       resetLugarForm();
-      setShowForm(false);
       fetchLugares();
     } catch (error) {
       console.error("Error saving lugar:", error);
@@ -200,218 +221,247 @@ const Lugares = ({ userId, onClose }) => {
   };
 
   return (
-    <div className="organizador-section">
-      <div className="section-header">
-        <h3>Gestionar Lugares</h3>
-        <button onClick={onClose} className="close-btn">×</button>
-      </div>
-
-      <button onClick={() => {
-        if (showForm && editingLugarId) {
-          resetLugarForm();
-        }
-        setShowForm(!showForm);
-      }} className="create-btn">
-        {showForm ? "Cancelar" : editingLugarId ? "Editar Lugar" : "Crear Nuevo Lugar"}
-      </button>
-
+    <>
       {showForm && (
-        <form onSubmit={handleSubmit} className="lugar-form">
-          <div className="form-group">
-            <label>Nombre del Lugar:</label>
-            <input
-              type="text"
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Dirección:</label>
-            <input
-              type="text"
-              name="direccion"
-              value={formData.direccion}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>URL de Maps (opcional):</label>
-            <input
-              type="url"
-              name="urlMaps"
-              value={formData.urlMaps}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label>Capacidad:</label>
-              <input
-                type="number"
-                name="capacidad"
-                value={formData.capacidad}
-                onChange={handleInputChange}
-                required
-                min="1"
-              />
+        <div className="overlay" onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            resetLugarForm();
+            setActiveSection("editar");
+            onClose();
+          }
+        }}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Gestión de lugares</h3>
+              <button type="button" onClick={() => {
+                resetLugarForm();
+                setActiveSection("editar");
+                onClose();
+              }} className="close-modal-btn">×</button>
             </div>
-
-            <div className="form-group">
-              <label>Precio Disponible ($):</label>
-              <input
-                type="number"
-                name="precioDisponible"
-                value={formData.precioDisponible}
-                onChange={handleInputChange}
-                required
-                min="0"
-                step="0.01"
-              />
+            <div className="section-switch">
+              <button
+                type="button"
+                className={`switch-btn ${activeSection === "editar" ? "active" : ""}`}
+                onClick={() => {
+                  setActiveSection("editar");
+                  setEditingLugarId(null);
+                  resetLugarForm();
+                }}
+              >
+                Editar lugares
+              </button>
+              <button
+                type="button"
+                className={`switch-btn ${activeSection === "crear" ? "active" : ""}`}
+                onClick={() => {
+                  setActiveSection("crear");
+                  setEditingLugarId(null);
+                  resetLugarForm();
+                }}
+              >
+                Crear lugar
+              </button>
             </div>
-          </div>
+            {activeSection === "crear" && (
+              <form onSubmit={handleSubmit} className="lugar-form">
+                <div className="form-group">
+                  <label>Nombre del Lugar:</label>
+                  <input
+                    type="text"
+                    name="nombre"
+                    value={formData.nombre}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
 
-          <div className="form-group">
-            <label>Descripción:</label>
-            <textarea
-              name="descripcion"
-              value={formData.descripcion}
-              onChange={handleInputChange}
-              rows="3"
-            />
-          </div>
+                <div className="form-group">
+                  <label>Dirección:</label>
+                  <input
+                    type="text"
+                    name="direccion"
+                    value={formData.direccion}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
 
-          <div className="form-group">
-            <label>Servicios:</label>
-            <div className="servicios-input">
-              <input
-                type="text"
-                value={servicioNombre}
-                onChange={(e) => setServicioNombre(e.target.value)}
-                placeholder="Nombre del servicio"
-              />
-              <input
-                type="number"
-                value={servicioPrecio}
-                onChange={(e) => setServicioPrecio(e.target.value)}
-                placeholder="Precio"
-                min="0"
-                step="0.01"
-              />
-              <label className="servicio-checkbox">
-                <input
-                  type="checkbox"
-                  checked={servicioAdicional}
-                  onChange={(e) => setServicioAdicional(e.target.checked)}
-                />
-                Costo adicional
-              </label>
-              <button type="button" onClick={addServicio} className="add-servicio-btn">+</button>
-            </div>
-            <div className="servicios-list">
-              {formData.serviciosIncluidos.map((servicio, index) => (
-                <span key={index} className="servicio-tag">
-                  {servicio.nombre} - ${servicio.precio.toFixed(2)} {servicio.adicional ? "(adicional)" : "(incluido)"}
-                  <button type="button" onClick={() => removeServicio(index)}>×</button>
-                </span>
-              ))}
-            </div>
-          </div>
+                <div className="form-group">
+                  <label>URL de Maps (opcional):</label>
+                  <input
+                    type="url"
+                    name="urlMaps"
+                    value={formData.urlMaps}
+                    onChange={handleInputChange}
+                  />
+                </div>
 
-          <div className="form-group">
-            <label>Fotos del lugar (URLs):</label>
-            <div className="servicios-input">
-              <input
-                type="url"
-                value={fotoInput}
-                onChange={(e) => setFotoInput(e.target.value)}
-                placeholder="Agregar URL de foto"
-              />
-              <button type="button" onClick={addFoto} className="add-servicio-btn">+</button>
-            </div>
-            <div className="fotos-list">
-              {formData.fotos.map((foto, index) => (
-                <span key={index} className="servicio-tag">
-                  <a href={foto} target="_blank" rel="noreferrer">Foto {index + 1}</a>
-                  <button type="button" onClick={() => removeFoto(index)}>×</button>
-                </span>
-              ))}
-            </div>
-          </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Capacidad:</label>
+                    <input
+                      type="text"
+                      name="capacidad"
+                      value={formData.capacidad}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
 
-          <div className="form-group checkbox-group">
-            <label>
-              <input
-                type="checkbox"
-                name="disponiblePublico"
-                checked={formData.disponiblePublico}
-                onChange={handleInputChange}
-              />
-              Disponible al público
-            </label>
-          </div>
+                  <div className="form-group">
+                    <label>Precio Disponible ($):</label>
+                    <input
+                      type="text"
+                      name="precioDisponible"
+                      value={formData.precioDisponible}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                </div>
 
-          <button type="submit" className="submit-btn">{editingLugarId ? "Actualizar Lugar" : "Crear Lugar"}</button>
-          {editingLugarId && (
-            <button type="button" className="cancel-btn" onClick={() => {
-              resetLugarForm();
-              setShowForm(false);
-            }}>
-              Cancelar edición
-            </button>
-          )}
-        </form>
+                <div className="form-group">
+                  <label>Descripción:</label>
+                  <textarea
+                    name="descripcion"
+                    value={formData.descripcion}
+                    onChange={handleInputChange}
+                    rows="3"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Servicios:</label>
+                  <div className="servicios-input">
+                    <input
+                      type="text"
+                      value={servicioNombre}
+                      onChange={(e) => setServicioNombre(e.target.value)}
+                      placeholder="Nombre del servicio"
+                    />
+                    <input
+                      type="number"
+                      value={servicioPrecio}
+                      onChange={(e) => setServicioPrecio(e.target.value)}
+                      placeholder="Precio"
+                      min="0"
+                      step="0.01"
+                    />
+                    <label className="servicio-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={servicioAdicional}
+                        onChange={(e) => setServicioAdicional(e.target.checked)}
+                      />
+                      Costo adicional
+                    </label>
+                    <button type="button" onClick={addServicio} className="add-servicio-btn">+</button>
+                  </div>
+                  <div className="servicios-list">
+                    {formData.serviciosIncluidos.map((servicio, index) => (
+                      <span key={index} className="servicio-tag">
+                        {servicio.nombre} - ${servicio.precio.toFixed(2)} {servicio.adicional ? "(adicional)" : "(incluido)"}
+                        <button type="button" onClick={() => removeServicio(index)}>×</button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Fotos del lugar (URLs):</label>
+                  <div className="servicios-input">
+                    <input
+                      type="url"
+                      value={fotoInput}
+                      onChange={(e) => setFotoInput(e.target.value)}
+                      placeholder="Agregar URL de foto"
+                    />
+                    <button type="button" onClick={addFoto} className="add-servicio-btn">+</button>
+                  </div>
+                  <div className="fotos-list">
+                    {formData.fotos.map((foto, index) => (
+                      <span key={index} className="servicio-tag">
+                        <a href={foto} target="_blank" rel="noreferrer">Foto {index + 1}</a>
+                        <button type="button" onClick={() => removeFoto(index)}>×</button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="form-group checkbox-group">
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="disponiblePublico"
+                      checked={formData.disponiblePublico}
+                      onChange={handleInputChange}
+                    />
+                    Disponible al público
+                  </label>
+                </div>
+
+                <button type="submit" className="submit-btn">{editingLugarId ? "Actualizar Lugar" : "Crear Lugar"}</button>
+                {editingLugarId && (
+                  <button type="button" className="cancel-btn" onClick={() => {
+                    resetLugarForm();
+                    setActiveSection("editar");
+                  }}>
+                    Cancelar edición
+                  </button>
+                )}
+              </form>
+            )}
+
+            {activeSection === "editar" && (
+              <div className="lugares-list">
+                {lugares.map(lugar => (
+                  <div key={lugar.id} className="lugar-card">
+                    {lugar.fotos && lugar.fotos.length > 0 && (
+                      <div className="image-slider">
+                        {lugar.fotos.map((foto, index) => (
+                          <div key={index} className="image-slide">
+                            <img src={foto} alt={`Lugar ${lugar.nombre} imagen ${index + 1}`} />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <h4>{lugar.nombre}</h4>
+                    <p className="lugar-address"><strong>Dirección:</strong> {lugar.direccion}</p>
+                    {lugar.descripcion && <p className="lugar-description">{lugar.descripcion}</p>}
+                    <p><strong>Capacidad:</strong> {Number(lugar.capacidad || 0).toLocaleString('es-ES')} personas</p>
+                    <p><strong>Precio:</strong> ${Number(lugar.precioDisponible || 0).toLocaleString('es-ES')}</p>
+                    <p><strong>Disponible:</strong> {lugar.disponiblePublico ? "Sí" : "No"}</p>
+                    {lugar.serviciosIncluidos && lugar.serviciosIncluidos.length > 0 && (
+                      <div className="servicios-list-card">
+                        <p><strong>Servicios:</strong></p>
+                        <ul>
+                          {lugar.serviciosIncluidos.map((servicio, index) => (
+                            <li key={index} className="servicio-item">
+                              {servicio.nombre || servicio} - ${Number(servicio.precio || 0).toFixed(2)} {servicio.adicional ? "(adicional)" : "(incluido)"}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    <div className="lugar-actions">
+                      <button
+                        onClick={() => toggleDisponible(lugar.id, lugar.disponiblePublico)}
+                        className={`toggle-btn-publico ${lugar.disponiblePublico ? "toggle-btn-publico" : ""}`}
+                      >
+                        {lugar.disponiblePublico ? "Ocultar" : "Mostrar"} al público
+                      </button>
+                      <button onClick={() => handleEditLugar(lugar)} className="edit-btn">Editar</button>
+                      <button onClick={() => deleteLugar(lugar.id)} className="delete-btn">Eliminar</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       )}
-
-      <div className="lugares-list">
-        {lugares.map(lugar => (
-          <div key={lugar.id} className="lugar-card">
-            <h4>{lugar.nombre}</h4>
-            <button onClick={() => toggleDisponible(lugar.id, lugar.disponiblePublico)} className="toggle-btn">
-              {lugar.disponiblePublico ? "Ocultar" : "Mostrar"} al público
-            </button>
-            <p><strong>Dirección:</strong> {lugar.direccion}</p>
-            <p><strong>Capacidad:</strong> {lugar.capacidad} personas</p>
-            <p><strong>Precio:</strong> ${lugar.precioDisponible}</p>
-            <p><strong>Disponible:</strong> {lugar.disponiblePublico ? "Sí" : "No"}</p>
-            {lugar.descripcion && <p><strong>Descripción:</strong> {lugar.descripcion}</p>}
-            {lugar.serviciosIncluidos && lugar.serviciosIncluidos.length > 0 && (
-              <div>
-                <p><strong>Servicios:</strong></p>
-                <ul>
-                  {lugar.serviciosIncluidos.map((servicio, index) => (
-                    <li key={index}>
-                      {servicio.nombre || servicio} - ${Number(servicio.precio || 0).toFixed(2)} {servicio.adicional ? "(adicional)" : "(incluido)"}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {lugar.fotos && lugar.fotos.length > 0 && (
-              <div>
-                <p><strong>Fotos:</strong></p>
-                <ul>
-                  {lugar.fotos.map((foto, index) => (
-                    <li key={index}>
-                      <a href={foto} target="_blank" rel="noreferrer">Foto {index + 1}</a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            <div className="lugar-actions">
-              <button onClick={() => handleEditLugar(lugar)} className="edit-btn">Editar</button>
-              <button onClick={() => deleteLugar(lugar.id)} className="delete-btn">Eliminar</button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+    </>
   );
 };
 

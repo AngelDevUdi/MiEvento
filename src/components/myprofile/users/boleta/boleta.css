@@ -65,6 +65,30 @@
   gap: 12px;
 }
 
+.qr-container {
+  position: relative;
+  display: inline-block;
+}
+
+.qr-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(128, 128, 128, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.qr-x {
+  font-size: 48px;
+  color: #ff0000;
+  font-weight: bold;
+}
+
 .qr-text {
   margin: 0;
   font-size: 0.9rem;

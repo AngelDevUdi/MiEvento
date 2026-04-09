@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { FaUser } from "react-icons/fa";
 import { auth } from "../../api/api.js";
 import { onAuthStateChanged, signOut } from "firebase/auth";
@@ -21,6 +22,8 @@ const Navbar = ({ onViewChange }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const dropdownRef = useRef(null);
+  const dropdownButtonRef = useRef(null);
+  const [dropdownCoords, setDropdownCoords] = useState({ top: 0, left: 0, width: 180 });
 
   /* 🔥 Detectar usuario */
   useEffect(() => {
@@ -52,15 +55,75 @@ const Navbar = ({ onViewChange }) => {
 
   /* 🔥 Click fuera */
   useEffect(() => {
+    if (!showDropdown) return;
+
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setShowDropdown(false);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [showDropdown]);
+
+  useEffect(() => {
+    if (!showDropdown) return;
+
+    const updateDropdownCoords = () => {
+      if (!dropdownButtonRef.current) return;
+      const rect = dropdownButtonRef.current.getBoundingClientRect();
+      setDropdownCoords({
+        top: rect.bottom + 10,
+        left: rect.left + rect.width / 2,
+        width: Math.max(180, rect.width + 24),
+      });
+    };
+
+    updateDropdownCoords();
+    window.addEventListener("resize", updateDropdownCoords);
+    window.addEventListener("scroll", updateDropdownCoords, true);
+
+    return () => {
+      window.removeEventListener("resize", updateDropdownCoords);
+      window.removeEventListener("scroll", updateDropdownCoords, true);
+    };
+  }, [showDropdown]);
+
+  /* 🔥 Evitar scroll cuando menú está abierto */
+  useEffect(() => {
+    if (open && isMobile) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [open, isMobile]);
+
+  const updateDropdownPosition = () => {
+    if (!dropdownButtonRef.current) return;
+    const rect = dropdownButtonRef.current.getBoundingClientRect();
+    setDropdownCoords({
+      top: rect.bottom + 10,
+      left: rect.left + rect.width / 2,
+      width: Math.max(180, rect.width + 24),
+    });
+  };
+
+  const toggleDropdown = () => {
+    if (showDropdown) {
+      setShowDropdown(false);
+      return;
+    }
+
+    updateDropdownPosition();
+    setShowDropdown(true);
+  };
 
   /* 🔥 Acciones */
   const handleLogout = async () => {
@@ -80,12 +143,43 @@ const Navbar = ({ onViewChange }) => {
 
   const handleMenuClick = () => {
     setOpen(false);
+    setShowDropdown(false);
   };
 
   const handleAuth = (type) => {
+    setShowDropdown(false);
     setShowLogin(type === "login");
     setShowRegister(type === "register");
   };
+
+  const dropdownMenu = showDropdown
+    ? createPortal(
+        <div
+          className="dropdown"
+          ref={dropdownRef}
+          style={{
+            top: dropdownCoords.top,
+            left: dropdownCoords.left,
+            minWidth: dropdownCoords.width,
+          }}
+        >
+          {user ? (
+            <>
+              <div onClick={() => { onViewChange("profile"); setShowDropdown(false); }}>
+                Perfil
+              </div>
+              <div onClick={handleLogout}>Cerrar sesión</div>
+            </>
+          ) : (
+            <>
+              <button onClick={() => handleAuth("register")}>Regístrate</button>
+              <button onClick={() => handleAuth("login")}>Inicia sesión</button>
+            </>
+          )}
+        </div>,
+        document.body
+      )
+    : null;
 
   return (
     <>
@@ -133,38 +227,30 @@ const Navbar = ({ onViewChange }) => {
             <li><a href="/" onClick={(e) => { e.preventDefault(); window.location.reload(); handleMenuClick(); }}>Inicio</a></li>
             <li><a href="#eventos" onClick={handleMenuClick}>Eventos</a></li>
 
-            <li ref={dropdownRef}>
+            <li>
               {user ? (
-                <div
-                  className="user-icon-container"
-                  onClick={() => setShowDropdown(true)}
-                >
-                  <FaUser className="user-icon" />
-
-                  {showDropdown && (
-                    <div className="dropdown">
-                      <div onClick={() => { onViewChange('profile'); setShowDropdown(false); }}>Perfil</div>
-                      <div onClick={handleLogout}>Cerrar sesión</div>
-                    </div>
-                  )}
+                <div className="user-icon-container" ref={dropdownButtonRef}>
+                  <FaUser
+                    className="user-icon"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleDropdown();
+                    }}
+                  />
                 </div>
               ) : (
-                <div
-                  className="welcome-button-container"
-                  onClick={() => setShowDropdown(true)}
-                >
-                  <button className="welcome-button">Bienvenido</button>
-
-                  {showDropdown && (
-                    <div className="dropdown">
-                      <button onClick={() => handleAuth("register")}>
-                        Regístrate
-                      </button>
-                      <button onClick={() => handleAuth("login")}>
-                        Inicia sesión
-                      </button>
-                    </div>
-                  )}
+                <div className="welcome-button-container" ref={dropdownButtonRef}>
+                  <button
+                    className="welcome-button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleDropdown();
+                    }}
+                  >
+                    Bienvenido
+                  </button>
                 </div>
               )}
             </li>
@@ -182,6 +268,7 @@ const Navbar = ({ onViewChange }) => {
 
         </div>
       </nav>
+      {dropdownMenu}
     </>
   );
 };
