@@ -205,3 +205,34 @@
   color: rgba(255, 255, 255, 0.6);
   margin: 0;
 }
+
+/* Botón Ver más */
+.see-more-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.see-more-btn {
+  background: linear-gradient(135deg, #00d4ff, #007cf0);
+  border: none;
+  color: white;
+  padding: 14px 50px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.see-more-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.5);
+}
+
+.see-more-btn:active {
+  transform: scale(0.95);
+}

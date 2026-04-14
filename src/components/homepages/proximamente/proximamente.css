@@ -3,7 +3,7 @@
 /* Sección Próximamente */
 .coming-soon-section {
   padding: 80px 20px;
-  background: linear-gradient(135deg, #1a1a1a 0%, #111 100%);
+  background: #0f0f0f;
 }
 
 .coming-soon-header {
@@ -26,57 +26,214 @@
   letter-spacing: 0.5px;
 }
 
-/* Cards de próximamente */
+/* Filtros */
+.filter-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 50px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 10px 25px;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text);
+  border: 1px solid rgba(74, 144, 226, 0.3);
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-btn:hover {
+  background: rgba(74, 144, 226, 0.1);
+  border-color: var(--color-btn-bg);
+}
+
+.filter-btn.active {
+  background: var(--color-btn-bg);
+  border-color: var(--color-btn-bg);
+  box-shadow: 0 0 15px rgba(74, 144, 226, 0.5);
+}
+
+/* Cards de lugares */
 .coming-soon-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 30px;
 }
 
 .coming-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px dashed rgba(74, 144, 226, 0.4);
+  background: #1a1a1a;
+  border: 1px solid rgba(74, 144, 226, 0.2);
   border-radius: 12px;
-  padding: 40px 30px;
-  text-align: center;
-  position: relative;
+  overflow: hidden;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .coming-card:hover {
-  background: rgba(74, 144, 226, 0.1);
   border-color: var(--color-btn-bg);
-  transform: translateY(-8px);
   box-shadow: 0 10px 30px rgba(74, 144, 226, 0.2);
+  transform: translateY(-8px);
 }
 
-.coming-badge {
+/* Imagen de la card */
+.card-image {
+  width: 100%;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-overlay {
   position: absolute;
-  top: -15px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(135deg, var(--color-btn-bg) 0%, #357abd 100%);
-  color: var(--color-text);
-  padding: 5px 20px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.coming-card:hover .card-overlay {
+  opacity: 1;
+}
+
+/* Contenido de la card */
+.card-content {
+  padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .coming-card h3 {
-  font-size: 22px;
+  font-size: 18px;
   color: var(--color-text);
-  margin: 20px 0 15px 0;
+  margin: 0 0 8px 0;
   font-weight: 600;
   letter-spacing: 0.5px;
 }
 
-.coming-card p {
+.lugar-address {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 10px 0;
+}
+
+.lugar-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lugar-info span {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.capacidad {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.precio {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+}
+
+/* Tags */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-badge {
+  background: var(--color-btn-bg);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  display: inline-block;
+}
+
+/* Botón Reservar */
+.reserve-btn {
+  padding: 12px 30px;
   font-size: 14px;
+  font-weight: 600;
+  background: var(--color-btn-bg);
+  color: var(--color-text);
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reserve-btn:hover {
+  background: var(--color-btn-bg-hover);
+  transform: scale(1.05);
+}
+
+/* Sin eventos */
+.no-events {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.no-events p {
+  font-size: 18px;
   color: rgba(255, 255, 255, 0.6);
   margin: 0;
-  line-height: 1.6;
+}
+
+/* Botón Ver más */
+.see-more-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.see-more-btn {
+  background: linear-gradient(135deg, #00d4ff, #007cf0);
+  border: none;
+  color: white;
+  padding: 14px 50px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.see-more-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.5);
+}
+
+.see-more-btn:active {
+  transform: scale(0.95);
 }

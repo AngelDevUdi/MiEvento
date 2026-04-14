@@ -10,7 +10,7 @@ import ResetPassword from "../resetpassword/resetpassword.js";
 import EventLoading from "../loading/EventLoading.js";
 import "./navbar.css";
 
-const Navbar = ({ onViewChange }) => {
+const Navbar = ({ onViewChange, onChange, isLoading = false, currentSection = "home" }) => {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -216,7 +216,7 @@ const Navbar = ({ onViewChange }) => {
         />
       )}
 
-      <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
+      <nav className={`navbar ${scrolled ? "scrolled" : ""} ${isLoading ? "loading" : ""} ${currentSection !== "home" ? "in-view" : ""}`}>
         <div className="navbar-container">
 
           {/* 🔥 Logo */}
@@ -225,19 +225,18 @@ const Navbar = ({ onViewChange }) => {
           {/* 🔥 Menú */}
           <ul className={`navbar-menu ${open ? "active" : ""}`}>
             <li><a href="/" onClick={(e) => { e.preventDefault(); window.location.reload(); handleMenuClick(); }}>Inicio</a></li>
-            <li><a href="#eventos" onClick={handleMenuClick}>Eventos</a></li>
-
+            <li><a href="#" onClick={(e) => { e.preventDefault(); if(onChange) onChange("eventos"); handleMenuClick(); }}>Eventos</a></li>
+            <li><a href="#" onClick={(e) => { e.preventDefault(); if(onChange) onChange("lugares"); handleMenuClick(); }}>Reservar Lugares</a></li>
+            {user && (
+              <>
+                <li><a onClick={() => { onViewChange("profile"); handleMenuClick(); }}>Mi perfil</a></li>
+                <li><a className="logout-link" onClick={() => { handleLogout(); handleMenuClick(); }}>Cerrar sesión</a></li>
+              </>
+            )}
             <li>
               {user ? (
-                <div className="user-icon-container" ref={dropdownButtonRef}>
-                  <FaUser
-                    className="user-icon"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleDropdown();
-                    }}
-                  />
+                <div className="user-icon-container">
+                  <FaUser className="user-icon" />
                 </div>
               ) : (
                 <div className="welcome-button-container" ref={dropdownButtonRef}>

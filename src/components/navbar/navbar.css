@@ -295,3 +295,30 @@
   backdrop-filter: blur(15px);
   box-shadow: 0 5px 20px rgba(0,0,0,0.4);
 }
+
+/* 🔥 Link de cerrar sesión en rojo */
+.logout-link {
+  color: #ff4d4d !important;
+}
+
+.logout-link::after {
+  background: #ff4d4d !important;
+}
+
+.logout-link:hover {
+  color: #ff6b6b !important;
+}
+
+/* 🔥 Navbar durante carga */
+.navbar.loading {
+  background: rgba(20, 20, 40, 0.85);
+  border-bottom-color: rgba(0, 212, 255, 0.5);
+  transition: background 0.4s ease, border-color 0.4s ease;
+}
+
+/* 🔥 Navbar durante vistas (eventos/lugares) */
+.navbar.in-view {
+  background: rgba(10, 30, 50, 0.8);
+  border-bottom-color: rgba(0, 212, 255, 0.3);
+  transition: background 0.4s ease, border-color 0.4s ease;
+}

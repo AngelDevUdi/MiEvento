@@ -17,12 +17,14 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
     descripcion: "",
     serviciosIncluidos: [],
     fotos: [],
-    disponiblePublico: false
+    disponiblePublico: false,
+    tags: []
   });
   const [servicioNombre, setServicioNombre] = useState("");
   const [servicioPrecio, setServicioPrecio] = useState("");
   const [servicioAdicional, setServicioAdicional] = useState(false);
   const [fotoInput, setFotoInput] = useState("");
+  const [tagInput, setTagInput] = useState("");
   const [activeSection, setActiveSection] = useState("editar");
 
   useEffect(() => {
@@ -113,6 +115,24 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
     }));
   };
 
+  const addTag = () => {
+    const tag = tagInput.trim().toLowerCase();
+    if (tag && !formData.tags.includes(tag)) {
+      setFormData(prev => ({
+        ...prev,
+        tags: [...prev.tags, tag]
+      }));
+      setTagInput("");
+    }
+  };
+
+  const removeTag = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter((_, i) => i !== index)
+    }));
+  };
+
   const resetLugarForm = () => {
     setFormData({
       nombre: "",
@@ -123,13 +143,15 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
       descripcion: "",
       serviciosIncluidos: [],
       fotos: [],
-      disponiblePublico: false
+      disponiblePublico: false,
+      tags: []
     });
     setEditingLugarId(null);
     setServicioNombre("");
     setServicioPrecio("");
     setServicioAdicional(false);
     setFotoInput("");
+    setTagInput("");
   };
 
   const handleEditLugar = (lugar) => {
@@ -152,7 +174,8 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
       descripcion: lugar.descripcion || "",
       serviciosIncluidos: servicios,
       fotos: lugar.fotos || [],
-      disponiblePublico: lugar.disponiblePublico || false
+      disponiblePublico: lugar.disponiblePublico || false,
+      tags: lugar.tags || []
     });
     setEditingLugarId(lugar.id);
     setActiveSection("crear");
@@ -169,7 +192,8 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
         precioDisponible: parseNumberValue(formData.precioDisponible),
         serviciosIncluidos: formData.serviciosIncluidos,
         fotos: formData.fotos,
-        disponiblePublico: formData.disponiblePublico
+        disponiblePublico: formData.disponiblePublico,
+        tags: formData.tags
       };
 
       if (editingLugarId) {
@@ -389,6 +413,27 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
                   </div>
                 </div>
 
+                <div className="form-group">
+                  <label>Etiquetas (tipos de eventos):</label>
+                  <div className="servicios-input">
+                    <input
+                      type="text"
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      placeholder="Agregar etiqueta (ej: fiesta, concierto)"
+                    />
+                    <button type="button" onClick={addTag} className="add-servicio-btn">+</button>
+                  </div>
+                  <div className="tags-list">
+                    {formData.tags.map((tag, index) => (
+                      <span key={index} className="tag">
+                        {tag}
+                        <button type="button" onClick={() => removeTag(index)}>×</button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="form-group checkbox-group">
                   <label>
                     <input
@@ -442,6 +487,18 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
                             </li>
                           ))}
                         </ul>
+                      </div>
+                    )}
+                    {lugar.tags && lugar.tags.length > 0 && (
+                      <div className="tags-display">
+                        <p><strong>Etiquetas:</strong></p>
+                        <div className="tags-list">
+                          {lugar.tags.map((tag, index) => (
+                            <span key={index} className="tag-display">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     )}
                     <div className="lugar-actions">

@@ -9,6 +9,7 @@ const Entradas = ({ userId }) => {
   const [loading, setLoading] = useState(true);
   const [selectedBoleta, setSelectedBoleta] = useState(null);
   const [boleteriaUnsubscribers, setBoleteriaUnsubscribers] = useState(new Map());
+  const [showOnlyActive, setShowOnlyActive] = useState(true);
 
   useEffect(() => {
     if (!userId) {
@@ -26,6 +27,7 @@ const Entradas = ({ userId }) => {
       where("usuarioId", "==", userId),
       where("estado", "==", "ACTIVADA")
     );
+    
 
     const unsubscribe = onSnapshot(
       solicitudesQuery,
@@ -127,15 +129,30 @@ const Entradas = ({ userId }) => {
   if (!userId) {
     return <div className="entradas-error">Debes iniciar sesión para ver tus entradas</div>;
   }
+  const boletasOrdenadas = [...boletas].sort((a, b) => {
+  if (a.estado === "ACTIVADA" && b.estado !== "ACTIVADA") return -1;
+  if (a.estado !== "ACTIVADA" && b.estado === "ACTIVADA") return 1;
+  return 0;
+});
+
+  const boletasFiltradas = showOnlyActive ? boletasOrdenadas.filter(b => b.estado === 'ACTIVADA') : boletasOrdenadas;
 
   return (
     <div className="entradas-section">
       <h2>Mis Boletas</h2>
-      {boletas.length === 0 ? (
-        <p>No tienes boletas compradas.</p>
+      <div className="filter-buttons">
+        <button 
+          className={`filter-toggle ${showOnlyActive ? 'active' : ''}`}
+          onClick={() => setShowOnlyActive(!showOnlyActive)}
+        >
+          {showOnlyActive ? 'Mostrar Todas' : 'Mostrar Activas'}
+        </button>
+      </div>
+      {boletasFiltradas.length === 0 ? (
+        <p>No tienes boletas {showOnlyActive ? 'activas' : ''}.</p>
       ) : (
         <div className="entradas-list">
-          {boletas.map(boleta => (
+          {boletasFiltradas.map(boleta => (
             <div key={boleta.id} className="entrada-card">
               <div className="boleta-header">
                 <h3>{boleta.eventoNombre}</h3>

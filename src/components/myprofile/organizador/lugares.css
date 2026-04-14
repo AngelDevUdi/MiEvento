@@ -222,14 +222,62 @@ body {
   flex-shrink: 0;
 }
 
-/* Lista servicios */
-.servicios-list {
+/* Lista tags */
+.tags-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
 /* Tag */
+.tag {
+  background: #222;
+  padding: 6px 10px;
+  border-radius: 20px;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  font-size: 12px;
+}
+
+/* Botón eliminar tag */
+.tag button {
+  background: none;
+  border: none;
+  color: #ff4d4d;
+  cursor: pointer;
+}
+
+/* Tags display en card */
+.tags-display {
+  margin-top: 10px;
+}
+
+.tags-display p {
+  margin: 0 0 5px 0;
+  font-weight: bold;
+}
+
+.tag-display {
+  background: #007bff;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  display: inline-block;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+/* Services Tag */
+.servicios-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .servicio-tag {
   background: #222;
   padding: 6px 10px;
@@ -242,13 +290,11 @@ body {
   font-size: 12px;
 }
 
-/* Botón eliminar */
 .servicio-tag button {
   background: none;
   border: none;
   color: #ff4d4d;
   cursor: pointer;
-  font-size: 14px;
 }
 
 /* =========================

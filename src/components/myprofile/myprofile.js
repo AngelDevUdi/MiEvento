@@ -14,10 +14,12 @@ import MetodosPagos from "./organizador/metodospagos/metodospagos";
 import SolicitudesBoletas from "./organizador/solicitudesboletas/solicitudesboletas";
 import Porteros from "./organizador/porteros/porteros";
 import EscanearBoletas from "./porteros/EscanearBoletas";
+import EventosView from "../views/EventosView";
+import LugaresView from "../views/LugaresView";
+import EventLoading from "../loading/EventLoading";
 import { FaClipboardList, FaUserCog, FaCreditCard, FaTicketAlt, FaDoorOpen } from "react-icons/fa";
 import { toast } from "react-toastify";
 import ConfirmationModal from "../confirmationmodal/confirmationmodal";
-import EventLoading from "../loading/EventLoading";
 
 const MyProfile = ({ onViewChange }) => {
   const [user, setUser] = useState(null);
@@ -33,6 +35,8 @@ const MyProfile = ({ onViewChange }) => {
   const [confirmMode, setConfirmMode] = useState("request");
   const [userDocId, setUserDocId] = useState(null);
   const [countSolicitudes, setCountSolicitudes] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentSection, setCurrentSection] = useState("profile");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -160,6 +164,20 @@ const MyProfile = ({ onViewChange }) => {
     setShowConfirm(false);
   };
 
+  const handleSectionChange = (section) => {
+    if (section === "eventos" || section === "lugares") {
+      setIsLoading(true);
+      setTimeout(() => {
+        setCurrentSection(section);
+        setIsLoading(false);
+      }, 500);
+    }
+  };
+
+  const handleBackToProfile = () => {
+    setCurrentSection("profile");
+  };
+
   if (loading) {
     return <EventLoading text="Cargando perfil..." />;
   }
@@ -168,9 +186,58 @@ const MyProfile = ({ onViewChange }) => {
     return <div className="myprofile-error">No has iniciado sesión</div>;
   }
 
+  // Mostrar pantalla de carga mientras está cargando
+  if (isLoading) {
+    return (
+      <>
+        <Navbar 
+          onViewChange={onViewChange}
+          onChange={handleSectionChange}
+          isLoading={true}
+          currentSection={currentSection}
+        />
+        <EventLoading text={currentSection === "eventos" ? "Cargando eventos..." : "Cargando lugares..."} />
+      </>
+    );
+  }
+
+  // Mostrar vista de eventos
+  if (currentSection === "eventos") {
+    return (
+      <>
+        <Navbar 
+          onViewChange={onViewChange}
+          onChange={handleSectionChange}
+          currentSection={currentSection}
+        />
+        <EventosView onBack={handleBackToProfile} />
+      </>
+    );
+  }
+
+  // Mostrar vista de lugares
+  if (currentSection === "lugares") {
+    return (
+      <>
+        <Navbar 
+          onViewChange={onViewChange}
+          onChange={handleSectionChange}
+          currentSection={currentSection}
+        />
+        <LugaresView onBack={handleBackToProfile} />
+      </>
+    );
+  }
+
+  // Mostrar perfil por defecto
   return (
     <div className="myprofile">
-      <Navbar onViewChange={onViewChange} />
+      <Navbar 
+        onViewChange={onViewChange}
+        onChange={handleSectionChange}
+        isLoading={isLoading}
+        currentSection={currentSection}
+      />
       <div className="myprofile-content">
         <h1>Mi Perfil</h1>
         <h2>Bienvenido, {(userData?.name || user?.displayName)?.charAt(0).toUpperCase() + (userData?.name || user?.displayName)?.slice(1)}</h2>

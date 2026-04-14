@@ -11,9 +11,42 @@
   margin-bottom: 1rem;
 }
 
-.entradas-list {
-  display: grid;
+.filter-buttons {
+  display: flex;
+  align-items: center;
   gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filter-toggle {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-width: 120px;
+}
+
+.filter-toggle.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.filter-toggle:not(.active) {
+  background-color: #28a745;
+  color: white;
+}
+
+.entradas-list {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  width: 320px;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: 10px;
 }
 
 .entrada-card {
@@ -22,6 +55,14 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid #e0e0e0;
+  width: 300px;
+  min-height: 350px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  scroll-snap-align: center;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .boleta-header {
@@ -70,6 +111,27 @@
   margin: 0 0 0.5rem 0;
   font-weight: bold;
   color: #333;
+}
+
+.boleta-qr button {
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.boleta-qr button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.boleta-qr button:active {
+  transform: scale(0.95);
 }
 
 .qr-placeholder {

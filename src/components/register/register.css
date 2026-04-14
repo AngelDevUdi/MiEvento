@@ -78,6 +78,7 @@
 
   padding: 0 6px;
   background: rgba(20,20,20,0.95);
+  pointer-events: none;
 }
 
 /* FLOAT - FOCUS */

@@ -1,40 +1,71 @@
+@import "../../../resources/colors/colors.css";
+
+/* CONTENEDOR GENERAL */
 .reservas-section {
-  margin-top: 2rem;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  padding: 20px;
+  color: var(--color-text);
 }
 
 .reservas-section h2 {
-  color: #333;
-  margin-bottom: 1rem;
+  margin-bottom: 20px;
+  font-size: 26px;
 }
 
+/* LISTA COMO SLIDER */
 .reservas-list {
-  display: grid;
-  gap: 1rem;
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 10px;
 }
 
+/* SCROLL BONITO */
+.reservas-list::-webkit-scrollbar {
+  height: 8px;
+}
+
+.reservas-list::-webkit-scrollbar-thumb {
+  background: var(--color-btn-bg);
+  border-radius: 10px;
+}
+
+/* TARJETA */
 .reserva-card {
-  background: white;
-  padding: 1rem;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 320px;
+  max-width: 320px;
+  background: linear-gradient(135deg, var(--color-bg-secondary), var(--color-bg-tertiary));
+  border-radius: 20px;
+  padding: 20px;
+  scroll-snap-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  position: relative;
 }
 
+/* EFECTO HOVER */
+.reserva-card:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+/* HEADER */
 .reserva-card h3 {
-  margin: 0 0 0.5rem 0;
-  color: #28a745;
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: var(--color-info);
 }
 
+/* INFO */
 .reserva-card p {
-  margin: 0.25rem 0;
-  font-size: 0.9rem;
+  margin: 6px 0;
+  font-size: 14px;
+  color: var(--color-text-muted);
 }
 
+/* LOADING */
 .reservas-loading {
   text-align: center;
-  padding: 2rem;
-  color: #666;
+  font-size: 18px;
+  color: var(--color-text-muted);
 }

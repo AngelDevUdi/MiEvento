@@ -73,6 +73,7 @@
   padding: 0 6px;
   background: rgba(20,20,20,0.95);
   border-radius: 4px;
+  pointer-events: none;
 }
 
 /* 🔥 FLOAT LABEL - FOCUS */

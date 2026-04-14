@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import ComprarBoleta from "../comprarboleta/comprarboleta";
 import "./eventosdisponibles.css";
 
-const EventosDisponibles = () => {
+const EventosDisponibles = ({ onVerMas }) => {
   const [activeFilter, setActiveFilter] = useState("todos");
   const [eventosDisponibles, setEventosDisponibles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -122,11 +122,11 @@ const EventosDisponibles = () => {
 
         {/* Grid de eventos */}
         <div className="events-grid">
-          {eventosFiltrados.map(evento => (
-            <div key={evento.id} className="event-card">
+          {eventosFiltrados.slice(0, 10).map(evento => (
+            <div key={evento.id} className="event-card" onClick={() => handleReservar(evento.id)}>
               <div className="event-image" style={{ backgroundImage: `url(${evento.postimage || 'https://via.placeholder.com/400x300?text=Sin+Imagen'})` }}>
                 <div className="event-overlay">
-                  <button className="reserve-btn" onClick={() => handleReservar(evento.id)}>Reservar Ahora</button>
+                  <button className="reserve-btn" onClick={(e) => { e.stopPropagation(); handleReservar(evento.id); }}>Reservar Ahora</button>
                 </div>
               </div>
               <div className="event-content">
@@ -157,6 +157,14 @@ const EventosDisponibles = () => {
         {eventosFiltrados.length === 0 && (
           <div className="no-events">
             <p>No hay eventos disponibles en esta categoría</p>
+          </div>
+        )}
+
+        {eventosFiltrados.length > 10 && (
+          <div className="see-more-container">
+            <button className="see-more-btn" onClick={() => onVerMas && onVerMas()}>
+              Ver más eventos
+            </button>
           </div>
         )}
       </div>
