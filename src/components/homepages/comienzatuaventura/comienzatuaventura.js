@@ -5,7 +5,7 @@ const ComienzaTuAventura = () => {
   return (
     <section className="download-section">
       <div className="container">
-        <h2>Comienza tu aventura con Mi Evento</h2>
+        <h2>Comienza tu aventura con MiEvento</h2>
       </div>
     </section>
   );
