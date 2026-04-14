@@ -10,7 +10,7 @@ import ResetPassword from "../resetpassword/resetpassword.js";
 import EventLoading from "../loading/EventLoading.js";
 import "./navbar.css";
 
-const Navbar = ({ onViewChange, onChange, isLoading = false, currentSection = "home" }) => {
+const Navbar = ({ onViewChange, onChange, onLogoClick, isLoading = false, currentSection = "home" }) => {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -24,7 +24,6 @@ const Navbar = ({ onViewChange, onChange, isLoading = false, currentSection = "h
   const dropdownRef = useRef(null);
   const dropdownButtonRef = useRef(null);
   const [dropdownCoords, setDropdownCoords] = useState({ top: 0, left: 0, width: 180 });
-
   /* 🔥 Detectar usuario */
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -52,7 +51,7 @@ const Navbar = ({ onViewChange, onChange, isLoading = false, currentSection = "h
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
+  
   /* 🔥 Click fuera */
   useEffect(() => {
     if (!showDropdown) return;
@@ -219,8 +218,12 @@ const Navbar = ({ onViewChange, onChange, isLoading = false, currentSection = "h
       <nav className={`navbar ${scrolled ? "scrolled" : ""} ${isLoading ? "loading" : ""} ${currentSection !== "home" ? "in-view" : ""}`}>
         <div className="navbar-container">
 
-          {/* 🔥 Logo */}
-          <div className="navbar-logo">MiEvento</div>
+        {/* 🔥 Logo */}
+        <div className="navbar-logo" onClick={onLogoClick } style={{ cursor: 'pointer' }} > 
+          MiEvento
+        </div>
+      
+   
 
           {/* 🔥 Menú */}
           <ul className={`navbar-menu ${open ? "active" : ""}`}>
