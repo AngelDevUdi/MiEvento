@@ -19,6 +19,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 10px;
+  background: var(--color-bghover);
 }
 
 /* Logo */
@@ -51,6 +52,11 @@
   font-weight: 500;
   padding: 5px 0;
   transition: 0.3s;
+  cursor: pointer;
+}
+
+.navbar-menu li div {
+  cursor: pointer;
 }
 
 .navbar-menu li a::after {
@@ -90,6 +96,11 @@
 .user-icon:hover {
   transform: scale(1.2);
   color: #00d4ff;
+}
+
+.navbar,
+.navbar * {
+  user-select: none;
 }
 
 /* 🔥 Dropdown animado */
@@ -291,7 +302,7 @@
 }
 /* Navbar cuando haces scroll */
 .navbar.scrolled {
-  background: rgba(10,10,10,0.9);
+  background: var(--color-bghover);
   backdrop-filter: blur(15px);
   box-shadow: 0 5px 20px rgba(0,0,0,0.4);
 }
@@ -311,14 +322,12 @@
 
 /* 🔥 Navbar durante carga */
 .navbar.loading {
-  background: rgba(20, 20, 40, 0.85);
-  border-bottom-color: rgba(0, 212, 255, 0.5);
+  background: var(--color-bghover);
   transition: background 0.4s ease, border-color 0.4s ease;
 }
 
 /* 🔥 Navbar durante vistas (eventos/lugares) */
 .navbar.in-view {
-  background: rgba(10, 30, 50, 0.8);
-  border-bottom-color: rgba(0, 212, 255, 0.3);
+  background: var(--color-bghover);
   transition: background 0.4s ease, border-color 0.4s ease;
 }

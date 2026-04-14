@@ -5,6 +5,7 @@
   --color-bg-primary: #0f172a;     /* Fondo principal (azul oscuro elegante) */
   --color-bg-secondary: #1e293b;   /* Cards / contenedores */
   --color-bg-tertiary: #334155;    /* Elementos secundarios */
+   --color-bghover: #0f0f0f;       /* Hover en elementos oscuros */
 
   /* =========================
      ✍️ TEXTO

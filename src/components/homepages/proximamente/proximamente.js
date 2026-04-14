@@ -4,7 +4,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth } from "../../../api/api";
 import { onAuthStateChanged } from "firebase/auth";
 import { toast } from "react-toastify";
-import ComprarBoleta from "../comprarboleta/comprarboleta";
+import ReservarLugar from "../reservarlugar/reservarlugar";
 import "./proximamente.css";
 
 const Proximamente = ({ onVerMas }) => {
@@ -159,8 +159,8 @@ const Proximamente = ({ onVerMas }) => {
       </div>
 
       {showCompraModal && selectedLugarId && (
-        <ComprarBoleta
-          eventoId={selectedLugarId}
+        <ReservarLugar
+          lugarId={selectedLugarId}
           onClose={handleCloseCompraModal}
         />
       )}

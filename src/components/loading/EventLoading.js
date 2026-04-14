@@ -1,7 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./eventLoading.css";
 
-const EventLoading = ({ text = "Cargando eventos..." }) => {
+const EventLoading = () => {
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
   return (
     <div className="event-loading-container">
       <div className="event-loader">
@@ -15,7 +23,7 @@ const EventLoading = ({ text = "Cargando eventos..." }) => {
         </div>
 
         {/* Texto */}
-        <p className="loading-text">{text}</p>
+        <p className="loading-text">Cargando</p>
       </div>
     </div>
   );

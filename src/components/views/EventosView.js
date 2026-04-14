@@ -5,6 +5,7 @@ import { auth } from "../../api/api";
 import { onAuthStateChanged } from "firebase/auth";
 import { toast } from "react-toastify";
 import ComprarBoleta from "../homepages/comprarboleta/comprarboleta";
+import EventLoading from "../loading/EventLoading";
 import "./EventosView.css";
 
 const EventosView = ({ onBack }) => {
@@ -85,16 +86,7 @@ const EventosView = ({ onBack }) => {
   };
 
   if (loading) {
-    return (
-      <div className="eventos-view-container">
-        <div className="sidebar">
-          <button className="back-btn" onClick={onBack}>← Volver</button>
-        </div>
-        <div className="main-content">
-          <p>Cargando eventos...</p>
-        </div>
-      </div>
-    );
+    return <EventLoading />;
   }
 
   return (

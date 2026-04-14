@@ -6,6 +6,7 @@ import { query, where, collection, getDocs, addDoc, updateDoc, doc, serverTimest
 import Navbar from "../navbar/navbar";
 import Entradas from "./users/entradas";
 import Reservas from "./users/reservas";
+import ReservasOrganizador from "./organizador/reservas/reservas";
 import Solicitudes from "./admin/solicitudes";
 import Asignar from "./admin/asignar";
 import Eventos from "./organizador/eventos";
@@ -31,6 +32,7 @@ const MyProfile = ({ onViewChange }) => {
   const [solicitudId, setSolicitudId] = useState(null);
   const [confirmTitle, setConfirmTitle] = useState("Confirmación");
   const [countSolicitudesBoletas, setCountSolicitudesBoletas] = useState(0);
+  const [countReservas, setCountReservas] = useState(0);
   const [confirmMessage, setConfirmMessage] = useState("");
   const [confirmMode, setConfirmMode] = useState("request");
   const [userDocId, setUserDocId] = useState(null);
@@ -58,54 +60,120 @@ const MyProfile = ({ onViewChange }) => {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "SOLICITUDES"), (snapshot) => {
-      setCountSolicitudes(snapshot.size);
-    });
-    return unsubscribe;
+    let active = true;
+
+    const loadSolicitudesCount = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "SOLICITUDES"));
+        if (active) {
+          setCountSolicitudes(snapshot.size);
+        }
+      } catch (error) {
+        console.error("Error fetching solicitudes count:", error);
+      }
+    };
+
+    loadSolicitudesCount();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
     if (!user || userData?.rol !== "ORGANIZADOR") return;
 
-    let unsubscribeBoletas = null;
-    const eventosQuery = query(collection(db, "EVENTOS"), where("organizadorId", "==", user.uid));
+    let active = true;
 
-    const unsubscribeEventos = onSnapshot(eventosQuery, (eventosSnapshot) => {
-      const eventoIds = eventosSnapshot.docs.map((doc) => doc.id);
+    const loadBoletasCount = async () => {
+      try {
+        const eventosQuery = query(collection(db, "EVENTOS"), where("organizadorId", "==", user.uid));
+        const eventosSnapshot = await getDocs(eventosQuery);
+        const eventoIds = eventosSnapshot.docs.map((doc) => doc.id);
 
-      if (unsubscribeBoletas) {
-        unsubscribeBoletas();
-        unsubscribeBoletas = null;
-      }
+        if (!active) return;
+        if (eventoIds.length === 0) {
+          setCountSolicitudesBoletas(0);
+          return;
+        }
 
-      if (eventoIds.length === 0) {
-        setCountSolicitudesBoletas(0);
-        return;
-      }
-
-      if (eventoIds.length <= 10) {
-        const boletasQuery = query(
-          collection(db, "SOLICITUDES_BOLETAS"),
-          where("eventoId", "in", eventoIds),
-          where("estado", "==", "PENDIENTE")
-        );
-        unsubscribeBoletas = onSnapshot(boletasQuery, (snapshot) => {
-          setCountSolicitudesBoletas(snapshot.size);
-        });
-      } else {
-        unsubscribeBoletas = onSnapshot(collection(db, "SOLICITUDES_BOLETAS"), (snapshot) => {
-          const count = snapshot.docs.reduce((acc, doc) => {
+        if (eventoIds.length <= 10) {
+          const boletasQuery = query(
+            collection(db, "SOLICITUDES_BOLETAS"),
+            where("eventoId", "in", eventoIds),
+            where("estado", "==", "PENDIENTE")
+          );
+          const boletasSnapshot = await getDocs(boletasQuery);
+          if (active) {
+            setCountSolicitudesBoletas(boletasSnapshot.size);
+          }
+        } else {
+          const boletasSnapshot = await getDocs(collection(db, "SOLICITUDES_BOLETAS"));
+          if (!active) return;
+          const count = boletasSnapshot.docs.reduce((acc, doc) => {
             const data = doc.data();
             return eventoIds.includes(data.eventoId) && data.estado === "PENDIENTE" ? acc + 1 : acc;
           }, 0);
           setCountSolicitudesBoletas(count);
-        });
+        }
+      } catch (error) {
+        console.error("Error fetching solicitudes de boletas:", error);
       }
-    });
+    };
+
+    loadBoletasCount();
 
     return () => {
-      if (unsubscribeBoletas) unsubscribeBoletas();
-      unsubscribeEventos();
+      active = false;
+    };
+  }, [user, userData?.rol]);
+
+  useEffect(() => {
+    if (!user || userData?.rol !== "ORGANIZADOR") return;
+
+    let unsubscribeLugares = null;
+    let unsubscribeReservas = null;
+
+    const setupRealtimeReservasCount = async () => {
+      try {
+        const lugaresQuery = query(collection(db, "LUGARES"), where("organizadorId", "==", user.uid));
+        const lugaresSnapshot = await getDocs(lugaresQuery);
+        const lugaresIds = lugaresSnapshot.docs.map((doc) => doc.id);
+
+        if (lugaresIds.length === 0) {
+          setCountReservas(0);
+          return;
+        }
+
+        if (lugaresIds.length <= 10) {
+          const reservasQuery = query(
+            collection(db, "RESERVAS"),
+            where("lugarId", "in", lugaresIds),
+            where("estado", "==", "PENDIENTE")
+          );
+          unsubscribeReservas = onSnapshot(reservasQuery, (snapshot) => {
+            setCountReservas(snapshot.size);
+          });
+        } else {
+          unsubscribeReservas = onSnapshot(collection(db, "RESERVAS"), (snapshot) => {
+            const count = snapshot.docs.reduce((acc, doc) => {
+              const data = doc.data();
+              return lugaresIds.includes(data.lugarId) && data.estado === "PENDIENTE" ? acc + 1 : acc;
+            }, 0);
+            setCountReservas(count);
+          });
+        }
+      } catch (error) {
+        console.error("Error setting up realtime reservas count:", error);
+      }
+    };
+
+    setupRealtimeReservasCount();
+
+    return () => {
+      if (unsubscribeReservas) {
+        unsubscribeReservas();
+      }
     };
   }, [user, userData?.rol]);
 
@@ -174,8 +242,23 @@ const MyProfile = ({ onViewChange }) => {
     }
   };
 
+  const handleCloseReservas = () => {
+    setActiveSection(null);
+    // El listener en tiempo real actualizará automáticamente el contador
+  };
+
   const handleBackToProfile = () => {
     setCurrentSection("profile");
+  };
+
+  const handleViewChange = (view) => {
+    if (view === "profile") {
+      setCurrentSection("profile");
+      setIsLoading(false);
+    }
+    if (onViewChange) {
+      onViewChange(view);
+    }
   };
 
   if (loading) {
@@ -191,7 +274,7 @@ const MyProfile = ({ onViewChange }) => {
     return (
       <>
         <Navbar 
-          onViewChange={onViewChange}
+          onViewChange={handleViewChange}
           onChange={handleSectionChange}
           isLoading={true}
           currentSection={currentSection}
@@ -206,7 +289,7 @@ const MyProfile = ({ onViewChange }) => {
     return (
       <>
         <Navbar 
-          onViewChange={onViewChange}
+          onViewChange={handleViewChange}
           onChange={handleSectionChange}
           currentSection={currentSection}
         />
@@ -220,7 +303,7 @@ const MyProfile = ({ onViewChange }) => {
     return (
       <>
         <Navbar 
-          onViewChange={onViewChange}
+          onViewChange={handleViewChange}
           onChange={handleSectionChange}
           currentSection={currentSection}
         />
@@ -233,7 +316,7 @@ const MyProfile = ({ onViewChange }) => {
   return (
     <div className="myprofile">
       <Navbar 
-        onViewChange={onViewChange}
+        onViewChange={handleViewChange}
         onChange={handleSectionChange}
         isLoading={isLoading}
         currentSection={currentSection}
@@ -309,6 +392,14 @@ const MyProfile = ({ onViewChange }) => {
                 {countSolicitudesBoletas > 0 && <span className="counter">{countSolicitudesBoletas}</span>}
               </button>
               <button 
+                className={`organizador-btn ${activeSection === 'reservas' ? 'active' : ''}`}
+                onClick={() => setActiveSection('reservas')}
+              >
+                <FaClipboardList className="organizador-icon" />
+                <span>Solicitudes de Reservas</span>
+                {countReservas > 0 && <span className="counter">{countReservas}</span>}
+              </button>
+              <button 
                 className={`organizador-btn ${activeSection === 'porteros' ? 'active' : ''}`}
                 onClick={() => setActiveSection('porteros')}
               >
@@ -321,6 +412,7 @@ const MyProfile = ({ onViewChange }) => {
             {activeSection === 'lugares' && <Lugares userId={user.uid} onClose={() => setActiveSection(null)} initialShowForm={true} />}
             {activeSection === 'metodospagos' && <MetodosPagos userId={user.uid} onClose={() => setActiveSection(null)} />}
             {activeSection === 'solicitudesboletas' && <SolicitudesBoletas userId={user.uid} onClose={() => setActiveSection(null)} />}
+            {activeSection === 'reservas' && <ReservasOrganizador userId={user.uid} onClose={handleCloseReservas} />}
             {activeSection === 'porteros' && <Porteros userId={user.uid} onClose={() => setActiveSection(null)} />}
           </div>
         )}
