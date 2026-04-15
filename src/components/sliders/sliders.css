@@ -9,6 +9,10 @@
   background: #111;
 }
 
+.slider-text h2, .slider-text p {
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+}
+
 /* Wrapper de slides */
 .slides-wrapper {
   position: relative;
@@ -245,5 +249,42 @@
   .slider-nav-btn {
     padding: 8px 12px;
     font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Movemos las flechas reales hacia los bordes */
+  .slider-nav-btn.prev {
+    left: 5px !important;
+    width: 35px; /* Un poco más pequeñas para que no estorben */
+    height: 35px;
+  }
+
+  .slider-nav-btn.next {
+    right: 5px !important;
+    width: 35px;
+    height: 35px;
+  }
+
+  /* Ajustamos el contenedor del texto para que no se pegue a las flechas */
+  .slider-content {
+    padding: 0 45px; /* Esto crea un "muro" para que el texto no toque las flechas */
+  }
+
+  .slider-content h2 {
+    font-size: 1.4rem !important; /* Texto un poco más pequeño */
+    margin-bottom: 8px;
+  }
+
+  .slider-content p {
+    font-size: 1rem !important;
+    line-height: 1.2;
+  }
+
+  /* El botón de Explorar */
+  .explorar-button {
+    padding: 10px 20px !important;
+    font-size: 0.9rem !important;
+    margin-top: 10px;
   }
 }
