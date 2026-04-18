@@ -1,13 +1,13 @@
 .entradas-section {
   margin-top: 2rem;
   padding: 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid #000000;
   border-radius: 8px;
-  background-color: #f9f9f9;
+  background-color: #2C61F2;
 }
 
 .entradas-section h2 {
-  color: #333;
+  color: #ffffff;
   margin-bottom: 1rem;
 }
 
@@ -161,4 +161,27 @@
   padding: 2rem;
   color: #dc3545;
   font-weight: bold;
+}
+
+/* Esto se aplica solo a celulares */
+@media (max-width: 768px) {
+  /* Si los elementos están uno al lado del otro, los ponemos en columna */
+  .container-perfil, .flex-layout { 
+    flex-direction: column !important;
+    padding: 10px;
+  }
+
+  /* Ajustamos los tamaños de fuente para que no se desborden */
+  h1 { font-size: 1.5rem; }
+  
+  /* Los botones deben ocupar casi todo el ancho para que sea fácil tocarlos */
+  button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  /* Si tienes tablas, mejor que tengan scroll horizontal */
+  .table-container {
+    overflow-x: auto;
+  }
 }

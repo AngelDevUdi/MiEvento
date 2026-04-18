@@ -1,71 +1,144 @@
-@import "../../../resources/colors/colors.css";
-
-/* CONTENEDOR GENERAL */
+/* --- SECCIÓN DE RESERVAS --- */
 .reservas-section {
-  padding: 20px;
-  color: var(--color-text);
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border-radius: 12px;
+  background-color: #1e273a; /* Mismo fondo oscuro que entradas */
+  border: 1px solid #3e4b6b;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  color: white;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .reservas-section h2 {
-  margin-bottom: 20px;
-  font-size: 26px;
+  color: #a29bfe; /* Lila elegante */
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
 }
 
-/* LISTA COMO SLIDER */
-.reservas-list {
-  display: flex;
-  gap: 20px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding-bottom: 10px;
+/* Reutilizamos los mismos estilos de botones para que no desentonen */
+.filter-toggle {
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
 }
 
-/* SCROLL BONITO */
-.reservas-list::-webkit-scrollbar {
-  height: 8px;
+.filter-toggle:not(.active) {
+  background-color: #28a745;
+  color: white;
 }
 
-.reservas-list::-webkit-scrollbar-thumb {
-  background: var(--color-btn-bg);
-  border-radius: 10px;
+.filter-toggle.active {
+  background-color: #5acd97; /* Morado para reservas */
+  color: white;
 }
 
-/* TARJETA */
+.filter-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+/* Tarjeta de Reserva (Gemela de entrada-card) */
 .reserva-card {
-  min-width: 320px;
-  max-width: 320px;
-  background: linear-gradient(135deg, var(--color-bg-secondary), var(--color-bg-tertiary));
-  border-radius: 20px;
-  padding: 20px;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+  width: 300px;
+  min-height: 300px; /* Un poco más baja que boletas por el QR */
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   scroll-snap-align: center;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
-  position: relative;
+  transition: transform 0.3s ease;
 }
 
-/* EFECTO HOVER */
-.reserva-card:hover {
-  transform: translateY(-10px) scale(1.03);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+.reserva-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
-/* HEADER */
-.reserva-card h3 {
-  font-size: 20px;
-  margin-bottom: 10px;
-  color: var(--color-info);
+.reserva-header h3 {
+  margin: 0;
+  color: #6a5acd; /* Un color distinto para diferenciar Reservas de Entradas */
+  font-size: 1.2rem;
 }
 
-/* INFO */
-.reserva-card p {
-  margin: 6px 0;
-  font-size: 14px;
-  color: var(--color-text-muted);
+.reserva-id {
+  background: #6a5acd;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
 }
 
-/* LOADING */
+.reserva-info p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.reserva-info strong {
+  color: #333;
+}
+
+/* Estados de la reserva */
+.estado-pendiente {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+.estado-confirmada {
+  color: #28a745;
+  font-weight: bold;
+}
+
+/* Detalles de la reserva (Footer de la card) */
+.reserva-footer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #ddd;
+  text-align: right;
+  font-size: 0.85rem;
+  color: #888;
+}
+
 .reservas-loading {
   text-align: center;
-  font-size: 18px;
-  color: var(--color-text-muted);
+  padding: 2rem;
+  color: #666;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+  .reservas-section {
+    padding: 10px;
+  }
+
+  /* En móvil el scroll horizontal sigue funcionando igual que en boletas */
+  .reservas-list {
+    width: 100%;
+  }
+
+  .reserva-card {
+    width: 280px; /* Un poco más angosta para pantallas pequeñas */
+  }
+
+  h1 { font-size: 1.5rem; }
+  
+  /* Ajuste de botones generales */
+  button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
 }

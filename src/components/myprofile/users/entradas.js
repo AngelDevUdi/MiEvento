@@ -3,6 +3,7 @@ import { db } from "../../../api/api";
 import { collection, query, where, doc, getDoc, onSnapshot } from "firebase/firestore";
 import BoletaModal from "./boleta/BoletaModal";
 import "./entradas.css";
+import { toast } from "react-toastify";
 
 const Entradas = ({ userId }) => {
   const [boletas, setBoletas] = useState([]);
@@ -142,14 +143,25 @@ const Entradas = ({ userId }) => {
       <h2>Mis Boletas</h2>
       <div className="filter-buttons">
         <button 
-          className={`filter-toggle ${showOnlyActive ? 'active' : ''}`}
-          onClick={() => setShowOnlyActive(!showOnlyActive)}
-        >
-          {showOnlyActive ? 'Mostrar Todas' : 'Mostrar Activas'}
-        </button>
+  className={`filter-toggle ${showOnlyActive ? 'active' : ''}`}
+  onClick={() => {
+    // Si va a mostrar activas pero no hay ninguna, lanzamos el Toast
+    if (!showOnlyActive && boletas.filter(b => b.estado === 'ACTIVADA').length === 0) {
+      toast.info("No tienes boletas activas actualmente", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "dark",
+      });
+    }
+    // De todas formas cambiamos el filtro
+    setShowOnlyActive(!showOnlyActive);
+  }}
+>
+  {showOnlyActive ? 'Mostrar Todas' : 'Mostrar Activas'}
+</button>
       </div>
       {boletasFiltradas.length === 0 ? (
-        <p>No tienes boletas {showOnlyActive ? 'activas' : ''}.</p>
+        <p>{showOnlyActive ? '' : ''}.</p>
       ) : (
         <div className="entradas-list">
           {boletasFiltradas.map(boleta => (
