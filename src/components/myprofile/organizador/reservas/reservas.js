@@ -11,51 +11,54 @@ const Reservas = ({ userId, onClose }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let unsubscribeLugares = null;
+    let unsubscribeReservas = null;
 
     const setupRealtimeListener = async () => {
       try {
-        // Obtener lugares del organizador
-        const lugaresQuery = query(collection(db, "LUGARES"), where("organizadorId", "==", userId));
-        const lugaresSnapshot = await getDocs(lugaresQuery);
-        const lugaresIds = lugaresSnapshot.docs.map(doc => doc.id);
+        // Buscar directamente por organizadorId en lugar de por lugarId
+        const reservasQuery = query(
+          collection(db, "RESERVAS"),
+          where("organizadorId", "==", userId),
+          where("estado", "==", "PENDIENTE")
+        );
+        
+        unsubscribeReservas = onSnapshot(reservasQuery, (snapshot) => {
+          // Obtener datos de usuarios para enriquecer la información
+          const loadUserData = async () => {
+            try {
+              const usuariosSnapshot = await getDocs(collection(db, "USUARIOS"));
+              const usuariosData = usuariosSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        if (lugaresIds.length === 0) {
-          setReservas([]);
-          setLoading(false);
-          return;
-        }
+              const reservasData = snapshot.docs
+                .map(doc => ({ id: doc.id, ...doc.data() }))
+                .sort((a, b) => {
+                  const fechaA = a.fechaReserva?.toDate ? a.fechaReserva.toDate() : a.fechaReserva;
+                  const fechaB = b.fechaReserva?.toDate ? b.fechaReserva.toDate() : b.fechaReserva;
+                  return fechaB - fechaA;
+                });
 
-        // Obtener datos adicionales (usuarios, lugares)
-        const usuariosSnapshot = await getDocs(collection(db, "USUARIOS"));
-        const usuariosData = usuariosSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+              // Combinar datos
+              const reservasCompletas = reservasData.map(reserva => {
+                const usuario = usuariosData.find(u => u.id === reserva.usuarioId);
 
-        // Listener en tiempo real para reservas
-        const reservasQuery = query(collection(db, "RESERVAS"), where("lugarId", "in", lugaresIds));
-        unsubscribeLugares = onSnapshot(reservasQuery, (snapshot) => {
-          const reservasData = snapshot.docs
-            .map(doc => ({ id: doc.id, ...doc.data() }))
-            .sort((a, b) => {
-              const fechaA = a.fechaReserva?.toDate ? a.fechaReserva.toDate() : a.fechaReserva;
-              const fechaB = b.fechaReserva?.toDate ? b.fechaReserva.toDate() : b.fechaReserva;
-              return fechaB - fechaA;
-            });
+                return {
+                  ...reserva,
+                  usuarioNombre: usuario ? (usuario.name || usuario.nombre || "Usuario desconocido") : "Usuario desconocido",
+                  usuarioEmail: usuario ? usuario.email : "",
+                  fechaFormatted: reserva.fechaReserva?.toDate ? reserva.fechaReserva.toDate().toLocaleDateString('es-ES') : reserva.fechaReserva,
+                  diaReservaFormatted: reserva.diaReserva || "No especificado"
+                };
+              });
 
-          // Combinar datos
-          const reservasCompletas = reservasData.map(reserva => {
-            const usuario = usuariosData.find(u => u.id === reserva.usuarioId);
+              setReservas(reservasCompletas);
+              setLoading(false);
+            } catch (error) {
+              console.error("Error loading user data:", error);
+              setLoading(false);
+            }
+          };
 
-            return {
-              ...reserva,
-              usuarioNombre: usuario ? (usuario.name || usuario.nombre || "Usuario desconocido") : "Usuario desconocido",
-              usuarioEmail: usuario ? usuario.email : "",
-              fechaFormatted: reserva.fechaReserva?.toDate ? reserva.fechaReserva.toDate().toLocaleDateString('es-ES') : reserva.fechaReserva,
-              diaReservaFormatted: reserva.diaReserva || "No especificado"
-            };
-          });
-
-          setReservas(reservasCompletas);
-          setLoading(false);
+          loadUserData();
         }, (error) => {
           console.error("Error in realtime listener:", error);
           toast.error("Error al cargar solicitudes de reservas");
@@ -71,20 +74,28 @@ const Reservas = ({ userId, onClose }) => {
     setupRealtimeListener();
 
     return () => {
-      if (unsubscribeLugares) {
-        unsubscribeLugares();
+      if (unsubscribeReservas) {
+        unsubscribeReservas();
       }
     };
   }, [userId]);
 
   const handleEstadoChange = async (reservaId, nuevoEstado) => {
     try {
+      // Si el organizador confirma, cambiar directamente a ACTIVADA
+      const estadoFinal = nuevoEstado === "CONFIRMADA" ? "ACTIVADA" : nuevoEstado;
+      
       await updateDoc(doc(db, "RESERVAS", reservaId), {
-        estado: nuevoEstado,
-        updatedAt: new Date()
+        estado: estadoFinal,
+        updatedAt: new Date(),
+        confirmedAt: estadoFinal === "ACTIVADA" ? new Date() : null
       });
 
-      toast.success(`Reserva ${nuevoEstado === "CONFIRMADA" ? "confirmada" : nuevoEstado.toLowerCase()} exitosamente`);
+      const mensaje = estadoFinal === "ACTIVADA" 
+        ? "Reserva confirmada y activada exitosamente" 
+        : "Reserva rechazada exitosamente";
+      
+      toast.success(mensaje);
       // El listener en tiempo real actualizará automáticamente la lista
     } catch (error) {
       console.error("Error updating reserva:", error);
@@ -158,15 +169,27 @@ const Reservas = ({ userId, onClose }) => {
                     <button
                       onClick={() => handleEstadoChange(reserva.id, 'CONFIRMADA')}
                       className="approve-btn"
+                      title="Confirmar el pago y activar la reserva"
                     >
-                      Confirmar
+                      Confirmar y Activar
                     </button>
                     <button
                       onClick={() => handleEstadoChange(reserva.id, 'RECHAZADA')}
                       className="reject-btn"
+                      title="Rechazar la solicitud de reserva"
                     >
                       Rechazar
                     </button>
+                  </div>
+                )}
+                {(reserva.estado === 'ACTIVADA' || reserva.estado === 'CONFIRMADA') && (
+                  <div className="reserva-status-active">
+                    <p className="status-confirmed">✓ Reserva Activada</p>
+                  </div>
+                )}
+                {reserva.estado === 'RECHAZADA' && (
+                  <div className="reserva-status-rejected">
+                    <p className="status-rejected">✗ Reserva Rechazada</p>
                   </div>
                 )}
               </div>

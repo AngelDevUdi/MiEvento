@@ -107,12 +107,26 @@ const Entradas = ({ userId }) => {
     <div className="entradas-section">
       <h2>Mis Boletas</h2>
       <div className="filter-buttons">
-        <button 
-          className={`filter-toggle ${showOnlyActive ? 'active' : ''}`}
-          onClick={() => setShowOnlyActive(!showOnlyActive)}
-        >
-          {showOnlyActive ? 'Mostrar Todas' : 'Mostrar Activas'}
-        </button>
+        <div>
+          <label>
+            <input 
+              type="radio" 
+              name="filtro-boletas" 
+              checked={showOnlyActive}
+              onChange={() => setShowOnlyActive(true)}
+            />
+            <span>Mostrar Activas</span>
+          </label>
+          <label>
+            <input 
+              type="radio" 
+              name="filtro-boletas" 
+              checked={!showOnlyActive}
+              onChange={() => setShowOnlyActive(false)}
+            />
+            <span>Mostrar Todas</span>
+          </label>
+        </div>
       </div>
       {boletasFiltradas.length === 0 ? (
         <p>No tienes boletas {showOnlyActive ? 'activas' : ''}.</p>

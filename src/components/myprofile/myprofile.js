@@ -64,21 +64,30 @@ const MyProfile = ({ onViewChange }) => {
 
     const loadSolicitudesCount = async () => {
       try {
+        // Solo admin puede leer el contador de solicitudes
+        if (userData?.rol !== "ADMINISTRADOR") {
+          setCountSolicitudes(0);
+          return;
+        }
+        
         const snapshot = await getDocs(collection(db, "SOLICITUDES"));
         if (active) {
           setCountSolicitudes(snapshot.size);
         }
       } catch (error) {
         console.error("Error fetching solicitudes count:", error);
+        setCountSolicitudes(0);
       }
     };
 
-    loadSolicitudesCount();
+    if (userData) {
+      loadSolicitudesCount();
+    }
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [userData]);
 
   useEffect(() => {
     if (!user || userData?.rol !== "ORGANIZADOR") return;
@@ -131,40 +140,23 @@ const MyProfile = ({ onViewChange }) => {
   useEffect(() => {
     if (!user || userData?.rol !== "ORGANIZADOR") return;
 
-    let unsubscribeLugares = null;
     let unsubscribeReservas = null;
 
     const setupRealtimeReservasCount = async () => {
       try {
-        const lugaresQuery = query(collection(db, "LUGARES"), where("organizadorId", "==", user.uid));
-        const lugaresSnapshot = await getDocs(lugaresQuery);
-        const lugaresIds = lugaresSnapshot.docs.map((doc) => doc.id);
-
-        if (lugaresIds.length === 0) {
-          setCountReservas(0);
-          return;
-        }
-
-        if (lugaresIds.length <= 10) {
-          const reservasQuery = query(
-            collection(db, "RESERVAS"),
-            where("lugarId", "in", lugaresIds),
-            where("estado", "==", "PENDIENTE")
-          );
-          unsubscribeReservas = onSnapshot(reservasQuery, (snapshot) => {
-            setCountReservas(snapshot.size);
-          });
-        } else {
-          unsubscribeReservas = onSnapshot(collection(db, "RESERVAS"), (snapshot) => {
-            const count = snapshot.docs.reduce((acc, doc) => {
-              const data = doc.data();
-              return lugaresIds.includes(data.lugarId) && data.estado === "PENDIENTE" ? acc + 1 : acc;
-            }, 0);
-            setCountReservas(count);
-          });
-        }
+        // Buscar directamente por organizadorId
+        const reservasQuery = query(
+          collection(db, "RESERVAS"),
+          where("organizadorId", "==", user.uid),
+          where("estado", "==", "PENDIENTE")
+        );
+        
+        unsubscribeReservas = onSnapshot(reservasQuery, (snapshot) => {
+          setCountReservas(snapshot.size);
+        });
       } catch (error) {
         console.error("Error setting up realtime reservas count:", error);
+        setCountReservas(0);
       }
     };
 
@@ -233,13 +225,13 @@ const MyProfile = ({ onViewChange }) => {
   };
 
   const handleSectionChange = (section) => {
-    if (section === "eventos" || section === "lugares") {
-      setIsLoading(true);
-      setTimeout(() => {
-        setCurrentSection(section);
-        setIsLoading(false);
-      }, 500);
-    }
+    // Siempre mostrar pantalla de carga, incluso si ya estamos en esa sección
+    setIsLoading(true);
+    setTimeout(() => {
+      setCurrentSection(section);
+      setActiveSection(null);
+      setIsLoading(false);
+    }, 500);
   };
 
   const handleCloseReservas = () => {
@@ -279,7 +271,7 @@ const MyProfile = ({ onViewChange }) => {
           isLoading={true}
           currentSection={currentSection}
         />
-        <EventLoading text={currentSection === "eventos" ? "Cargando eventos..." : "Cargando lugares..."} />
+        <EventLoading text={currentSection === "eventos" ? "Cargando eventos..." : currentSection === "lugares" ? "Cargando lugares..." : "Cargando perfil..."} />
       </>
     );
   }
@@ -329,7 +321,7 @@ const MyProfile = ({ onViewChange }) => {
         {userData?.rol === "USUARIO" && (
           <div className="user-sections">
             <Entradas userId={user.uid} />
-            <Reservas userEmail={user.email} />
+            <Reservas userId={user.uid} />
           </div>
         )}
         

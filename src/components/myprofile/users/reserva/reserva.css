@@ -1,0 +1,90 @@
+.reserva-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.reserva-modal {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.reserva-modal-header {
+  margin-bottom: 16px;
+}
+
+.reserva-modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.reserva-details {
+  text-align: left;
+  margin: 0 auto 20px;
+  max-width: 320px;
+}
+
+.reserva-details p {
+  margin: 6px 0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.reserva-qrcode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.qr-container {
+  position: relative;
+  display: inline-block;
+}
+
+.qr-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(128, 128, 128, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.qr-x {
+  font-size: 48px;
+  color: #ff0000;
+  font-weight: bold;
+}
+
+.qr-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+}

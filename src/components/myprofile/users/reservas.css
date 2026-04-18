@@ -3,7 +3,7 @@
   margin-top: 2rem;
   padding: 1.5rem;
   border-radius: 12px;
-  background-color: #1e273a; /* Mismo fondo oscuro que entradas */
+  background-color: #1e273a;
   border: 1px solid #3e4b6b;
   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
   color: white;
@@ -11,53 +11,99 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .reservas-section h2 {
-  color: #a29bfe; /* Lila elegante */
+  color: #a29bfe;
   margin-bottom: 1.5rem;
   font-size: 1.6rem;
 }
 
-/* Reutilizamos los mismos estilos de botones para que no desentonen */
-.filter-toggle {
-  padding: 0.6rem 1.5rem;
-  border: none;
-  border-radius: 25px;
+/* Filtro de 3 botones */
+.filter-buttons {
+  display: flex;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+.filter-buttons div {
+  display: flex;
+  flex-wrap: nowrap;
+  margin-top: 0.5rem;
+  justify-content: center;
+  gap: 0.0625em;
+}
+
+.filter-buttons input[type="radio"] {
+  clip: rect(0 0 0 0);
+  clip-path: inset(100%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.filter-buttons input[type="radio"]:checked + span {
+  box-shadow: 0 0 0 0.0625em #0043ed;
+  background-color: #dee7ff;
+  z-index: 1;
+  color: #0043ed;
+}
+
+.filter-buttons label span {
+  display: block;
   cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s ease;
+  background-color: #fff;
+  padding: 0.375em .75em;
+  position: relative;
+  margin-left: .0625em;
+  box-shadow: 0 0 0 0.0625em #b5bfd9;
+  letter-spacing: .05em;
+  color: #3e4963;
+  text-align: center;
+  transition: background-color .5s ease;
 }
 
-.filter-toggle:not(.active) {
-  background-color: #28a745;
-  color: white;
+.filter-buttons label:first-child span {
+  border-radius: .375em 0 0 .375em;
 }
 
-.filter-toggle.active {
-  background-color: #5acd97; /* Morado para reservas */
-  color: white;
+.filter-buttons label:last-child span {
+  border-radius: 0 .375em .375em 0;
 }
 
-.filter-toggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+/* Lista de reservas - CARRUSEL HORIZONTAL */
+.reservas-list {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  width: 320px;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: 10px;
 }
-/* Tarjeta de Reserva (Gemela de entrada-card) */
-.reserva-card {
+
+/* Tarjeta de Reserva Usuario */
+.reserva-card-usuario {
   background: white;
   padding: 1.5rem;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid #e0e0e0;
   width: 300px;
-  min-height: 300px; /* Un poco más baja que boletas por el QR */
+  min-height: 350px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   scroll-snap-align: center;
-  transition: transform 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  box-sizing: border-box;
 }
 
 .reserva-header {
@@ -67,19 +113,40 @@
   margin-bottom: 1rem;
 }
 
-.reserva-header h3 {
+.reserva-card-usuario .reserva-header h3 {
   margin: 0;
-  color: #6a5acd; /* Un color distinto para diferenciar Reservas de Entradas */
+  color: #007bff;
   font-size: 1.2rem;
 }
 
-.reserva-id {
-  background: #6a5acd;
+.estado-badge {
+  background: #007bff;
   color: white;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.8rem;
   font-weight: bold;
+}
+
+.estado-pendiente {
+  background-color: #ffc107;
+  color: #333;
+}
+
+.estado-confirmada,
+.estado-activada {
+  background-color: #28a745;
+  color: white;
+}
+
+.estado-rechazada {
+  background-color: #dc3545;
+  color: white;
+}
+
+.estado-usada {
+  background-color: #6c757d;
+  color: white;
 }
 
 .reserva-info p {
@@ -92,25 +159,49 @@
   color: #333;
 }
 
-/* Estados de la reserva */
-.estado-pendiente {
-  color: #ffc107;
-  font-weight: bold;
-}
-
-.estado-confirmada {
-  color: #28a745;
-  font-weight: bold;
-}
-
-/* Detalles de la reserva (Footer de la card) */
 .reserva-footer {
   margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px dashed #ddd;
-  text-align: right;
+  text-align: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.reserva-button {
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.reserva-button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.reserva-button:active {
+  transform: scale(0.95);
+}
+
+.reserva-footer small {
   font-size: 0.85rem;
-  color: #888;
+  color: #666;
+}
+
+/* Mensaje cuando no hay reservas */
+.no-reservas-message {
+  text-align: center;
+  padding: 2rem;
+  color: #a29bfe;
+  font-size: 1rem;
+  font-weight: 500;
+  width: 100%;
 }
 
 .reservas-loading {
@@ -125,18 +216,29 @@
     padding: 10px;
   }
 
-  /* En móvil el scroll horizontal sigue funcionando igual que en boletas */
+  .filter-buttons {
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .filter-toggle {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
   .reservas-list {
     width: 100%;
   }
 
   .reserva-card {
-    width: 280px; /* Un poco más angosta para pantallas pequeñas */
+    width: 280px;
   }
 
-  h1 { font-size: 1.5rem; }
+  h1 { 
+    font-size: 1.5rem; 
+  }
   
-  /* Ajuste de botones generales */
   button {
     width: 100%;
     margin-bottom: 10px;

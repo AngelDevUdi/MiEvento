@@ -7,7 +7,8 @@ import CryptoJS from 'crypto-js';
 import './EscanearBoletas.css';
 
 const EscanearBoletas = ({ userId }) => {
-  const [boletaInfo, setBoletaInfo] = useState(null);
+  const [itemInfo, setItemInfo] = useState(null);
+  const [itemType, setItemType] = useState(null); // 'boleta' o 'reserva'
   const [showModal, setShowModal] = useState(false);
   const scannerRef = useRef(null);
 
@@ -27,14 +28,26 @@ const EscanearBoletas = ({ userId }) => {
 
   const onScanSuccess = (decodedText) => {
     try {
-      const secretKey = 'clave_secreta_porteros_2026'; // Clave secreta para descifrar
+      const secretKey = 'clave_secreta_porteros_2026';
       const bytes = CryptoJS.AES.decrypt(decodedText, secretKey);
       const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
       if (!decryptedData) {
         throw new Error('Descifrado fallido');
       }
       const data = JSON.parse(decryptedData);
-      fetchBoletaInfo(data.numeroBoleta, data.usuarioId);
+      
+      // Identificar si es boleta o reserva
+      if (data.boletaId && data.eventoId) {
+        // Es una boleta
+        setItemType('boleta');
+        fetchBoletaInfo(data.numeroBoleta, data.usuarioId);
+      } else if (data.reservaId) {
+        // Es una reserva
+        setItemType('reserva');
+        fetchReservaInfo(data.reservaId, data.usuarioId);
+      } else {
+        throw new Error('Tipo de código inválido');
+      }
     } catch (error) {
       toast.error('QR inválido o no autorizado');
     }
@@ -42,6 +55,37 @@ const EscanearBoletas = ({ userId }) => {
 
   const onScanFailure = (error) => {
     // ignore
+  };
+
+  const fetchReservaInfo = async (reservaId, usuarioId) => {
+    try {
+      const reservaRef = doc(db, "RESERVAS", reservaId);
+      const reservaDoc = await getDoc(reservaRef);
+
+      if (!reservaDoc.exists()) {
+        toast.error('Reserva no encontrada');
+        return;
+      }
+
+      const reserva = reservaDoc.data();
+      
+      // Verificar que la reserva esté activa o confirmada
+      if (reserva.estado !== 'ACTIVADA' && reserva.estado !== 'CONFIRMADA') {
+        toast.error('Esta reserva no está disponible');
+        return;
+      }
+
+      setItemInfo({
+        ...reserva,
+        id: reservaId,
+        usuarioId: usuarioId,
+        tipo: 'reserva'
+      });
+      setShowModal(true);
+    } catch (error) {
+      console.error(error);
+      toast.error('Error al buscar reserva');
+    }
   };
 
   const fetchBoletaInfo = async (numeroBoleta, usuarioId) => {
@@ -59,11 +103,11 @@ const EscanearBoletas = ({ userId }) => {
           const boleta = boleterias?.[solicitudDoc.id];
           if (boleta && boleta.numeroBoleta === numeroBoleta && boleta.estado === 'ACTIVA') {
             // Obtener información del evento
-            const eventoQuery = query(collection(db, "EVENTOS"), where("__name__", "==", solicitud.eventoId));
-            const eventoSnapshot = await getDocs(eventoQuery);
-            if (!eventoSnapshot.empty) {
-              const evento = eventoSnapshot.docs[0].data();
-              setBoletaInfo({ 
+            const eventoRef = doc(db, "EVENTOS", solicitud.eventoId);
+            const eventoDoc = await getDoc(eventoRef);
+            if (eventoDoc.exists()) {
+              const evento = eventoDoc.data();
+              setItemInfo({ 
                 ...boleta, 
                 solicitudId: solicitudDoc.id, 
                 eventoId: solicitud.eventoId, 
@@ -71,7 +115,8 @@ const EscanearBoletas = ({ userId }) => {
                 ingresados: boleta.ingresados || 0, 
                 faltantes: boleta.faltantes !== undefined ? boleta.faltantes : boleta.cantidad,
                 eventoNombre: evento.nombre,
-                eventoFecha: evento.fecha?.toDate ? evento.fecha.toDate().toLocaleDateString('es-ES') : evento.fecha
+                eventoFecha: evento.fecha?.toDate ? evento.fecha.toDate().toLocaleDateString('es-ES') : evento.fecha,
+                tipo: 'boleta'
               });
               setShowModal(true);
               return;
@@ -87,18 +132,19 @@ const EscanearBoletas = ({ userId }) => {
   };
 
   const handleEntrarTodos = async () => {
-    if (!boletaInfo) return;
+    if (!itemInfo || itemType !== 'boleta') return;
     try {
-      const boleteriaRef = doc(db, "BOLETERIA", boletaInfo.eventoId);
+      const boleteriaRef = doc(db, "BOLETERIA", itemInfo.eventoId);
       await updateDoc(boleteriaRef, {
-        [`boletas.${boletaInfo.solicitudId}.estado`]: 'USADA',
-        [`boletas.${boletaInfo.solicitudId}.ingresados`]: boletaInfo.cantidad,
-        [`boletas.${boletaInfo.solicitudId}.faltantes`]: 0,
-        [`boletas.${boletaInfo.solicitudId}.updatedAt`]: new Date()
+        [`boletas.${itemInfo.solicitudId}.estado`]: 'USADA',
+        [`boletas.${itemInfo.solicitudId}.ingresados`]: itemInfo.cantidad,
+        [`boletas.${itemInfo.solicitudId}.faltantes`]: 0,
+        [`boletas.${itemInfo.solicitudId}.updatedAt`]: new Date()
       });
       toast.success('Todos ingresados');
       setShowModal(false);
-      setBoletaInfo(null);
+      setItemInfo(null);
+      setItemType(null);
     } catch (error) {
       console.error(error);
       toast.error('Error al actualizar');
@@ -106,61 +152,99 @@ const EscanearBoletas = ({ userId }) => {
   };
 
   const handleEntrarParcial = async () => {
+    if (itemType !== 'boleta') return;
     const cantidadInput = document.getElementById('cantidadInput');
     const cantidadIngresar = parseInt(cantidadInput.value);
-    if (!boletaInfo || isNaN(cantidadIngresar) || cantidadIngresar <= 0) return;
+    if (!itemInfo || isNaN(cantidadIngresar) || cantidadIngresar <= 0) return;
 
-    const faltantes = boletaInfo.faltantes || boletaInfo.cantidad;
+    const faltantes = itemInfo.faltantes || itemInfo.cantidad;
     if (cantidadIngresar > faltantes) {
       toast.error('No puedes ingresar más personas de las que faltan');
       return;
     }
 
-    const nuevosIngresados = (boletaInfo.ingresados || 0) + cantidadIngresar;
-    const nuevosFaltantes = boletaInfo.cantidad - nuevosIngresados;
-    const nuevoEstado = nuevosFaltantes <= 0 ? 'USADA' : boletaInfo.estado;
+    const nuevosIngresados = (itemInfo.ingresados || 0) + cantidadIngresar;
+    const nuevosFaltantes = itemInfo.cantidad - nuevosIngresados;
+    const nuevoEstado = nuevosFaltantes <= 0 ? 'USADA' : itemInfo.estado;
 
     try {
-      const boleteriaRef = doc(db, "BOLETERIA", boletaInfo.eventoId);
+      const boleteriaRef = doc(db, "BOLETERIA", itemInfo.eventoId);
       await updateDoc(boleteriaRef, {
-        [`boletas.${boletaInfo.solicitudId}.estado`]: nuevoEstado,
-        [`boletas.${boletaInfo.solicitudId}.ingresados`]: nuevosIngresados,
-        [`boletas.${boletaInfo.solicitudId}.faltantes`]: nuevosFaltantes,
-        [`boletas.${boletaInfo.solicitudId}.updatedAt`]: new Date()
+        [`boletas.${itemInfo.solicitudId}.estado`]: nuevoEstado,
+        [`boletas.${itemInfo.solicitudId}.ingresados`]: nuevosIngresados,
+        [`boletas.${itemInfo.solicitudId}.faltantes`]: nuevosFaltantes,
+        [`boletas.${itemInfo.solicitudId}.updatedAt`]: new Date()
       });
       toast.success(`${cantidadIngresar} persona(s) ingresada(s)`);
       setShowModal(false);
-      setBoletaInfo(null);
+      setItemInfo(null);
+      setItemType(null);
     } catch (error) {
       console.error(error);
       toast.error('Error al actualizar');
     }
   };
 
+  const handleConfirmarReserva = async () => {
+    if (!itemInfo || itemType !== 'reserva') return;
+    try {
+      const reservaRef = doc(db, "RESERVAS", itemInfo.id);
+      await updateDoc(reservaRef, {
+        estado: 'USADA',
+        updatedAt: new Date()
+      });
+      toast.success('Reserva confirmada y marcada como usada');
+      setShowModal(false);
+      setItemInfo(null);
+      setItemType(null);
+    } catch (error) {
+      console.error(error);
+      toast.error('Error al confirmar reserva');
+    }
+  };
+
   return (
     <div className="escanear-boletas">
-      <h3>Escanear Boletas</h3>
+      <h3>Escanear Boletas y Reservas</h3>
       <div id="reader"></div>
-      {showModal && boletaInfo && (
+      {showModal && itemInfo && (
         <div className="modal-overlay">
           <div className="modal">
-            <h4>Información de Boleta</h4>
-            <p><strong>Evento:</strong> {boletaInfo.eventoNombre}</p>
-            <p><strong>Fecha:</strong> {boletaInfo.eventoFecha}</p>
-            <p><strong>Cantidad:</strong> {boletaInfo.cantidad}</p>
-            <p><strong>Estado:</strong> {boletaInfo.estado}</p>
-            <p><strong>Ingresados:</strong> {boletaInfo.ingresados || 0}</p>
-            <p><strong>Faltantes:</strong> {boletaInfo.faltantes || boletaInfo.cantidad}</p>
-            {boletaInfo.cantidad === 1 ? (
-              <button onClick={handleEntrarTodos}>Marcar como Usada</button>
+            {itemType === 'boleta' ? (
+              <>
+                <h4>Información de Boleta</h4>
+                <p><strong>Evento:</strong> {itemInfo.eventoNombre}</p>
+                <p><strong>Fecha:</strong> {itemInfo.eventoFecha}</p>
+                <p><strong>Cantidad:</strong> {itemInfo.cantidad}</p>
+                <p><strong>Estado:</strong> {itemInfo.estado}</p>
+                <p><strong>Ingresados:</strong> {itemInfo.ingresados || 0}</p>
+                <p><strong>Faltantes:</strong> {itemInfo.faltantes || itemInfo.cantidad}</p>
+                {itemInfo.cantidad === 1 ? (
+                  <button onClick={handleEntrarTodos}>Marcar como Usada</button>
+                ) : (
+                  <>
+                    <button onClick={handleEntrarTodos}>Entrar Todos</button>
+                    <input type="number" min="1" max={itemInfo.faltantes || itemInfo.cantidad} placeholder="Cantidad a ingresar" id="cantidadInput" />
+                    <button onClick={handleEntrarParcial}>Ingresar Parcial</button>
+                  </>
+                )}
+              </>
             ) : (
               <>
-                <button onClick={handleEntrarTodos}>Entrar Todos</button>
-                <input type="number" min="1" max={boletaInfo.faltantes || boletaInfo.cantidad} placeholder="Cantidad a ingresar" id="cantidadInput" />
-                <button onClick={handleEntrarParcial}>Ingresar Parcial</button>
+                <h4>Información de Reserva</h4>
+                <p><strong>Lugar:</strong> {itemInfo.lugarNombre}</p>
+                <p><strong>Fecha Evento:</strong> {itemInfo.diaReserva}</p>
+                <p><strong>Total:</strong> ${itemInfo.total?.toLocaleString('es-ES') || '0'}</p>
+                <p><strong>Método de Pago:</strong> {itemInfo.metodoPago}</p>
+                <p><strong>Estado:</strong> {itemInfo.estado}</p>
+                <button onClick={handleConfirmarReserva}>Confirmar Reserva</button>
               </>
             )}
-            <button onClick={() => setShowModal(false)}>Cerrar</button>
+            <button onClick={() => {
+              setShowModal(false);
+              setItemInfo(null);
+              setItemType(null);
+            }}>Cerrar</button>
           </div>
         </div>
       )}
