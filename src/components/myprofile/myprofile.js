@@ -18,7 +18,10 @@ import EscanearBoletas from "./porteros/EscanearBoletas";
 import EventosView from "../views/EventosView";
 import LugaresView from "../views/LugaresView";
 import EventLoading from "../loading/EventLoading";
-import { FaClipboardList, FaUserCog, FaCreditCard, FaTicketAlt, FaDoorOpen } from "react-icons/fa";
+import Dashboard from "./organizador/opciones avanzadas/Dashboard";
+import CalendarioReservas from "./organizador/opciones avanzadas/CalendarioReservas";
+import Modal from "./organizador/opciones avanzadas/Modal";
+import { FaClipboardList, FaUserCog, FaCreditCard, FaTicketAlt, FaDoorOpen, FaChartBar, FaCalendarAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import ConfirmationModal from "../confirmationmodal/confirmationmodal";
 
@@ -398,6 +401,20 @@ const MyProfile = ({ onViewChange }) => {
                 <FaDoorOpen className="organizador-icon" />
                 <span>Gestión de Porteros</span>
               </button>
+              <button 
+                className={`organizador-btn ${activeSection === 'dashboard' ? 'active' : ''}`}
+                onClick={() => setActiveSection('dashboard')}
+              >
+                <FaChartBar className="organizador-icon" />
+                <span>Dashboard</span>
+              </button>
+              <button 
+                className={`organizador-btn ${activeSection === 'calendario' ? 'active' : ''}`}
+                onClick={() => setActiveSection('calendario')}
+              >
+                <FaCalendarAlt className="organizador-icon" />
+                <span>Calendario de Reservas</span>
+              </button>
             </div>
             
             {activeSection === 'eventos' && <Eventos userId={user.uid} onClose={() => setActiveSection(null)} />}
@@ -437,6 +454,22 @@ const MyProfile = ({ onViewChange }) => {
           Volver al Inicio
         </button>
       </div>
+
+      <Modal 
+        isOpen={activeSection === 'dashboard'} 
+        onClose={() => setActiveSection(null)}
+        title="Dashboard de Estadísticas"
+      >
+        <Dashboard userId={user.uid} onClose={() => setActiveSection(null)} />
+      </Modal>
+      
+      <Modal 
+        isOpen={activeSection === 'calendario'} 
+        onClose={() => setActiveSection(null)}
+        title="Calendario de Reservas"
+      >
+        <CalendarioReservas userId={user.uid} onClose={() => setActiveSection(null)} />
+      </Modal>
     </div>
   );
 };

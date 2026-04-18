@@ -1,0 +1,228 @@
+@import "../../../../resources/colors/colors.css";
+
+.dashboard-content {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.dashboard-loading {
+  text-align: center;
+  padding: 3rem;
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+}
+
+.no-eventos {
+  text-align: center;
+  padding: 3rem;
+  color: var(--color-text-muted);
+}
+
+.no-eventos p {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.text-muted {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.dashboard-select-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--color-bg-tertiary);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+.dashboard-select-section label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.evento-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.evento-select:hover {
+  border-color: var(--color-accent);
+}
+
+.evento-select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(162, 155, 254, 0.1);
+}
+
+.evento-info {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.evento-info h3 {
+  color: var(--color-text);
+  font-size: 1.6rem;
+  margin: 0 0 1rem 0;
+}
+
+.evento-image {
+  width: 100%;
+  max-width: 400px;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-md);
+}
+
+.evento-description {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 1rem 0 0 0;
+}
+
+.estadisticas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.estadistica-card {
+  background: linear-gradient(135deg, var(--color-bg-tertiary) 0%, var(--color-bg-secondary) 100%);
+  border: 2px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.estadistica-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-accent);
+}
+
+.estadistica-card.ingreso-card {
+  background: linear-gradient(135deg, rgba(162, 155, 254, 0.1) 0%, rgba(162, 155, 254, 0.05) 100%);
+}
+
+.card-icon {
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+  min-width: 60px;
+}
+
+.card-content {
+  flex: 1;
+}
+
+.card-content h4 {
+  color: var(--color-text);
+  margin: 0 0 0.5rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-value {
+  color: var(--color-accent);
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0;
+  line-height: 1;
+}
+
+.card-subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  margin: 0.25rem 0 0 0;
+}
+
+.estadisticas-summary {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.estadisticas-summary h4 {
+  color: var(--color-text);
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  border-bottom: 2px solid var(--color-accent);
+  padding-bottom: 0.5rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-item span {
+  color: var(--color-text-muted);
+}
+
+.summary-item strong {
+  color: var(--color-accent);
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .dashboard-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .estadisticas-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .evento-image {
+    max-width: 100%;
+    height: 200px;
+  }
+
+  .card-value {
+    font-size: 1.5rem;
+  }
+}
