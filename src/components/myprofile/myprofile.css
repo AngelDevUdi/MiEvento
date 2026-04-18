@@ -164,39 +164,125 @@
   pointer-events: none;
 }
 
-/* Contenedor principal del botón */
-.organizer-request {
-  margin-top: 3rem;
-  padding: 0;           /* Eliminamos el padding interno */
-  border: none;        /* Quitamos el borde gris */
-  background: none;    /* Quitamos el fondo gris */
-  display: flex;
-  justify-content: center; /* Centrado horizontal */
-  align-items: center;
-  width: 100%;
+.organizador-info {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background-color: var(--color-bg-tertiary);
+  text-align: center;
 }
 
-/* El botón morado */
+.organizador-info p {
+  font-size: 1.1rem;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.organizador-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.organizador-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background-color: var(--color-accent);
+  color: var(--color-btn-text);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+  min-height: 120px;
+  position: relative;
+}
+
+.organizador-btn:hover {
+  background-color: var(--color-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.organizador-btn.active {
+  background-color: var(--color-accent-hover);
+  box-shadow: 0 0 0 3px var(--color-accent);
+}
+
+.organizador-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.organizador-btn span {
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.organizer-request {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background-color: var(--color-bg-tertiary);
+}
+
+.organizer-request-info h2 {
+  margin: 0 0 0.75rem;
+  color: var(--color-accent);
+}
+
+.organizer-request-info p {
+  margin: 0 0 1.25rem;
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
 .organizer-request-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: auto;          /* Ya no ocupa todo el ancho */
-  min-width: 280px;     /* Tamaño cómodo para el pulgar en móvil */
-  padding: 1rem 2.5rem;
-  background-color: #8b5cf6; /* El morado vibrante */
-  color: white;
+  width: 100%;
+  max-width: 320px;
+  padding: 0.95rem 1.25rem;
+  background-color: var(--color-accent);
+  color: var(--color-btn-text);
   border: none;
-  border-radius: 50px;  /* Bordes más redondeados tipo píldora */
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 1.1rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+  font-size: 1rem;
+  transition: background-color var(--transition-normal), transform var(--transition-normal);
 }
 
 .organizer-request-btn:hover {
-  background-color: #7c3aed;
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+  background-color: var(--color-accent-hover);
+  transform: translateY(-1px);
+}
+
+.organizer-request-pending {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
+  background: var(--color-bg-tertiary);
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning-dark);
+  font-weight: 500;
+  text-align: center;
+}
+
+.organizer-request-status {
+  padding: 1rem;
+  border-radius: 10px;
+  background: var(--color-bg-tertiary);
+  color: var(--color-info);
+  border: 1px solid var(--color-info-dark);
+  font-weight: 500;
+  text-align: center;
 }

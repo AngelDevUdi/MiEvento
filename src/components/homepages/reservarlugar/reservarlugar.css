@@ -1,0 +1,229 @@
+@import "../../../resources/colors/colors.css";
+
+/* Modal de Reserva de Lugar */
+.reservar-lugar-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.reservar-lugar-modal .modal-content {
+  background: var(--color-bg-secondary);
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  /* Hide scrollbar */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.reservar-lugar-modal .modal-content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
+}
+
+.reservar-lugar-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.reservar-lugar-modal .modal-header h3 {
+  color: var(--color-text);
+  margin: 0;
+}
+
+.reservar-lugar-modal .close-btn {
+  background: none;
+  border: none;
+  color: var(--color-text);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.reservar-lugar-modal .evento-info {
+  background: rgba(59, 130, 246, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.reservar-lugar-modal .evento-info h4 {
+  color: var(--color-text);
+  margin: 0 0 10px 0;
+}
+
+.reservar-lugar-modal .evento-info p {
+  color: var(--color-text-muted);
+  margin: 5px 0;
+}
+
+.reserva-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.reserva-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reserva-form .form-group label {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.reserva-form .form-group input,
+.reserva-form .form-group select {
+  padding: 12px;
+  background: var(--color-input-bg);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 6px;
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+.reserva-form .form-group input:focus,
+.reserva-form .form-group select:focus {
+  outline: none;
+  border-color: var(--color-btn-bg);
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.servicios-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.service-checkbox {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(74, 144, 226, 0.15);
+  border-radius: 8px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.service-checkbox div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.service-checkbox input {
+  accent-color: var(--color-btn-bg);
+  cursor: pointer;
+}
+
+.service-price {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+}
+
+.service-note {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.total-section {
+  text-align: center;
+  padding: 15px;
+  background: rgba(34, 197, 94, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.total-section h4 {
+  color: var(--color-text);
+  margin: 0;
+  font-size: 20px;
+}
+
+.metodo-detalles {
+  padding: 15px;
+  background: var(--color-bg-tertiary);
+  border-radius: 8px;
+}
+
+.qr-section {
+  text-align: center;
+}
+
+.qr-section p {
+  color: var(--color-text);
+  margin-bottom: 10px;
+}
+
+.qr-code {
+  max-width: 150px;
+  max-height: 150px;
+  border-radius: 8px;
+}
+
+.transferencia-section p {
+  color: var(--color-text-muted);
+  margin: 5px 0;
+}
+
+.instrucciones {
+  background: rgba(250, 204, 21, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(250, 204, 21, 0.3);
+}
+
+.instrucciones p {
+  color: var(--color-warning);
+  margin: 0 0 10px 0;
+  font-weight: 600;
+}
+
+.instrucciones ol {
+  color: var(--color-text-muted);
+  margin: 0;
+  padding-left: 20px;
+}
+
+.instrucciones li {
+  margin: 5px 0;
+}
+
+.pagar-btn {
+  background: var(--color-btn-yes-bg);
+  color: var(--color-btn-text);
+  border: none;
+  padding: 15px 30px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  width: 100%;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.pagar-btn:hover {
+  background: var(--color-btn-yes-bg-hover);
+  transform: scale(1.02);
+}

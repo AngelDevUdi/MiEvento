@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import QRCode from 'react-qr-code';
 import CryptoJS from 'crypto-js';
 import { db } from '../../../../api/api';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import './boleta.css';
 
 const BoletaModal = ({ isOpen, onClose, boleta, usuarioId }) => {
@@ -17,9 +17,14 @@ const BoletaModal = ({ isOpen, onClose, boleta, usuarioId }) => {
       return;
     }
 
+    let active = true;
     const boleteriaRef = doc(db, "BOLETERIA", boleta.eventoId);
-    const unsubscribe = onSnapshot(boleteriaRef, (docSnapshot) => {
-      if (docSnapshot.exists()) {
+
+    const fetchBoleteria = async () => {
+      try {
+        const docSnapshot = await getDoc(boleteriaRef);
+        if (!active || !docSnapshot.exists()) return;
+
         const boleteriaData = docSnapshot.data();
         const updatedBoleta = boleteriaData.boletas?.[boleta.id];
         if (updatedBoleta) {
@@ -31,10 +36,16 @@ const BoletaModal = ({ isOpen, onClose, boleta, usuarioId }) => {
             faltantes: updatedBoleta.faltantes !== undefined ? updatedBoleta.faltantes : prevData.cantidad
           }));
         }
+      } catch (error) {
+        console.error("Error loading boleta data:", error);
       }
-    });
+    };
 
-    return () => unsubscribe();
+    fetchBoleteria();
+
+    return () => {
+      active = false;
+    };
   }, [isOpen, boleta?.eventoId, boleta?.id]);
 
   if (!isOpen || !boletaData) return null;

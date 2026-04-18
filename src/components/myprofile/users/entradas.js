@@ -1,23 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../../../api/api";
-import { collection, query, where, doc, getDoc, onSnapshot } from "firebase/firestore";
+import { collection, query, where, doc, getDoc, getDocs } from "firebase/firestore";
+import EventLoading from "../../loading/EventLoading";
 import BoletaModal from "./boleta/BoletaModal";
 import "./entradas.css";
-import { toast } from "react-toastify";
 
 const Entradas = ({ userId }) => {
   const [boletas, setBoletas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBoleta, setSelectedBoleta] = useState(null);
-  const [boleteriaUnsubscribers, setBoleteriaUnsubscribers] = useState(new Map());
   const [showOnlyActive, setShowOnlyActive] = useState(true);
 
   useEffect(() => {
     if (!userId) {
       setBoletas([]);
       setLoading(false);
-      boleteriaUnsubscribers.forEach(unsub => unsub());
-      setBoleteriaUnsubscribers(new Map());
       return;
     }
 
@@ -28,103 +25,71 @@ const Entradas = ({ userId }) => {
       where("usuarioId", "==", userId),
       where("estado", "==", "ACTIVADA")
     );
-    
 
-    const unsubscribe = onSnapshot(
-      solicitudesQuery,
-      async (snapshot) => {
-        try {
-          const boletasPromises = snapshot.docs.map(async (solicitudDoc) => {
-            const solicitud = solicitudDoc.data();
-            const boleteriaRef = doc(db, "BOLETERIA", solicitud.eventoId);
-            const boleteriaDoc = await getDoc(boleteriaRef);
+    let active = true;
 
-            if (!boleteriaDoc.exists()) {
-              return null;
-            }
+    const fetchBoletas = async () => {
+      try {
+        const snapshot = await getDocs(solicitudesQuery);
+        const boletasPromises = snapshot.docs.map(async (solicitudDoc) => {
+          const solicitud = solicitudDoc.data();
+          const boleteriaRef = doc(db, "BOLETERIA", solicitud.eventoId);
+          const eventoRef = doc(db, "EVENTOS", solicitud.eventoId);
 
-            const boleteriaData = boleteriaDoc.data();
-            const boletaUsuario = boleteriaData.boletas?.[solicitudDoc.id];
-            if (!boletaUsuario) {
-              return null;
-            }
+          const [boleteriaDoc, eventoDoc] = await Promise.all([
+            getDoc(boleteriaRef),
+            getDoc(eventoRef),
+          ]);
 
-            const eventoRef = doc(db, "EVENTOS", solicitud.eventoId);
-            const eventoDoc = await getDoc(eventoRef);
-            if (!eventoDoc.exists()) {
-              return null;
-            }
+          if (!boleteriaDoc.exists() || !eventoDoc.exists()) {
+            return null;
+          }
 
-            const evento = eventoDoc.data();
-            const lugarRef = doc(db, "LUGARES", evento.lugarId);
-            const lugarDoc = await getDoc(lugarRef);
-            const lugar = lugarDoc.exists() ? lugarDoc.data() : null;
+          const boleteriaData = boleteriaDoc.data();
+          const boletaUsuario = boleteriaData.boletas?.[solicitudDoc.id];
+          if (!boletaUsuario) {
+            return null;
+          }
 
-            return {
-              id: solicitudDoc.id,
-              eventoId: solicitud.eventoId,
-              ...boletaUsuario,
-              eventoNombre: evento.nombre || "Evento desconocido",
-              eventoFecha: evento.fecha?.toDate ? evento.fecha.toDate().toLocaleDateString('es-ES') : evento.fecha || "Sin fecha",
-              eventoHora: evento.hora || "",
-              lugarNombre: lugar?.nombre || "Lugar desconocido",
-              estado: boletaUsuario.estado || solicitud.estado || "ACTIVADA"
-            };
-          });
+          const evento = eventoDoc.data();
+          const lugarRef = doc(db, "LUGARES", evento.lugarId);
+          const lugarDoc = await getDoc(lugarRef);
+          const lugar = lugarDoc.exists() ? lugarDoc.data() : null;
 
-          const boletasCompletas = (await Promise.all(boletasPromises)).filter((boleta) => boleta !== null);
+          return {
+            id: solicitudDoc.id,
+            eventoId: solicitud.eventoId,
+            ...boletaUsuario,
+            eventoNombre: evento.nombre || "Evento desconocido",
+            eventoFecha: evento.fecha?.toDate ? evento.fecha.toDate().toLocaleDateString('es-ES') : evento.fecha || "Sin fecha",
+            eventoHora: evento.hora || "",
+            lugarNombre: lugar?.nombre || "Lugar desconocido",
+            estado: boletaUsuario.estado || solicitud.estado || "ACTIVADA"
+          };
+        });
+
+        const boletasCompletas = (await Promise.all(boletasPromises)).filter((boleta) => boleta !== null);
+        if (active) {
           setBoletas(boletasCompletas);
-
-          // Limpiar listeners anteriores
-          boleteriaUnsubscribers.forEach(unsub => unsub());
-          setBoleteriaUnsubscribers(new Map());
-
-          // Agregar listeners para cada boleteria única
-          const newUnsubscribers = new Map();
-          const eventoIds = [...new Set(boletasCompletas.map(b => b.eventoId))];
-          eventoIds.forEach(eventoId => {
-            const boleteriaRef = doc(db, "BOLETERIA", eventoId);
-            const unsub = onSnapshot(boleteriaRef, (boleteriaDoc) => {
-              if (boleteriaDoc.exists()) {
-                const boleteriaData = boleteriaDoc.data();
-                setBoletas(prevBoletas =>
-                  prevBoletas.map(boleta => {
-                    if (boleta.eventoId === eventoId && boleteriaData.boletas?.[boleta.id]) {
-                      const updatedBoleta = boleteriaData.boletas[boleta.id];
-                      return {
-                        ...boleta,
-                        ...updatedBoleta,
-                        estado: updatedBoleta.estado
-                      };
-                    }
-                    return boleta;
-                  })
-                );
-              }
-            });
-            newUnsubscribers.set(eventoId, unsub);
-          });
-          setBoleteriaUnsubscribers(newUnsubscribers);
-        } catch (error) {
-          console.error("Error fetching boletas:", error);
-        } finally {
+        }
+      } catch (error) {
+        console.error("Error fetching boletas:", error);
+      } finally {
+        if (active) {
           setLoading(false);
         }
-      },
-      (error) => {
-        console.error("Error listening boletas en tiempo real:", error);
-        setLoading(false);
       }
-    );
+    };
+
+    fetchBoletas();
 
     return () => {
-      unsubscribe();
-      boleteriaUnsubscribers.forEach(unsub => unsub());
+      active = false;
     };
   }, [userId]);
 
   if (loading) {
-    return <div className="entradas-loading">Cargando entradas...</div>;
+    return <EventLoading />;
   }
 
   if (!userId) {
@@ -143,25 +108,14 @@ const Entradas = ({ userId }) => {
       <h2>Mis Boletas</h2>
       <div className="filter-buttons">
         <button 
-  className={`filter-toggle ${showOnlyActive ? 'active' : ''}`}
-  onClick={() => {
-    // Si va a mostrar activas pero no hay ninguna, lanzamos el Toast
-    if (!showOnlyActive && boletas.filter(b => b.estado === 'ACTIVADA').length === 0) {
-      toast.info("No tienes boletas activas actualmente", {
-        position: "top-right",
-        autoClose: 3000,
-        theme: "dark",
-      });
-    }
-    // De todas formas cambiamos el filtro
-    setShowOnlyActive(!showOnlyActive);
-  }}
->
-  {showOnlyActive ? 'Mostrar Todas' : 'Mostrar Activas'}
-</button>
+          className={`filter-toggle ${showOnlyActive ? 'active' : ''}`}
+          onClick={() => setShowOnlyActive(!showOnlyActive)}
+        >
+          {showOnlyActive ? 'Mostrar Todas' : 'Mostrar Activas'}
+        </button>
       </div>
       {boletasFiltradas.length === 0 ? (
-        <p>{showOnlyActive ? '' : ''}.</p>
+        <p>No tienes boletas {showOnlyActive ? 'activas' : ''}.</p>
       ) : (
         <div className="entradas-list">
           {boletasFiltradas.map(boleta => (

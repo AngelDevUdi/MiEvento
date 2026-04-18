@@ -232,7 +232,7 @@ const Navbar = ({ onViewChange, onChange, onLogoClick, isLoading = false, curren
             <li><a href="#" onClick={(e) => { e.preventDefault(); if(onChange) onChange("lugares"); handleMenuClick(); }}>Reservar Lugares</a></li>
             {user && (
               <>
-                <li><a onClick={() => { onViewChange("profile"); handleMenuClick(); }}>Mi perfil</a></li>
+                <li><a className="profile-link" onClick={() => { if(onChange) onChange("profile"); onViewChange("profile"); handleMenuClick(); }}>Mi perfil</a></li>
                 <li><a className="logout-link" onClick={() => { handleLogout(); handleMenuClick(); }}>Cerrar sesión</a></li>
               </>
             )}

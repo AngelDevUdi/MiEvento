@@ -1,14 +1,21 @@
 .entradas-section {
   margin-top: 2rem;
-  padding: 1rem;
-  border: 1px solid #000000;
-  border-radius: 8px;
-  background-color: #2C61F2;
+  padding: 1.5rem;
+  border-radius: 12px;
+  background-color: #1e273a; /* Mismo fondo oscuro que entradas */
+  border: 1px solid #3e4b6b;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  color: white;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .entradas-section h2 {
-  color: #ffffff;
-  margin-bottom: 1rem;
+  color: #a29bfe; /* Lila elegante */
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
 }
 
 .filter-buttons {
@@ -19,24 +26,27 @@
 }
 
 .filter-toggle {
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.5rem;
   border: none;
-  border-radius: 20px;
+  border-radius: 25px;
   cursor: pointer;
-  font-size: 0.9rem;
   font-weight: bold;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  min-width: 120px;
-}
-
-.filter-toggle.active {
-  background-color: #007bff;
-  color: white;
+  transition: all 0.3s ease;
 }
 
 .filter-toggle:not(.active) {
   background-color: #28a745;
   color: white;
+}
+
+.filter-toggle.active {
+  background-color: #5acd97;
+  color: white;
+}
+
+.filter-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 .entradas-list {

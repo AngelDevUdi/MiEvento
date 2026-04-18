@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../../../api/api";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { toast } from "react-toastify"; // 🔥 Importamos toast
+import EventLoading from "../../loading/EventLoading";
+import { toast } from "react-toastify";
 import "./reservas.css";
 
 const Reservas = ({ userEmail }) => {
@@ -31,7 +32,7 @@ const Reservas = ({ userEmail }) => {
     ? reservas.filter(r => r.status === 'ACTIVADA' || r.status === 'CONFIRMADA') 
     : reservas;
 
-  if (loading) return <div className="reservas-loading">Cargando reservas...</div>;
+  if (loading) return <EventLoading text="Cargando reservas..." />;
 
   return (
     <div className="reservas-section">
