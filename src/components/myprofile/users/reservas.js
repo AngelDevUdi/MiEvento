@@ -98,7 +98,7 @@ const Reservas = ({ userId }) => {
           No tienes reservas {filtro !== 'todas' ? `${filtro}` : ''}.
         </div>
       ) : (
-        <div className="reservas-list">
+        <div className="user-reservas-list">
           {reservasFiltradas.map(reserva => (
             <div key={reserva.id} className="reserva-card-usuario">
               <div className="reserva-header">

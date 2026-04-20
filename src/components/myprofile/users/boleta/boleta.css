@@ -1,10 +1,12 @@
+@import "../../../../resources/colors/colors.css";
+
 .boleta-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--color-overlay);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -38,11 +40,12 @@
 .boleta-modal-header h3 {
   margin: 0;
   font-size: 1.25rem;
+  color: var(--color-text-inverse);
 }
 
 .boleta-modal-subtitle {
   margin: 8px 0 0;
-  color: #555;
+  color: var(--color-text-muted);
   font-size: 0.95rem;
 }
 
@@ -55,7 +58,7 @@
 .boleta-details p {
   margin: 6px 0;
   font-size: 0.95rem;
-  color: #333;
+  color: var(--color-text-inverse);
 }
 
 .boleta-qrcode {
@@ -76,7 +79,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(128, 128, 128, 0.7);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -85,12 +88,12 @@
 
 .qr-x {
   font-size: 48px;
-  color: #ff0000;
+  color: var(--color-btn-no-bg);
   font-weight: bold;
 }
 
 .qr-text {
   margin: 0;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--color-text-muted);
 }
