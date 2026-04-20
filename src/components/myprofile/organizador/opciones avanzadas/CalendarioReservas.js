@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import { db } from "../../../../api/api";
 import { collection, getDocs, query, where, getDoc, doc } from "firebase/firestore";
 import { toast } from "react-toastify";
@@ -169,7 +170,10 @@ const CalendarioReservas = ({ userId, onClose }) => {
   const calendarDays = generateCalendarDays();
 
   if (loading) {
-    return <EventLoading />;
+    return ReactDOM.createPortal(
+      <EventLoading />,
+      document.body
+    );
   }
 
   return (

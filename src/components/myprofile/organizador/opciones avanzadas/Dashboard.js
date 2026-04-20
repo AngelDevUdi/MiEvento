@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import { db } from "../../../../api/api";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { toast } from "react-toastify";
 import "./dashboard.css";
 import { FaTicketAlt, FaUserCheck, FaChartBar } from "react-icons/fa";
+import EventLoading from "../../../loading/EventLoading";
 
 const Dashboard = ({ userId, onClose }) => {
   const [eventos, setEventos] = useState([]);
@@ -87,7 +89,10 @@ const Dashboard = ({ userId, onClose }) => {
   };
 
   if (loading) {
-    return <div className="dashboard-loading">Cargando dashboard...</div>;
+    return ReactDOM.createPortal(
+      <EventLoading />,
+      document.body
+    );
   }
 
   if (eventos.length === 0) {
