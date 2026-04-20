@@ -22,10 +22,13 @@ const Eventos = ({ userId, onClose }) => {
     precio: "",
     tags: ""
   });
+  const [allTags, setAllTags] = useState([]);
+  const [tagSuggestions, setTagSuggestions] = useState([]);
 
   useEffect(() => {
     fetchLugares();
     fetchEventos();
+    fetchAllTags();
   }, []);
 
   const fetchLugares = async () => {
@@ -52,6 +55,22 @@ const Eventos = ({ userId, onClose }) => {
     }
   };
 
+  const fetchAllTags = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "EVENTOS"));
+      const tagsSet = new Set();
+      querySnapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.tags && Array.isArray(data.tags)) {
+          data.tags.forEach(tag => tagsSet.add(tag.toLowerCase()));
+        }
+      });
+      setAllTags(Array.from(tagsSet));
+    } catch (error) {
+      console.error("Error fetching all tags:", error);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -74,6 +93,7 @@ const Eventos = ({ userId, onClose }) => {
       tags: ""
     });
     setEditingEventId(null);
+    setTagSuggestions([]);
   };
 
   const handleEditEvent = (evento) => {
@@ -168,15 +188,15 @@ const Eventos = ({ userId, onClose }) => {
   const selectedLugarCapacidad = lugares.find(lugar => lugar.id === formData.lugarId)?.capacidad;
 
   return ReactDOM.createPortal(
-    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>×</button>
+    <div className="organizador-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
+      <div className="organizador-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="organizador-close-btn" onClick={onClose}>×</button>
         <h3>Eventos</h3>
 
-      <div className="section-switch">
+      <div className="organizador-section-switch">
         <button
           type="button"
-          className={`switch-btn ${activeSection === "editar" ? "active" : ""}`}
+          className={`organizador-switch-btn ${activeSection === "editar" ? "organizador-active" : ""}`}
           onClick={() => {
             setActiveSection("editar");
             resetForm();
@@ -186,7 +206,7 @@ const Eventos = ({ userId, onClose }) => {
         </button>
         <button
           type="button"
-          className={`switch-btn ${activeSection === "crear" ? "active" : ""}`}
+          className={`organizador-switch-btn ${activeSection === "crear" ? "organizador-active" : ""}`}
           onClick={() => {
             resetForm();
             setActiveSection("crear");
@@ -198,18 +218,18 @@ const Eventos = ({ userId, onClose }) => {
 
       {activeSection === "editar" && (
         eventos.length > 0 ? (
-          <div className="eventos-list">
+          <div className="organizador-eventos-list">
             <h4>Eventos creados</h4>
             {eventos.map(evento => {
               const lugar = lugares.find(l => l.id === evento.lugarId);
               return (
-                <div key={evento.id} className="evento-card">
-                  <div className="evento-card-header">
+                <div key={evento.id} className="organizador-evento-card">
+                  <div className="organizador-evento-card-header">
                     <strong>{evento.nombre}</strong>
-                    <button type="button" onClick={() => handleEditEvent(evento)} className="edit-btn">Editar</button>
+                    <button type="button" onClick={() => handleEditEvent(evento)} className="organizador-edit-btn">Editar</button>
                   </div>
                   {evento.postimage && (
-                    <div className="evento-poster-preview">
+                    <div className="organizador-evento-poster-preview">
                       <img src={evento.postimage} alt={evento.nombre} />
                     </div>
                   )}
@@ -222,7 +242,7 @@ const Eventos = ({ userId, onClose }) => {
             })}
           </div>
         ) : (
-          <div className="no-eventos">
+          <div className="organizador-no-eventos">
             <p>No hay eventos creados aún.</p>
           </div>
         )
@@ -230,12 +250,12 @@ const Eventos = ({ userId, onClose }) => {
 
       {activeSection === "crear" && (
         lugares.length === 0 ? (
-          <div className="no-lugares">
+          <div className="organizador-no-lugares">
             <p>No tienes lugares registrados. Crea un lugar primero para poder crear eventos.</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="evento-form">
-            <div className="form-group">
+          <form onSubmit={handleSubmit} className="organizador-evento-form">
+            <div className="organizador-form-group">
               <label>Nombre del Evento:</label>
               <input
                 type="text"
@@ -246,7 +266,7 @@ const Eventos = ({ userId, onClose }) => {
               />
             </div>
 
-            <div className="form-group">
+            <div className="organizador-form-group">
               <label>Descripción:</label>
               <textarea
                 name="descripcion"
@@ -257,8 +277,8 @@ const Eventos = ({ userId, onClose }) => {
               />
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
+            <div className="organizador-form-row">
+              <div className="organizador-form-group">
                 <label>Fecha:</label>
                 <input
                   type="date"
@@ -270,7 +290,7 @@ const Eventos = ({ userId, onClose }) => {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="organizador-form-group">
                 <label>Hora:</label>
                 <input
                   type="time"
@@ -282,7 +302,7 @@ const Eventos = ({ userId, onClose }) => {
               </div>
             </div>
 
-            <div className="form-group">
+            <div className="organizador-form-group">
               <label>Lugar:</label>
               <select
                 name="lugarId"
@@ -302,7 +322,7 @@ const Eventos = ({ userId, onClose }) => {
               )}
             </div>
 
-            <div className="form-group">
+            <div className="organizador-form-group">
               <label>URL del Poster del Evento:</label>
               <input
                 type="url"
@@ -313,8 +333,8 @@ const Eventos = ({ userId, onClose }) => {
               />
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
+            <div className="organizador-form-row">
+              <div className="organizador-form-group">
                 <label>Estado:</label>
                 <select
                   name="estado"
@@ -327,7 +347,7 @@ const Eventos = ({ userId, onClose }) => {
                 </select>
               </div>
 
-              <div className="form-group">
+              <div className="organizador-form-group">
                 <label>Stock de Boletas:</label>
                 <input
                   type="number"
@@ -340,7 +360,7 @@ const Eventos = ({ userId, onClose }) => {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="organizador-form-group">
                 <label>Precio de Boleta ($):</label>
                 <input
                   type="number"
@@ -353,19 +373,51 @@ const Eventos = ({ userId, onClose }) => {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="organizador-form-group">
                 <label>Tags (separados por coma):</label>
-                <input
-                  type="text"
-                  name="tags"
-                  value={formData.tags}
-                  onChange={handleInputChange}
-                  placeholder="concierto, rock, festival"
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    name="tags"
+                    value={formData.tags}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFormData(prev => ({ ...prev, tags: value }));
+                      const parts = value.split(',');
+                      const lastPart = parts[parts.length - 1].trim();
+                      if (lastPart) {
+                        const filtered = allTags.filter(tag => tag.toLowerCase().includes(lastPart.toLowerCase()));
+                        setTagSuggestions(filtered.slice(0, 10));
+                      } else {
+                        setTagSuggestions([]);
+                      }
+                    }}
+                    placeholder="concierto, rock, festival"
+                  />
+                  {tagSuggestions.length > 0 && (
+                    <div className="tag-suggestions">
+                      {tagSuggestions.map((suggestion, index) => (
+                        <div
+                          key={index}
+                          onClick={() => {
+                            const parts = formData.tags.split(',');
+                            parts[parts.length - 1] = suggestion;
+                            const newValue = parts.join(', ') + ', ';
+                            setFormData(prev => ({ ...prev, tags: newValue }));
+                            setTagSuggestions([]);
+                          }}
+                          className="tag-suggestion-item"
+                        >
+                          {suggestion}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
-            <button type="submit" className="submit-btn">
+            <button type="submit" className="organizador-submit-btn">
               {editingEventId ? "Actualizar Evento" : "Crear Evento"}
             </button>
           </form>
