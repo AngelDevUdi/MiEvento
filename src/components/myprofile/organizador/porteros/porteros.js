@@ -4,6 +4,7 @@ import { db, auth } from "../../../../api/api";
 import { collection, getDocs, query, where, updateDoc, doc, deleteDoc, setDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-toastify";
+import EventLoading from "../../../loading/EventLoading";
 import "./porteros.css";
 
 const Porteros = ({ userId, onClose }) => {
@@ -11,6 +12,7 @@ const Porteros = ({ userId, onClose }) => {
   const [lugares, setLugares] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingPorteroId, setEditingPorteroId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,8 +20,19 @@ const Porteros = ({ userId, onClose }) => {
   });
 
   useEffect(() => {
-    fetchLugares();
-    fetchPorteros();
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        const lugaresData = await fetchLugares();
+        setLugares(lugaresData);
+        if (lugaresData.length > 0) {
+          await fetchPorteros();
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
   }, []);
 
   const fetchLugares = async () => {
@@ -28,9 +41,11 @@ const Porteros = ({ userId, onClose }) => {
       const querySnapshot = await getDocs(q);
       const lugaresData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setLugares(lugaresData);
+      return lugaresData;
     } catch (error) {
       console.error("Error fetching lugares:", error);
       toast.error("Error al cargar lugares");
+      return [];
     }
   };
 
@@ -51,12 +66,6 @@ const Porteros = ({ userId, onClose }) => {
       toast.error("Error al cargar porteros");
     }
   };
-
-  useEffect(() => {
-    if (lugares.length > 0) {
-      fetchPorteros();
-    }
-  }, [lugares]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -153,6 +162,17 @@ const Porteros = ({ userId, onClose }) => {
       }
     }
   };
+
+  if (isLoading) {
+    return ReactDOM.createPortal(
+      <div className="modal-overlay">
+        <div className="modal" onClick={(e) => e.stopPropagation()}>
+          <EventLoading />
+        </div>
+      </div>,
+      document.body
+    );
+  }
 
   return ReactDOM.createPortal(
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
