@@ -93,7 +93,8 @@ const Reservas = ({ userId, onClose }) => {
           setLoading(false);
         });
       } catch (error) {
-        console.error("Error setting up realtime listener:", error);
+        console.error("❌ Error configurando realtime listener:", error);
+        console.error("❌ Detalles:", error.message);
         toast.error("Error al cargar solicitudes de reservas");
         setLoading(false);
       }
@@ -132,6 +133,7 @@ const Reservas = ({ userId, onClose }) => {
   };
 
   if (loading) {
+    console.log("⏳ Aún cargando reservas...");
     return ReactDOM.createPortal(
       <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
         <div className="modal" onClick={(e) => e.stopPropagation()}>
