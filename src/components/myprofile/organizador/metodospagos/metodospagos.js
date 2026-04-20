@@ -143,7 +143,7 @@ const MetodosPagos = ({ userId, onClose }) => {
 
         {activeSection === "editar" && metodos.length > 0 && (
           <div className="organizador-metodospay-metodos-list">
-            <h4>Métodos registrados</h4>
+            <h3>Métodos registrados</h3>
             {metodos.map(metodo => (
               <div key={metodo.id} className="organizador-metodospay-metodo-card">
                 <div className="organizador-metodospay-metodo-card-header">

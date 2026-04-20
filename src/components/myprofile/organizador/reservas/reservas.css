@@ -1,8 +1,10 @@
+@import "../../../../resources/colors/colors.css";
+
 /* Overlay */
 .organizador-solicitudesdereserva-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.7);
+  background: var(--color-overlay);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
@@ -16,12 +18,22 @@
   max-width: 900px;
   max-height: 90vh;
   overflow-y: auto;
-  background: #fff;
+  background: var(--color-bg-primary);
   border-radius: 18px;
   padding: 25px;
-  box-shadow: 0 25px 70px rgba(0,0,0,0.35);
+  box-shadow: var(--shadow-lg);
   position: relative;
   animation: fadeInScale 0.25s ease;
+  color: var(--color-text);
+}
+
+h3 {
+  color: var(--color-text);
+}
+
+label {
+  color: var(--color-text);
+  font-weight: 600;
 }
 
 /* Close */
@@ -29,18 +41,20 @@
   position: absolute;
   top: 12px;
   right: 15px;
-  background: #f1f5f9;
+  background: var(--color-bg-secondary);
   border: none;
   width: 35px;
   height: 35px;
   border-radius: 50%;
   font-size: 18px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: var(--transition-fast);
+  color: var(--color-text-muted);
 }
 
 .organizador-solicitudesdereserva-close-btn:hover {
-  background: #e2e8f0;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text);
   transform: rotate(90deg);
 }
 
@@ -53,21 +67,23 @@
   width: 100%;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--color-border);
   outline: none;
-  transition: 0.2s;
+  transition: var(--transition-fast);
+  background: var(--color-bg-secondary);
+  color: var(--color-text);
 }
 
 .organizador-solicitudesdereserva-search-input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(162, 155, 254, 0.2);
 }
 
 /* Sin reservas */
 .organizador-solicitudesdereserva-no-reservas {
   text-align: center;
   padding: 30px;
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
 /* Lista */
@@ -79,12 +95,13 @@
 
 /* Card */
 .organizador-solicitudesdereserva-reserva-card {
-  background: #f8fafc;
+  background: var(--color-bg-secondary);
   border-radius: 14px;
   padding: 16px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-  transition: 0.2s;
-  border-left: 5px solid #cbd5f5;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-fast);
+  border-left: 5px solid var(--color-accent);
+  color: var(--color-text);
 }
 
 .organizador-solicitudesdereserva-reserva-card:hover {
@@ -110,19 +127,19 @@
 
 /* Estados */
 .organizador-solicitudesdereserva-estado-pendiente {
-  background: #fef3c7;
-  color: #92400e;
+  background: rgba(250, 204, 21, 0.15);
+  color: var(--color-warning-dark);
 }
 
 .organizador-solicitudesdereserva-estado-confirmada,
 .organizador-solicitudesdereserva-estado-activada {
-  background: #dcfce7;
-  color: #166534;
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--color-btn-yes-bg);
 }
 
 .organizador-solicitudesdereserva-estado-rechazada {
-  background: #fee2e2;
-  color: #991b1b;
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--color-btn-no-bg);
 }
 
 /* Info */
@@ -145,10 +162,11 @@
 /* Servicios */
 .organizador-solicitudesdereserva-servicios-reserva {
   margin-top: 8px;
-  background: #eef2ff;
+  background: rgba(162, 155, 254, 0.1);
   padding: 10px;
   border-radius: 10px;
   font-size: 14px;
+  color: var(--color-text);
 }
 
 .organizador-solicitudesdereserva-servicios-reserva ul {
@@ -166,13 +184,13 @@
 /* Botones */
 .organizador-solicitudesdereserva-approve-btn {
   flex: 1;
-  background: linear-gradient(135deg, #22c55e, #16a34a);
+  background: linear-gradient(135deg, var(--color-btn-yes-bg), var(--color-btn-yes-bg-hover));
   border: none;
   color: white;
   padding: 10px;
   border-radius: 10px;
   cursor: pointer;
-  transition: 0.25s;
+  transition: var(--transition-normal);
 }
 
 .organizador-solicitudesdereserva-approve-btn:hover {
@@ -182,13 +200,13 @@
 
 .organizador-solicitudesdereserva-reject-btn {
   flex: 1;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: linear-gradient(135deg, var(--color-btn-no-bg), var(--color-btn-no-bg-hover));
   border: none;
   color: white;
   padding: 10px;
   border-radius: 10px;
   cursor: pointer;
-  transition: 0.25s;
+  transition: var(--transition-normal);
 }
 
 .organizador-solicitudesdereserva-reject-btn:hover {
@@ -200,26 +218,26 @@
 .organizador-solicitudesdereserva-reserva-status-active {
   margin-top: 12px;
   padding: 10px;
-  background: #dcfce7;
+  background: rgba(34, 197, 94, 0.15);
   border-radius: 10px;
   text-align: center;
 }
 
 .organizador-solicitudesdereserva-status-confirmed {
-  color: #166534;
+  color: var(--color-btn-yes-bg);
   font-weight: bold;
 }
 
 .organizador-solicitudesdereserva-reserva-status-rejected {
   margin-top: 12px;
   padding: 10px;
-  background: #fee2e2;
+  background: rgba(239, 68, 68, 0.15);
   border-radius: 10px;
   text-align: center;
 }
 
 .organizador-solicitudesdereserva-status-rejected {
-  color: #991b1b;
+  color: var(--color-btn-no-bg);
   font-weight: bold;
 }
 
@@ -229,6 +247,6 @@
 }
 
 .organizador-solicitudesdereserva-modal::-webkit-scrollbar-thumb {
-  background: #c7d2fe;
+  background: var(--color-accent);
   border-radius: 10px;
 }

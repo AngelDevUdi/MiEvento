@@ -184,7 +184,7 @@ const Porteros = ({ userId, onClose }) => {
 
         {porteros.length > 0 && !showForm && (
           <div className="portero-componente-porteros-list">
-            <h4>Porteros registrados</h4>
+            <h3>Porteros registrados</h3>
             {porteros.map(portero => (
               <div key={portero.id} className="portero-componente-portero-card">
                 <div className="portero-componente-portero-card-header">
