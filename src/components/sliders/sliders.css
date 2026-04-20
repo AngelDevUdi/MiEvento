@@ -1,37 +1,37 @@
 @import "../../resources/colors/colors.css";
 
-/* Contenedor principal del slider */
+/* ========================= */
+/* CONTENEDOR PRINCIPAL */
+/* ========================= */
+
 .sliders-container {
   position: relative;
   width: 100%;
-  height: 500px;
+  height: 500px; /* mantiene ratio visual tipo 16:9 en web */
   overflow: hidden;
   background: #111;
 }
 
-.slider-text h2, .slider-text p {
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
-}
+/* ========================= */
+/* WRAPPER */
+/* ========================= */
 
-/* Wrapper de slides */
 .slides-wrapper {
   position: relative;
   width: 100%;
   height: 100%;
 }
 
-/* Estilo individual de cada slide */
+/* ========================= */
+/* SLIDE BASE */
+/* ========================= */
+
 .slide {
   position: absolute;
   width: 100%;
   height: 100%;
-  background-size: cover;
-  background-position: center;
   opacity: 0;
   transition: opacity 0.8s ease-in-out;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .slide.active {
@@ -39,45 +39,130 @@
   z-index: 1;
 }
 
-/* Overlay oscuro en los slides */
+/* Overlay global */
 .slide-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
   z-index: 1;
 }
 
-/* Contenido del slide */
-.slide-content {
+/* ========================= */
+/* LAYOUT 75 / 25 */
+/* ========================= */
+
+.slide-layout {
   position: relative;
   z-index: 2;
-  text-align: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+/* ========================= */
+/* IMAGEN (OPTIMIZADA 1920x1080) */
+/* ========================= */
+
+.slide-image {
+  width: 75%;
+  height: 100%;
+
+  /* 🔥 OPTIMIZADO PARA 1920x1080 */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* mejora visual para recortes inevitables */
+  filter: saturate(1.05) contrast(1.05);
+}
+
+/* ========================= */
+/* PANEL DERECHO (GLASS EFFECT) */
+/* ========================= */
+
+.slide-info {
+  width: 25%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 30px;
+  gap: 15px;
   color: var(--color-text);
-  animation: slideInUp 0.8s ease-out;
+
+  /* ✨ GLASS MODERNO */
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.35);
+
+  position: relative;
+  z-index: 2;
 }
 
+/* brillo interno elegante */
+.slide-info::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0.02)
+  );
+  pointer-events: none;
+}
+
+/* ========================= */
+/* RESPONSIVE */
+/* ========================= */
+
+@media (max-width: 768px) {
+  .sliders-container {
+    height: 320px;
+  }
+
+  .slide-layout {
+    flex-direction: column;
+  }
+
+  .slide-image {
+    width: 100%;
+    height: 60%;
+  }
+
+  .slide-info {
+    width: 100%;
+    height: 40%;
+
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+/* Texto */
 .slide-title {
-  font-size: 54px;
-  font-weight: 700;
-  margin: 0 0 15px 0;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-  letter-spacing: 1px;
-}
-
-.slide-subtitle {
   font-size: 28px;
-  margin: 0 0 30px 0;
-  opacity: 0.9;
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-/* Botón del slide */
+.slide-description {
+  font-size: 14px;
+  opacity: 0.85;
+  line-height: 1.4;
+}
+
+/* Botón */
 .slide-btn {
-  padding: 15px 40px;
-  font-size: 16px;
+  padding: 12px 20px;
+  font-size: 14px;
   font-weight: 600;
   background: var(--color-btn-bg);
   color: var(--color-text);
@@ -85,32 +170,39 @@
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .slide-btn:hover {
   background: var(--color-btn-bg-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
-/* Botones de navegación */
+/* Promo button */
+.slide-btn-promo {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.slide-btn-promo:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+/* ========================= */
+/* NAV BUTTONS */
+/* ========================= */
+
 .slider-nav-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   z-index: 3;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.25);
   color: white;
   border: none;
-  padding: 15px 20px;
-  font-size: 24px;
+  padding: 15px;
+  font-size: 22px;
   cursor: pointer;
+  border-radius: 6px;
   transition: all 0.3s ease;
-  border-radius: 5px;
-  font-weight: bold;
 }
 
 .slider-nav-btn:hover {
@@ -126,165 +218,119 @@
   right: 20px;
 }
 
-/* Indicadores (dots) */
+/* ========================= */
+/* INDICATORS */
+/* ========================= */
+
 .slider-indicators {
   position: absolute;
-  bottom: 25px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 12px;
+  gap: 10px;
   z-index: 3;
 }
 
 .indicator {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.4);
   cursor: pointer;
   transition: all 0.3s ease;
-  border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .indicator.active {
-  background: var(--color-btn-bg);
-  width: 30px;
+  width: 25px;
   border-radius: 6px;
-  border: 2px solid var(--color-btn-bg);
-  box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+  background: var(--color-btn-bg);
 }
 
-.indicator:hover {
-  background: rgba(255, 255, 255, 0.8);
+/* ========================= */
+/* MODAL */
+/* ========================= */
+
+.modal-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Animación de entrada */
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* ========================= */
+/* RESPONSIVE */
+/* ========================= */
 
-/* 📱 Responsive */
 @media (max-width: 1024px) {
   .sliders-container {
     height: 400px;
   }
 
-  .slide-title {
-    font-size: 40px;
+  .slide-info {
+    padding: 20px;
   }
 
-  .slide-subtitle {
-    font-size: 20px;
+  .slide-title {
+    font-size: 22px;
   }
 }
 
 @media (max-width: 768px) {
   .sliders-container {
-    height: 300px;
+    height: 320px;
+  }
+
+  .slide-layout {
+    flex-direction: column;
+  }
+
+  .slide-image {
+    width: 100%;
+    height: 60%;
+  }
+
+  .slide-info {
+    width: 100%;
+    height: 40%;
+    padding: 15px;
   }
 
   .slide-title {
-    font-size: 28px;
-  }
-
-  .slide-subtitle {
-    font-size: 16px;
-  }
-
-  .slide-btn {
-    padding: 10px 25px;
-    font-size: 14px;
-  }
-
-  .slider-nav-btn {
-    padding: 10px 15px;
     font-size: 18px;
   }
 
-  .slider-nav-btn.prev {
-    left: 10px;
+  .slide-description {
+    font-size: 12px;
   }
 
-  .slider-nav-btn.next {
-    right: 10px;
-  }
-
-  .indicator {
-    width: 10px;
-    height: 10px;
-  }
-
-  .indicator.active {
-    width: 25px;
+  .slider-nav-btn {
+    padding: 10px;
+    font-size: 18px;
   }
 }
 
 @media (max-width: 480px) {
   .sliders-container {
-    height: 250px;
+    height: 260px;
+  }
+
+  .slide-info {
+    padding: 10px;
   }
 
   .slide-title {
-    font-size: 20px;
+    font-size: 16px;
   }
 
-  .slide-subtitle {
-    font-size: 13px;
-    margin-bottom: 15px;
+  .slide-description {
+    display: none; /* opcional para móviles */
   }
 
   .slide-btn {
-    padding: 8px 20px;
     font-size: 12px;
-  }
-
-  .slider-nav-btn {
-    padding: 8px 12px;
-    font-size: 16px;
-  }
-}
-
-@media (max-width: 768px) {
-  /* Movemos las flechas reales hacia los bordes */
-  .slider-nav-btn.prev {
-    left: 5px !important;
-    width: 35px; /* Un poco más pequeñas para que no estorben */
-    height: 35px;
-  }
-
-  .slider-nav-btn.next {
-    right: 5px !important;
-    width: 35px;
-    height: 35px;
-  }
-
-  /* Ajustamos el contenedor del texto para que no se pegue a las flechas */
-  .slider-content {
-    padding: 0 45px; /* Esto crea un "muro" para que el texto no toque las flechas */
-  }
-
-  .slider-content h2 {
-    font-size: 1.4rem !important; /* Texto un poco más pequeño */
-    margin-bottom: 8px;
-  }
-
-  .slider-content p {
-    font-size: 1rem !important;
-    line-height: 1.2;
-  }
-
-  /* El botón de Explorar */
-  .explorar-button {
-    padding: 10px 20px !important;
-    font-size: 0.9rem !important;
-    margin-top: 10px;
+    padding: 8px 15px;
   }
 }

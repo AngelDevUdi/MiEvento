@@ -9,6 +9,7 @@ import Reservas from "./users/reservas";
 import ReservasOrganizador from "./organizador/reservas/reservas";
 import Solicitudes from "./admin/solicitudes";
 import Asignar from "./admin/asignar";
+import Promocionar from "./admin/promocionar";
 import Eventos from "./organizador/eventos";
 import Lugares from "./organizador/lugares";
 import MetodosPagos from "./organizador/metodospagos/metodospagos";
@@ -21,7 +22,7 @@ import EventLoading from "../loading/EventLoading";
 import Dashboard from "./organizador/opciones avanzadas/Dashboard";
 import CalendarioReservas from "./organizador/opciones avanzadas/CalendarioReservas";
 import Modal from "./organizador/opciones avanzadas/Modal";
-import { FaClipboardList, FaUserCog, FaCreditCard, FaTicketAlt, FaDoorOpen, FaChartBar, FaCalendarAlt } from "react-icons/fa";
+import { FaClipboardList, FaUserCog, FaCreditCard, FaTicketAlt, FaDoorOpen, FaChartBar, FaCalendarAlt, FaStar } from "react-icons/fa";
 import { toast } from "react-toastify";
 import ConfirmationModal from "../confirmationmodal/confirmationmodal";
 
@@ -346,10 +347,18 @@ const MyProfile = ({ onViewChange }) => {
                 <FaUserCog className="admin-icon" />
                 <span>Asignar</span>
               </button>
+              <button 
+                className={`admin-btn ${activeSection === 'promocionar' ? 'active' : ''}`}
+                onClick={() => setActiveSection('promocionar')}
+              >
+                <FaStar className="admin-icon" />
+                <span>Promociones</span>
+              </button>
             </div>
             
             {activeSection === 'solicitudes' && <Solicitudes onClose={() => setActiveSection(null)} />}
             {activeSection === 'asignar' && <Asignar onClose={() => setActiveSection(null)} />}
+            {activeSection === 'promocionar' && <Promocionar onClose={() => setActiveSection(null)} />}
           </div>
         )}
 
