@@ -227,3 +227,17 @@
   background: var(--color-btn-yes-bg-hover);
   transform: scale(1.02);
 }
+
+.blocked-dates-warning {
+  background: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.blocked-dates-warning p {
+  color: #f44336;
+  margin: 0;
+  font-size: 0.9rem;
+}

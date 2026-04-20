@@ -3,7 +3,8 @@ import { db } from "../../../../api/api";
 import { collection, getDocs, query, where, getDoc, doc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import "./calendarioReservas.css";
-import { FaCalendarAlt, FaUser, FaClock, FaMapMarkerAlt } from "react-icons/fa";
+import { FaCalendarAlt, FaUser, FaClock, FaMapMarkerAlt, FaPhone } from "react-icons/fa";
+import EventLoading from "../../../loading/EventLoading";
 
 const CalendarioReservas = ({ userId, onClose }) => {
   const [reservas, setReservas] = useState([]);
@@ -11,6 +12,7 @@ const CalendarioReservas = ({ userId, onClose }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
   const [reservasMap, setReservasMap] = useState({});
+  const [filterState, setFilterState] = useState('all'); // 'all', 'activadas', 'usadas'
 
   useEffect(() => {
     cargarDatos();
@@ -56,8 +58,8 @@ const CalendarioReservas = ({ userId, onClose }) => {
 
       // Ordenar por fecha de reserva más próxima
       const reservasOrdenadas = reservasData.sort((a, b) => {
-        const fechaA = a.fechaReserva?.toDate ? a.fechaReserva.toDate() : new Date(a.fechaReserva);
-        const fechaB = b.fechaReserva?.toDate ? b.fechaReserva.toDate() : new Date(b.fechaReserva);
+        const fechaA = new Date(a.diaReserva);
+        const fechaB = new Date(b.diaReserva);
         return fechaA - fechaB;
       });
 
@@ -66,7 +68,7 @@ const CalendarioReservas = ({ userId, onClose }) => {
       // Crear mapa de reservas por fecha para el calendario
       const mapa = {};
       reservasOrdenadas.forEach(reserva => {
-        const fecha = reserva.fechaReserva?.toDate ? reserva.fechaReserva.toDate() : new Date(reserva.fechaReserva);
+        const fecha = new Date(reserva.diaReserva);
         const fechaKey = fecha.toISOString().split('T')[0];
         if (!mapa[fechaKey]) {
           mapa[fechaKey] = [];
@@ -121,14 +123,14 @@ const CalendarioReservas = ({ userId, onClose }) => {
     if (!day) return false;
     const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
     const dateKey = date.toISOString().split('T')[0];
-    return reservasMap[dateKey] && reservasMap[dateKey].length > 0;
+    return filteredReservasMap[dateKey] && filteredReservasMap[dateKey].length > 0;
   };
 
   const getReservasCount = (day) => {
     if (!day) return 0;
     const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
     const dateKey = date.toISOString().split('T')[0];
-    return reservasMap[dateKey] ? reservasMap[dateKey].length : 0;
+    return filteredReservasMap[dateKey] ? filteredReservasMap[dateKey].length : 0;
   };
 
   const formatDate = (date) => {
@@ -148,33 +150,80 @@ const CalendarioReservas = ({ userId, onClose }) => {
 
   const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
+  const filteredReservas = filterState === 'all' 
+    ? reservas 
+    : filterState === 'activadas'
+    ? reservas.filter(r => r.estado?.toLowerCase() === 'activada')
+    : reservas.filter(r => r.estado?.toLowerCase() === 'usada');
+
+  const filteredReservasMap = {};
+  filteredReservas.forEach(reserva => {
+    const fecha = new Date(reserva.diaReserva);
+    const fechaKey = fecha.toISOString().split('T')[0];
+    if (!filteredReservasMap[fechaKey]) {
+      filteredReservasMap[fechaKey] = [];
+    }
+    filteredReservasMap[fechaKey].push(reserva);
+  });
+
   const calendarDays = generateCalendarDays();
 
   if (loading) {
-    return <div className="calendario-loading">Cargando calendario...</div>;
+    return <EventLoading />;
   }
 
   return (
-    <div className="calendario-reservas-content">
+    <div>
+      <div className="filter-buttons">
+        <div>
+          <label>
+            <input 
+              type="radio" 
+              name="filtro-reservas" 
+              checked={filterState === 'all'}
+              onChange={() => setFilterState('all')}
+            />
+          </label>
+          <label>
+            <input 
+              type="radio" 
+              name="filtro-reservas" 
+              checked={filterState === 'activadas'}
+              onChange={() => setFilterState('activadas')}
+            />
+            <span>Mostrar Activadas</span>
+          </label>
+          <label>
+            <input 
+              type="radio" 
+              name="filtro-reservas" 
+              checked={filterState === 'usadas'}
+              onChange={() => setFilterState('usadas')}
+            />
+            <span>Mostrar Usadas</span>
+          </label>
+        </div>
+      </div>
+      <div className="calendario-reservas-content">
         {/* Sección izquierda - Próximas reservas */}
         <div className="reservas-list-section">
           <h3>Próximas Reservas</h3>
           <div className="reservas-list">
-            {reservas.length === 0 ? (
+            {filteredReservas.length === 0 ? (
               <div className="no-reservas">
                 <p>No hay reservas registradas</p>
               </div>
             ) : (
-              reservas.map((reserva, index) => (
+              filteredReservas.map((reserva, index) => (
                 <div key={reserva.id} className={`reserva-item ${index === 0 ? 'next' : ''}`}>
                   <div className="reserva-date">
-                    {reserva.fechaReserva && (
+                    {reserva.diaReserva && (
                       <>
                         <div className="date-day">
-                          {new Date(reserva.fechaReserva?.toDate ? reserva.fechaReserva.toDate() : reserva.fechaReserva).getDate()}
+                          {new Date(reserva.diaReserva).getDate()}
                         </div>
                         <div className="date-month">
-                          {new Date(reserva.fechaReserva?.toDate ? reserva.fechaReserva.toDate() : reserva.fechaReserva).toLocaleDateString('es-ES', { month: 'short' })}
+                          {new Date(reserva.diaReserva).toLocaleDateString('es-ES', { month: 'short' })}
                         </div>
                       </>
                     )}
@@ -188,6 +237,12 @@ const CalendarioReservas = ({ userId, onClose }) => {
                       <FaUser className="icon-small" />
                       <span>{reserva.usuarioData?.name || reserva.usuarioData?.nombre || 'Usuario desconocido'}</span>
                     </div>
+                    {reserva.usuarioData?.telefono && (
+                      <div className="reserva-telefono">
+                        <FaPhone className="icon-small" />
+                        <span>{reserva.usuarioData.telefono}</span>
+                      </div>
+                    )}
                     <div className="reserva-dia">
                       <FaClock className="icon-small" />
                       <span>{reserva.diaReserva || 'Día no especificado'}</span>
@@ -255,6 +310,7 @@ const CalendarioReservas = ({ userId, onClose }) => {
             </div>
           </div>
         </div>
+    </div>
     </div>
   );
 };

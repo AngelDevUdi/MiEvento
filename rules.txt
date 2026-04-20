@@ -1,0 +1,99 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null && get(/databases/$(database)/documents/USUARIOS/$(request.auth.uid)).data.rol == "ADMINISTRADOR";
+    }
+
+    function isOrganizador() {
+      return request.auth != null && get(/databases/$(database)/documents/USUARIOS/$(request.auth.uid)).data.rol == "ORGANIZADOR";
+    }
+
+    function isPortero() {
+      return request.auth != null && get(/databases/$(database)/documents/USUARIOS/$(request.auth.uid)).data.rol == "PORTERO";
+    }
+
+    function isUsuario() {
+      return request.auth != null && get(/databases/$(database)/documents/USUARIOS/$(request.auth.uid)).data.rol == "USUARIO";
+    }
+
+    match /USUARIOS/{userId} {
+      allow create: if true;   // cualquiera puede registrarse
+      allow read: if true;     // opcional: cualquiera puede leer
+      allow update: if true;   // permitir actualización del campo solicitud
+      allow delete: if false;  // opcional: bloquear eliminación
+    }
+
+    match /SOLICITUDES/{solicitudId} {
+      allow create: if request.auth != null;
+      allow read: if isAdmin() || 
+        (request.auth != null && resource.data.userId == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    match /LUGARES/{lugarId} {
+      allow create: if isOrganizador() && request.auth.uid == request.resource.data.organizadorId;
+      allow read: if true; // lugares pueden ser leídos por todos
+      allow update, delete: if isOrganizador() && request.auth.uid == resource.data.organizadorId;
+    }
+
+    match /EVENTOS/{eventoId} {
+      allow create: if isOrganizador() && request.auth.uid == request.resource.data.organizadorId;
+      allow read: if true; // eventos pueden ser leídos por todos
+      allow update, delete: if isOrganizador() && request.auth.uid == resource.data.organizadorId;
+    }
+
+    match /METODOS_PAGOS/{metodoId} {
+      allow create: if isOrganizador() && request.auth.uid == request.resource.data.organizadorId;
+      allow read: if true; // métodos de pago pueden ser leídos por todos (para compras)
+      allow update, delete: if isOrganizador() && request.auth.uid == resource.data.organizadorId;
+    }
+
+    match /SOLICITUDES_BOLETAS/{solicitudId} {
+      allow create: if request.auth != null; // usuarios autenticados pueden crear solicitudes
+      allow read: if 
+        request.auth != null && (
+          resource.data.usuarioId == request.auth.uid ||  // usuarios ven sus propias solicitudes
+          isAdmin() ||  // admin ve todas las solicitudes
+          (isOrganizador() && get(/databases/$(database)/documents/EVENTOS/$(resource.data.eventoId)).data.organizadorId == request.auth.uid)  // organizador ve solicitudes de sus eventos
+        );
+      allow update: if isOrganizador() && get(/databases/$(database)/documents/EVENTOS/$(resource.data.eventoId)).data.organizadorId == request.auth.uid; // solo organizadores pueden actualizar estado
+      allow delete: if false;
+    }
+
+    match /RESERVAS/{reservaId} {
+      allow create: if request.auth != null && 
+        request.resource.data.usuarioId == request.auth.uid &&
+        request.resource.data.estado == "PENDIENTE";
+      
+      allow read: if 
+        request.auth != null && (
+          resource.data.usuarioId == request.auth.uid ||
+          isAdmin() ||
+          (isOrganizador() && resource.data.organizadorId == request.auth.uid) ||
+          isPortero() ||
+          isUsuario()  // todos los usuarios pueden ver todas las reservas para saber días disponibles
+        );
+      
+      allow update: if request.auth != null && (
+        isAdmin() ||
+        (isOrganizador() && resource.data.organizadorId == request.auth.uid && 
+         (request.resource.data.estado == "CONFIRMADA" || 
+          request.resource.data.estado == "ACTIVADA" || 
+          request.resource.data.estado == "RECHAZADA")) ||
+        (isPortero() && request.resource.data.estado == "ESCANEADA")
+      );
+      
+      allow delete: if false;
+    }
+
+    match /BOLETERIA/{eventoId} {
+      allow create: if isOrganizador() && get(/databases/$(database)/documents/EVENTOS/$(eventoId)).data.organizadorId == request.auth.uid;
+      allow read: if true;
+      allow update: if request.auth != null && (isPortero() || isOrganizador() || isAdmin());
+      allow delete: if false;
+    }
+
+  }
+}

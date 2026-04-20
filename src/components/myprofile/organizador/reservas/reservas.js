@@ -9,25 +9,39 @@ import "./reservas.css";
 const Reservas = ({ userId, onClose }) => {
   const [reservas, setReservas] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchEvento, setSearchEvento] = useState('');
 
   useEffect(() => {
     let unsubscribeReservas = null;
 
     const setupRealtimeListener = async () => {
       try {
-        // Buscar directamente por organizadorId en lugar de por lugarId
+        console.log("🔍 Setting up listener for userId:", userId);
+        console.log("🔍 Buscando reservas con organizadorId:", userId);
+        
+        // Buscar directamente por organizadorId - SIN filtro de estado para debug
         const reservasQuery = query(
           collection(db, "RESERVAS"),
-          where("organizadorId", "==", userId),
-          where("estado", "==", "PENDIENTE")
+          where("organizadorId", "==", userId)
+          // Temporalmente removemos el filtro de estado para ver todas las reservas
+          // where("estado", "==", "PENDIENTE")
         );
         
+        console.log("🔍 Query creado, configurando listener...");
+        
         unsubscribeReservas = onSnapshot(reservasQuery, (snapshot) => {
+          console.log("✅ Snapshot recibido, documentos encontrados:", snapshot.docs.length);
+          
           // Obtener datos de usuarios para enriquecer la información
           const loadUserData = async () => {
             try {
+              console.log("📦 Cargando datos de usuarios...");
               const usuariosSnapshot = await getDocs(collection(db, "USUARIOS"));
               const usuariosData = usuariosSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+              const eventosQuery = query(collection(db, "EVENTOS"), where("organizadorId", "==", userId));
+              const eventosSnapshot = await getDocs(eventosQuery);
+              const eventosData = eventosSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
               const reservasData = snapshot.docs
                 .map(doc => ({ id: doc.id, ...doc.data() }))
@@ -37,14 +51,22 @@ const Reservas = ({ userId, onClose }) => {
                   return fechaB - fechaA;
                 });
 
+              console.log("📋 Datos brutos de reservas:", reservasData);
+              console.log("🔎 Reservas con organizadorId coincidente:", reservasData.filter(r => r.organizadorId === userId));
+              console.log("🔎 Estados de reservas encontrados:", reservasData.map(r => r.estado));
+
               // Combinar datos
               const reservasCompletas = reservasData.map(reserva => {
                 const usuario = usuariosData.find(u => u.id === reserva.usuarioId);
+                const evento = eventosData.find(e => e.id === reserva.eventoId);
 
                 return {
                   ...reserva,
                   usuarioNombre: usuario ? (usuario.name || usuario.nombre || "Usuario desconocido") : "Usuario desconocido",
                   usuarioEmail: usuario ? usuario.email : "",
+                  usuarioTelefono: usuario ? usuario.telefono : "",
+                  eventoNombre: evento ? evento.nombre : "Evento desconocido",
+                  eventoDescripcion: evento ? evento.descripcion : "",
                   fechaFormatted: reserva.fechaReserva?.toDate ? reserva.fechaReserva.toDate().toLocaleDateString('es-ES') : reserva.fechaReserva,
                   diaReservaFormatted: reserva.diaReserva || "No especificado"
                 };
@@ -52,6 +74,11 @@ const Reservas = ({ userId, onClose }) => {
 
               setReservas(reservasCompletas);
               setLoading(false);
+              
+              console.log("✨ Reservas finales procesadas:", reservasCompletas);
+              console.log("📊 Total de reservas para mostrar:", reservasCompletas.length);
+              console.log("👤 Usuarios encontrados:", usuariosData.length);
+              console.log("🎯 Eventos encontrados:", eventosData.length);
             } catch (error) {
               console.error("Error loading user data:", error);
               setLoading(false);
@@ -60,7 +87,8 @@ const Reservas = ({ userId, onClose }) => {
 
           loadUserData();
         }, (error) => {
-          console.error("Error in realtime listener:", error);
+          console.error("❌ Error en realtime listener:", error);
+          console.error("❌ Detalles del error:", error.message);
           toast.error("Error al cargar solicitudes de reservas");
           setLoading(false);
         });
@@ -122,14 +150,23 @@ const Reservas = ({ userId, onClose }) => {
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <button className="close-btn" onClick={onClose}>×</button>
         <h3>Solicitudes de Reservas</h3>
+        <div className="filter-controls">
+          <input
+            type="text"
+            placeholder="Buscar por nombre de evento"
+            value={searchEvento}
+            onChange={(e) => setSearchEvento(e.target.value)}
+            className="search-input"
+          />
+        </div>
 
-        {reservas.length === 0 ? (
+        {reservas.filter(r => r.eventoNombre.toLowerCase().includes(searchEvento.toLowerCase())).length === 0 ? (
           <div className="no-reservas">
             <p>No hay solicitudes de reservas pendientes</p>
           </div>
         ) : (
           <div className="reservas-list">
-            {reservas.map(reserva => (
+            {reservas.filter(r => r.eventoNombre.toLowerCase().includes(searchEvento.toLowerCase())).map(reserva => (
               <div key={reserva.id} className="reserva-card">
                 <div className="reserva-header">
                   <h4>{reserva.lugarNombre}</h4>
@@ -141,6 +178,7 @@ const Reservas = ({ userId, onClose }) => {
                 <div className="reserva-info">
                   <p><strong>Usuario:</strong> {reserva.usuarioNombre}</p>
                   <p><strong>Email:</strong> {reserva.usuarioEmail}</p>
+                  <p><strong>Teléfono:</strong> {reserva.usuarioTelefono ? <a href={`https://wa.me/${reserva.usuarioTelefono}`} target="_blank" rel="noopener noreferrer">{reserva.usuarioTelefono}</a> : 'No disponible'}</p>
                   <p><strong>Dirección:</strong> {reserva.direccion}</p>
                   <p><strong>Capacidad:</strong> {reserva.capacidad} personas</p>
                   <p><strong>Día de Reserva:</strong> {reserva.diaReservaFormatted}</p>
