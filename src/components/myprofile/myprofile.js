@@ -9,6 +9,7 @@ import Reservas from "./users/reservas";
 import ReservasOrganizador from "./organizador/reservas/reservas";
 import Solicitudes from "./admin/solicitudes";
 import Asignar from "./admin/asignar";
+import Promocionar from "./admin/promocionar";
 import Eventos from "./organizador/eventos";
 import Lugares from "./organizador/lugares";
 import MetodosPagos from "./organizador/metodospagos/metodospagos";
@@ -18,7 +19,10 @@ import EscanearBoletas from "./porteros/EscanearBoletas";
 import EventosView from "../views/EventosView";
 import LugaresView from "../views/LugaresView";
 import EventLoading from "../loading/EventLoading";
-import { FaClipboardList, FaUserCog, FaCreditCard, FaTicketAlt, FaDoorOpen } from "react-icons/fa";
+import Dashboard from "./organizador/opciones avanzadas/Dashboard";
+import CalendarioReservas from "./organizador/opciones avanzadas/CalendarioReservas";
+import Modal from "./organizador/opciones avanzadas/Modal";
+import { FaClipboardList, FaUserCog, FaCreditCard, FaTicketAlt, FaDoorOpen, FaChartBar, FaCalendarAlt, FaStar } from "react-icons/fa";
 import { toast } from "react-toastify";
 import ConfirmationModal from "../confirmationmodal/confirmationmodal";
 
@@ -64,21 +68,30 @@ const MyProfile = ({ onViewChange }) => {
 
     const loadSolicitudesCount = async () => {
       try {
+        // Solo admin puede leer el contador de solicitudes
+        if (userData?.rol !== "ADMINISTRADOR") {
+          setCountSolicitudes(0);
+          return;
+        }
+        
         const snapshot = await getDocs(collection(db, "SOLICITUDES"));
         if (active) {
           setCountSolicitudes(snapshot.size);
         }
       } catch (error) {
         console.error("Error fetching solicitudes count:", error);
+        setCountSolicitudes(0);
       }
     };
 
-    loadSolicitudesCount();
+    if (userData) {
+      loadSolicitudesCount();
+    }
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [userData]);
 
   useEffect(() => {
     if (!user || userData?.rol !== "ORGANIZADOR") return;
@@ -131,40 +144,23 @@ const MyProfile = ({ onViewChange }) => {
   useEffect(() => {
     if (!user || userData?.rol !== "ORGANIZADOR") return;
 
-    let unsubscribeLugares = null;
     let unsubscribeReservas = null;
 
     const setupRealtimeReservasCount = async () => {
       try {
-        const lugaresQuery = query(collection(db, "LUGARES"), where("organizadorId", "==", user.uid));
-        const lugaresSnapshot = await getDocs(lugaresQuery);
-        const lugaresIds = lugaresSnapshot.docs.map((doc) => doc.id);
-
-        if (lugaresIds.length === 0) {
-          setCountReservas(0);
-          return;
-        }
-
-        if (lugaresIds.length <= 10) {
-          const reservasQuery = query(
-            collection(db, "RESERVAS"),
-            where("lugarId", "in", lugaresIds),
-            where("estado", "==", "PENDIENTE")
-          );
-          unsubscribeReservas = onSnapshot(reservasQuery, (snapshot) => {
-            setCountReservas(snapshot.size);
-          });
-        } else {
-          unsubscribeReservas = onSnapshot(collection(db, "RESERVAS"), (snapshot) => {
-            const count = snapshot.docs.reduce((acc, doc) => {
-              const data = doc.data();
-              return lugaresIds.includes(data.lugarId) && data.estado === "PENDIENTE" ? acc + 1 : acc;
-            }, 0);
-            setCountReservas(count);
-          });
-        }
+        // Buscar directamente por organizadorId
+        const reservasQuery = query(
+          collection(db, "RESERVAS"),
+          where("organizadorId", "==", user.uid),
+          where("estado", "==", "PENDIENTE")
+        );
+        
+        unsubscribeReservas = onSnapshot(reservasQuery, (snapshot) => {
+          setCountReservas(snapshot.size);
+        });
       } catch (error) {
         console.error("Error setting up realtime reservas count:", error);
+        setCountReservas(0);
       }
     };
 
@@ -233,13 +229,13 @@ const MyProfile = ({ onViewChange }) => {
   };
 
   const handleSectionChange = (section) => {
-    if (section === "eventos" || section === "lugares") {
-      setIsLoading(true);
-      setTimeout(() => {
-        setCurrentSection(section);
-        setIsLoading(false);
-      }, 500);
-    }
+    // Siempre mostrar pantalla de carga, incluso si ya estamos en esa sección
+    setIsLoading(true);
+    setTimeout(() => {
+      setCurrentSection(section);
+      setActiveSection(null);
+      setIsLoading(false);
+    }, 500);
   };
 
   const handleCloseReservas = () => {
@@ -279,7 +275,7 @@ const MyProfile = ({ onViewChange }) => {
           isLoading={true}
           currentSection={currentSection}
         />
-        <EventLoading text={currentSection === "eventos" ? "Cargando eventos..." : "Cargando lugares..."} />
+        <EventLoading text={currentSection === "eventos" ? "Cargando eventos..." : currentSection === "lugares" ? "Cargando lugares..." : "Cargando perfil..."} />
       </>
     );
   }
@@ -329,7 +325,7 @@ const MyProfile = ({ onViewChange }) => {
         {userData?.rol === "USUARIO" && (
           <div className="user-sections">
             <Entradas userId={user.uid} />
-            <Reservas userEmail={user.email} />
+            <Reservas userId={user.uid} />
           </div>
         )}
         
@@ -351,10 +347,18 @@ const MyProfile = ({ onViewChange }) => {
                 <FaUserCog className="admin-icon" />
                 <span>Asignar</span>
               </button>
+              <button 
+                className={`admin-btn ${activeSection === 'promocionar' ? 'active' : ''}`}
+                onClick={() => setActiveSection('promocionar')}
+              >
+                <FaStar className="admin-icon" />
+                <span>Promociones</span>
+              </button>
             </div>
             
             {activeSection === 'solicitudes' && <Solicitudes onClose={() => setActiveSection(null)} />}
             {activeSection === 'asignar' && <Asignar onClose={() => setActiveSection(null)} />}
+            {activeSection === 'promocionar' && <Promocionar onClose={() => setActiveSection(null)} />}
           </div>
         )}
 
@@ -406,6 +410,20 @@ const MyProfile = ({ onViewChange }) => {
                 <FaDoorOpen className="organizador-icon" />
                 <span>Gestión de Porteros</span>
               </button>
+              <button 
+                className={`organizador-btn ${activeSection === 'dashboard' ? 'active' : ''}`}
+                onClick={() => setActiveSection('dashboard')}
+              >
+                <FaChartBar className="organizador-icon" />
+                <span>Dashboard</span>
+              </button>
+              <button 
+                className={`organizador-btn ${activeSection === 'calendario' ? 'active' : ''}`}
+                onClick={() => setActiveSection('calendario')}
+              >
+                <FaCalendarAlt className="organizador-icon" />
+                <span>Calendario de Reservas</span>
+              </button>
             </div>
             
             {activeSection === 'eventos' && <Eventos userId={user.uid} onClose={() => setActiveSection(null)} />}
@@ -445,6 +463,22 @@ const MyProfile = ({ onViewChange }) => {
           Volver al Inicio
         </button>
       </div>
+
+      <Modal 
+        isOpen={activeSection === 'dashboard'} 
+        onClose={() => setActiveSection(null)}
+        title="Dashboard de Estadísticas"
+      >
+        <Dashboard userId={user.uid} onClose={() => setActiveSection(null)} />
+      </Modal>
+      
+      <Modal 
+        isOpen={activeSection === 'calendario'} 
+        onClose={() => setActiveSection(null)}
+        title="Calendario de Reservas"
+      >
+        <CalendarioReservas userId={user.uid} onClose={() => setActiveSection(null)} />
+      </Modal>
     </div>
   );
 };

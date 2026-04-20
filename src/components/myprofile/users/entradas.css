@@ -1,42 +1,75 @@
+@import "../../../resources/colors/colors.css";
+
 .entradas-section {
   margin-top: 2rem;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 12px;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-light);
+  box-shadow: var(--shadow-md);
+  color: var(--color-text);
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .entradas-section h2 {
-  color: #333;
-  margin-bottom: 1rem;
+  color: var(--color-accent);
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
 }
 
 .filter-buttons {
   display: flex;
-  align-items: center;
-  gap: 1rem;
   margin-bottom: 1rem;
+  justify-content: center;
 }
 
-.filter-toggle {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 20px;
+.filter-buttons div {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  justify-content: center;
+}
+
+.filter-buttons input[type="radio"] {
+  clip: rect(0 0 0 0);
+  clip-path: inset(100%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.filter-buttons input[type="radio"]:checked + span {
+  box-shadow: 0 0 0 0.0625em var(--color-btn-bg);
+  background-color: var(--color-btn-bg);
+  z-index: 1;
+  color: white;
+}
+
+.filter-buttons label span {
+  display: block;
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: bold;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  min-width: 120px;
+  background-color: white;
+  padding: 0.375em .75em;
+  position: relative;
+  margin-left: .0625em;
+  box-shadow: 0 0 0 0.0625em var(--color-border);
+  letter-spacing: .05em;
+  color: var(--color-text-inverse);
+  text-align: center;
+  transition: var(--transition-normal);
 }
 
-.filter-toggle.active {
-  background-color: #007bff;
-  color: white;
+.filter-buttons label:first-child span {
+  border-radius: .375em 0 0 .375em;
 }
 
-.filter-toggle:not(.active) {
-  background-color: #28a745;
-  color: white;
+.filter-buttons label:last-child span {
+  border-radius: 0 .375em .375em 0;
 }
 
 .entradas-list {
@@ -53,8 +86,8 @@
   background: white;
   padding: 1.5rem;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e0e0e0;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
   width: 300px;
   min-height: 350px;
   flex-shrink: 0;
@@ -62,7 +95,7 @@
   flex-direction: column;
   justify-content: space-between;
   scroll-snap-align: center;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: var(--transition-fast);
 }
 
 .boleta-header {
@@ -74,7 +107,7 @@
 
 .boleta-header h3 {
   margin: 0;
-  color: #007bff;
+  color: var(--color-btn-bg);
   font-size: 1.2rem;
 }
 
@@ -90,11 +123,11 @@
 .boleta-info p {
   margin: 0.5rem 0;
   font-size: 0.95rem;
-  color: #555;
+  color: var(--color-text-inverse);
 }
 
 .estado-activa {
-  color: #28a745;
+  color: var(--color-btn-yes-bg);
   font-weight: bold;
 }
 
@@ -102,31 +135,31 @@
   margin-top: 1rem;
   text-align: center;
   padding: 1rem;
-  background: #f8f9fa;
+  background: var(--color-bg-secondary);
   border-radius: 6px;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--color-border);
 }
 
 .boleta-qr p {
   margin: 0 0 0.5rem 0;
   font-weight: bold;
-  color: #333;
+  color: var(--color-text-inverse);
 }
 
 .boleta-qr button {
   padding: 0.5rem 1rem;
-  background-color: #007bff;
+  background-color: var(--color-btn-bg);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: bold;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: var(--transition-normal);
 }
 
 .boleta-qr button:hover {
-  background-color: #0056b3;
+  background-color: var(--color-btn-bg-hover);
   transform: scale(1.05);
 }
 
@@ -138,7 +171,7 @@
   display: inline-block;
   padding: 1rem;
   background: white;
-  border: 2px solid #007bff;
+  border: 2px solid var(--color-btn-bg);
   border-radius: 8px;
 }
 
@@ -146,19 +179,42 @@
   font-family: monospace;
   font-size: 1.2rem;
   font-weight: bold;
-  color: #007bff;
+  color: var(--color-btn-bg);
   letter-spacing: 2px;
 }
 
 .entradas-loading {
   text-align: center;
   padding: 2rem;
-  color: #666;
+  color: var(--color-text-muted);
 }
 
 .entradas-error {
   text-align: center;
   padding: 2rem;
-  color: #dc3545;
+  color: var(--color-btn-no-bg);
   font-weight: bold;
+}
+
+/* Esto se aplica solo a celulares */
+@media (max-width: 768px) {
+  /* Si los elementos están uno al lado del otro, los ponemos en columna */
+  .container-perfil, .flex-layout { 
+    flex-direction: column !important;
+    padding: 10px;
+  }
+
+  /* Ajustamos los tamaños de fuente para que no se desborden */
+  h1 { font-size: 1.5rem; }
+  
+  /* Los botones deben ocupar casi todo el ancho para que sea fácil tocarlos */
+  button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  /* Si tienes tablas, mejor que tengan scroll horizontal */
+  .table-container {
+    overflow-x: auto;
+  }
 }

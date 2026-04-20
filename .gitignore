@@ -24,3 +24,5 @@ yarn-error.log*
 src/rules.txt
 build-output.txt
 build-output2.txt
+rules.txt
+src/PROMOCIONES_ESTRUCTURA.md

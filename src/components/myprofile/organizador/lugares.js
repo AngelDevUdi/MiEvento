@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import EventLoading from "../../loading/EventLoading";
 import { db } from "../../../api/api";
 import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
@@ -26,10 +27,19 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
   const [fotoInput, setFotoInput] = useState("");
   const [tagInput, setTagInput] = useState("");
   const [activeSection, setActiveSection] = useState("editar");
+  const [allTags, setAllTags] = useState([]);
+  const [tagSuggestions, setTagSuggestions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchLugares();
-  }, []);
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchLugares(), fetchAllTags()]);
+      setLoading(false);
+    };
+
+    loadData();
+  }, [userId]);
 
   const formatNumberWithDots = (value) => {
     const digits = String(value).replace(/\D/g, "");
@@ -50,6 +60,22 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
     } catch (error) {
       console.error("Error fetching lugares:", error);
       toast.error("Error al cargar lugares");
+    }
+  };
+
+  const fetchAllTags = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "LUGARES"));
+      const tagsSet = new Set();
+      querySnapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.tags && Array.isArray(data.tags)) {
+          data.tags.forEach(tag => tagsSet.add(tag.toLowerCase()));
+        }
+      });
+      setAllTags(Array.from(tagsSet));
+    } catch (error) {
+      console.error("Error fetching all tags:", error);
     }
   };
 
@@ -152,6 +178,7 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
     setServicioAdicional(false);
     setFotoInput("");
     setTagInput("");
+    setTagSuggestions([]);
   };
 
   const handleEditLugar = (lugar) => {
@@ -244,29 +271,35 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
     }
   };
 
+  if (!showForm) return null;
+
+  if (loading) {
+    return (
+      <EventLoading text="Cargando lugares..." />
+    );
+  }
+
   return (
-    <>
-      {showForm && (
-        <div className="overlay" onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            resetLugarForm();
-            setActiveSection("editar");
-            onClose();
-          }
-        }}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
+      <div className="organizador-crudlugares-overlay" onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          resetLugarForm();
+          setActiveSection("editar");
+          onClose();
+        }
+      }}>
+        <div className="organizador-crudlugares-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="organizador-crudlugares-modal-header">
               <h3>Gestión de lugares</h3>
               <button type="button" onClick={() => {
                 resetLugarForm();
                 setActiveSection("editar");
                 onClose();
-              }} className="close-modal-btn">×</button>
+              }} className="organizador-crudlugares-close-modal-btn">×</button>
             </div>
-            <div className="section-switch">
+            <div className="organizador-crudlugares-section-switch">
               <button
                 type="button"
-                className={`switch-btn ${activeSection === "editar" ? "active" : ""}`}
+                className={`organizador-crudlugares-switch-btn ${activeSection === "editar" ? "organizador-crudlugares-active" : ""}`}
                 onClick={() => {
                   setActiveSection("editar");
                   setEditingLugarId(null);
@@ -277,7 +310,7 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
               </button>
               <button
                 type="button"
-                className={`switch-btn ${activeSection === "crear" ? "active" : ""}`}
+                className={`organizador-crudlugares-switch-btn ${activeSection === "crear" ? "organizador-crudlugares-active" : ""}`}
                 onClick={() => {
                   setActiveSection("crear");
                   setEditingLugarId(null);
@@ -288,8 +321,8 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
               </button>
             </div>
             {activeSection === "crear" && (
-              <form onSubmit={handleSubmit} className="lugar-form">
-                <div className="form-group">
+              <form onSubmit={handleSubmit} className="organizador-crudlugares-lugar-form">
+                <div className="organizador-crudlugares-form-group">
                   <label>Nombre del Lugar:</label>
                   <input
                     type="text"
@@ -300,7 +333,7 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="organizador-crudlugares-form-group">
                   <label>Dirección:</label>
                   <input
                     type="text"
@@ -311,7 +344,7 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="organizador-crudlugares-form-group">
                   <label>URL de Maps (opcional):</label>
                   <input
                     type="url"
@@ -321,8 +354,8 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
                   />
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
+                <div className="organizador-crudlugares-form-row">
+                  <div className="organizador-crudlugares-form-group">
                     <label>Capacidad:</label>
                     <input
                       type="text"
@@ -333,7 +366,7 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
                     />
                   </div>
 
-                  <div className="form-group">
+                  <div className="organizador-crudlugares-form-group">
                     <label>Precio Disponible ($):</label>
                     <input
                       type="text"
@@ -345,7 +378,7 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
                   </div>
                 </div>
 
-                <div className="form-group">
+                <div className="organizador-crudlugares-form-group">
                   <label>Descripción:</label>
                   <textarea
                     name="descripcion"
@@ -355,9 +388,9 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="organizador-crudlugares-form-group">
                   <label>Servicios:</label>
-                  <div className="servicios-input">
+                  <div className="organizador-crudlugares-servicios-input">
                     <input
                       type="text"
                       value={servicioNombre}
@@ -372,7 +405,7 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
                       min="0"
                       step="0.01"
                     />
-                    <label className="servicio-checkbox">
+                    <label className="organizador-crudlugares-servicio-checkbox">
                       <input
                         type="checkbox"
                         checked={servicioAdicional}
@@ -380,11 +413,11 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
                       />
                       Costo adicional
                     </label>
-                    <button type="button" onClick={addServicio} className="add-servicio-btn">+</button>
+                    <button type="button" onClick={addServicio} className="organizador-crudlugares-add-servicio-btn">+</button>
                   </div>
-                  <div className="servicios-list">
+                  <div className="organizador-crudlugares-servicios-list">
                     {formData.serviciosIncluidos.map((servicio, index) => (
-                      <span key={index} className="servicio-tag">
+                      <span key={index} className="organizador-crudlugares-servicio-tag">
                         {servicio.nombre} - ${servicio.precio.toFixed(2)} {servicio.adicional ? "(adicional)" : "(incluido)"}
                         <button type="button" onClick={() => removeServicio(index)}>×</button>
                       </span>
@@ -392,20 +425,20 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
                   </div>
                 </div>
 
-                <div className="form-group">
+                <div className="organizador-crudlugares-form-group">
                   <label>Fotos del lugar (URLs):</label>
-                  <div className="servicios-input">
+                  <div className="organizador-crudlugares-servicios-input">
                     <input
                       type="url"
                       value={fotoInput}
                       onChange={(e) => setFotoInput(e.target.value)}
                       placeholder="Agregar URL de foto"
                     />
-                    <button type="button" onClick={addFoto} className="add-servicio-btn">+</button>
+                    <button type="button" onClick={addFoto} className="organizador-crudlugares-add-servicio-btn">+</button>
                   </div>
-                  <div className="fotos-list">
+                  <div className="organizador-crudlugares-fotos-list">
                     {formData.fotos.map((foto, index) => (
-                      <span key={index} className="servicio-tag">
+                      <span key={index} className="organizador-crudlugares-servicio-tag">
                         <a href={foto} target="_blank" rel="noreferrer">Foto {index + 1}</a>
                         <button type="button" onClick={() => removeFoto(index)}>×</button>
                       </span>
@@ -413,20 +446,54 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
                   </div>
                 </div>
 
-                <div className="form-group">
+                <div className="organizador-crudlugares-form-group">
                   <label>Etiquetas (tipos de eventos):</label>
-                  <div className="servicios-input">
-                    <input
-                      type="text"
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      placeholder="Agregar etiqueta (ej: fiesta, concierto)"
-                    />
-                    <button type="button" onClick={addTag} className="add-servicio-btn">+</button>
+                  <div className="organizador-crudlugares-servicios-input">
+                    <div style={{ position: 'relative', flex: 1 }}>
+                      <input
+                        type="text"
+                        value={tagInput}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setTagInput(value);
+                          if (value.trim()) {
+                            const filtered = allTags.filter(tag => tag.includes(value.toLowerCase()));
+                            setTagSuggestions(filtered.slice(0, 10)); // Limit to 10 suggestions
+                          } else {
+                            setTagSuggestions([]);
+                          }
+                        }}
+                        placeholder="Agregar etiqueta (ej: fiesta, concierto)"
+                      />
+                      {tagSuggestions.length > 0 && (
+                        <div className="tag-suggestions">
+                          {tagSuggestions.map((suggestion, index) => (
+                            <div
+                              key={index}
+                              onClick={() => {
+                                const tag = suggestion.toLowerCase();
+                                if (!formData.tags.includes(tag)) {
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    tags: [...prev.tags, tag]
+                                  }));
+                                }
+                                setTagInput("");
+                                setTagSuggestions([]);
+                              }}
+                              className="tag-suggestion-item"
+                            >
+                              {suggestion}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <button type="button" onClick={addTag} className="organizador-crudlugares-add-servicio-btn">+</button>
                   </div>
-                  <div className="tags-list">
+                  <div className="organizador-crudlugares-tags-list">
                     {formData.tags.map((tag, index) => (
-                      <span key={index} className="tag">
+                      <span key={index} className="organizador-crudlugares-tag">
                         {tag}
                         <button type="button" onClick={() => removeTag(index)}>×</button>
                       </span>
@@ -434,7 +501,7 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
                   </div>
                 </div>
 
-                <div className="form-group checkbox-group">
+                <div className="organizador-crudlugares-form-group organizador-crudlugares-checkbox-group">
                   <label>
                     <input
                       type="checkbox"
@@ -446,9 +513,9 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
                   </label>
                 </div>
 
-                <button type="submit" className="submit-btn">{editingLugarId ? "Actualizar Lugar" : "Crear Lugar"}</button>
+                <button type="submit" className="organizador-crudlugares-submit-btn">{editingLugarId ? "Actualizar Lugar" : "Crear Lugar"}</button>
                 {editingLugarId && (
-                  <button type="button" className="cancel-btn" onClick={() => {
+                  <button type="button" className="organizador-crudlugares-cancel-btn" onClick={() => {
                     resetLugarForm();
                     setActiveSection("editar");
                   }}>
@@ -459,30 +526,30 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
             )}
 
             {activeSection === "editar" && (
-              <div className="lugares-list">
+              <div className="organizador-crudlugares-lugares-list">
                 {lugares.map(lugar => (
-                  <div key={lugar.id} className="lugar-card">
+                  <div key={lugar.id} className="organizador-crudlugares-lugar-card">
                     {lugar.fotos && lugar.fotos.length > 0 && (
-                      <div className="image-slider">
+                      <div className="organizador-crudlugares-image-slider">
                         {lugar.fotos.map((foto, index) => (
-                          <div key={index} className="image-slide">
+                          <div key={index} className="organizador-crudlugares-image-slide">
                             <img src={foto} alt={`Lugar ${lugar.nombre} imagen ${index + 1}`} />
                           </div>
                         ))}
                       </div>
                     )}
                     <h4>{lugar.nombre}</h4>
-                    <p className="lugar-address"><strong>Dirección:</strong> {lugar.direccion}</p>
-                    {lugar.descripcion && <p className="lugar-description">{lugar.descripcion}</p>}
+                    <p className="organizador-crudlugares-lugar-address"><strong>Dirección:</strong> {lugar.direccion}</p>
+                    {lugar.descripcion && <p className="organizador-crudlugares-lugar-description">{lugar.descripcion}</p>}
                     <p><strong>Capacidad:</strong> {Number(lugar.capacidad || 0).toLocaleString('es-ES')} personas</p>
                     <p><strong>Precio:</strong> ${Number(lugar.precioDisponible || 0).toLocaleString('es-ES')}</p>
                     <p><strong>Disponible:</strong> {lugar.disponiblePublico ? "Sí" : "No"}</p>
                     {lugar.serviciosIncluidos && lugar.serviciosIncluidos.length > 0 && (
-                      <div className="servicios-list-card">
+                      <div className="organizador-crudlugares-servicios-list-card">
                         <p><strong>Servicios:</strong></p>
                         <ul>
                           {lugar.serviciosIncluidos.map((servicio, index) => (
-                            <li key={index} className="servicio-item">
+                            <li key={index} className="organizador-crudlugares-servicio-item">
                               {servicio.nombre || servicio} - ${Number(servicio.precio || 0).toFixed(2)} {servicio.adicional ? "(adicional)" : "(incluido)"}
                             </li>
                           ))}
@@ -490,26 +557,26 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
                       </div>
                     )}
                     {lugar.tags && lugar.tags.length > 0 && (
-                      <div className="tags-display">
+                      <div className="organizador-crudlugares-tags-display">
                         <p><strong>Etiquetas:</strong></p>
-                        <div className="tags-list">
+                        <div className="organizador-crudlugares-tags-list">
                           {lugar.tags.map((tag, index) => (
-                            <span key={index} className="tag-display">
+                            <span key={index} className="organizador-crudlugares-tag-display">
                               {tag}
                             </span>
                           ))}
                         </div>
                       </div>
                     )}
-                    <div className="lugar-actions">
+                    <div className="organizador-crudlugares-lugar-actions">
                       <button
                         onClick={() => toggleDisponible(lugar.id, lugar.disponiblePublico)}
-                        className={`toggle-btn-publico ${lugar.disponiblePublico ? "toggle-btn-publico" : ""}`}
+                        className={`organizador-crudlugares-toggle-btn-publico ${lugar.disponiblePublico ? "organizador-crudlugares-toggle-btn-publico" : ""}`}
                       >
                         {lugar.disponiblePublico ? "Ocultar" : "Mostrar"} al público
                       </button>
-                      <button onClick={() => handleEditLugar(lugar)} className="edit-btn">Editar</button>
-                      <button onClick={() => deleteLugar(lugar.id)} className="delete-btn">Eliminar</button>
+                      <button onClick={() => handleEditLugar(lugar)} className="organizador-crudlugares-edit-btn">Editar</button>
+                      <button onClick={() => deleteLugar(lugar.id)} className="organizador-crudlugares-delete-btn">Eliminar</button>
                     </div>
                   </div>
                 ))}
@@ -517,9 +584,7 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
             )}
           </div>
         </div>
-      )}
-    </>
-  );
+    );
 };
 
 export default Lugares;

@@ -4,7 +4,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth } from "../../api/api";
 import { onAuthStateChanged } from "firebase/auth";
 import { toast } from "react-toastify";
-import ComprarBoleta from "../homepages/comprarboleta/comprarboleta";
+import ReservarLugar from "../homepages/reservarlugar/reservarlugar";
 import EventLoading from "../loading/EventLoading";
 import "./LugaresView.css";
 
@@ -164,8 +164,8 @@ const LugaresView = ({ onBack }) => {
       </main>
 
       {showCompraModal && selectedLugarId && (
-        <ComprarBoleta
-          eventoId={selectedLugarId}
+        <ReservarLugar
+          lugarId={selectedLugarId}
           onClose={() => {
             setShowCompraModal(false);
             setSelectedLugarId(null);

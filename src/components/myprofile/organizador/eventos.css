@@ -1,205 +1,260 @@
-/* Eventos - estilos de switch y cards */
-.modal-overlay {
+@import "../../../resources/colors/colors.css";
+
+/* Overlay */
+.organizador-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+  background: var(--color-overlay);
+  backdrop-filter: blur(6px);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
+  justify-content: center;
+  z-index: 9999;
 }
 
-.modal {
-  position: relative;
-  background-color: #121212;
-  border-radius: 16px;
-  padding: 24px;
-  width: min(90%, 900px);
+/* Modal */
+.organizador-modal {
+  width: 95%;
+  max-width: 900px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-  color: #f1f1f1;
+  background: var(--color-bg-primary);
+  border-radius: 18px;
+  padding: 25px 30px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  animation: fadeInScale 0.25s ease;
+  color: var(--color-text);
 }
 
-.close-btn {
+/* Animación */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Botón cerrar */
+.organizador-close-btn {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  background: none;
+  top: 12px;
+  right: 15px;
+  background: var(--color-bg-secondary);
   border: none;
-  font-size: 26px;
-  color: #ccc;
+  font-size: 20px;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
   cursor: pointer;
+  transition: var(--transition-fast);
+  color: var(--color-text-muted);
 }
 
-.close-btn:hover {
-  color: #fff;
+.organizador-close-btn:hover {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text);
+  transform: rotate(90deg);
 }
 
-.section-switch {
+/* Switch botones */
+.organizador-section-switch {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
 }
 
-.switch-btn {
+h3 {
+  color: var(--color-text);
+}
+
+.organizador-switch-btn {
   flex: 1;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 999px;
-  padding: 12px 16px;
-  background: #171717;
-  color: #ddd;
-  font-weight: 700;
+  padding: 10px;
+  border-radius: 10px;
+  border: 2px solid var(--color-border);
+  background: var(--color-bg-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  transition: var(--transition-fast);
+  color: var(--color-text);
 }
 
-.switch-btn.active,
-.switch-btn:hover {
-  background: #00d4ff;
-  color: #121212;
-  border-color: #00d4ff;
+.organizador-switch-btn:hover {
+  background: var(--color-bg-tertiary);
+  border-color: var(--color-accent);
 }
 
-.eventos-list {
-  display: grid;
-  gap: 18px;
-  margin-bottom: 20px;
+.organizador-active {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-btn-bg));
+  color: white;
+  border-color: var(--color-accent);
 }
 
-.evento-card {
-  background: #1b1b1b;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* Cards eventos */
+.organizador-eventos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.organizador-evento-card {
+  background: var(--color-bg-secondary);
   border-radius: 14px;
-  padding: 18px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  padding: 15px;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-fast);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
 }
 
-.evento-card-header {
+.organizador-evento-card:hover {
+  transform: translateY(-3px);
+}
+
+.organizador-evento-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
 }
 
-.evento-card-header strong {
-  font-size: 1rem;
-}
-
-.edit-btn {
-  background: #007cf0;
-  color: #fff;
-  border: none;
-  padding: 8px 14px;
+/* Botón editar */
+.organizador-edit-btn {
+  background: var(--color-btn-bg);
+  border: 2px solid var(--color-btn-bg);
+  color: white;
+  padding: 6px 12px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 12px;
+  transition: var(--transition-fast);
 }
 
-.evento-poster-preview {
-  margin-bottom: 14px;
-  border-radius: 14px;
-  overflow: hidden;
+.organizador-edit-btn:hover {
+  background: var(--color-btn-bg-hover);
+  border-color: var(--color-btn-bg-hover);
 }
 
-.evento-poster-preview img {
+/* Imagen preview */
+.organizador-evento-poster-preview img {
   width: 100%;
-  height: 220px;
-  object-fit: cover;
-  display: block;
-}
-
-.evento-card p {
-  margin: 8px 0;
-  color: rgba(255, 255, 255, 0.82);
-  line-height: 1.55;
-}
-
-.evento-form {
-  background: #1b1b1b;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 24px;
-}
-
-.evento-form .form-group {
-  margin-bottom: 16px;
-}
-
-.evento-form label {
-  display: block;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: #ddd;
-}
-
-.evento-form input,
-.evento-form select,
-.evento-form textarea {
-  width: 100%;
-  padding: 12px 14px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: #121212;
-  color: #f1f1f1;
-  font-size: 14px;
+  margin: 10px 0;
+  object-fit: cover;
+  max-height: 200px;
 }
 
-.evento-form textarea {
-  min-height: 100px;
-  resize: vertical;
+/* Formularios */
+.organizador-evento-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.evento-form small {
-  display: block;
-  margin-top: 8px;
-  color: rgba(255, 255, 255, 0.6);
+.organizador-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
-.evento-form .form-row {
+.organizador-form-group label {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.organizador-form-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
 }
 
-.submit-btn {
-  width: 100%;
-  margin-top: 18px;
-  background: #00d4ff;
-  color: #121212;
-  border: none;
+/* Inputs */
+input, textarea, select {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  outline: none;
+  transition: var(--transition-fast);
+  font-size: 14px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text);
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(162, 155, 254, 0.2);
+}
+
+/* Botón submit */
+.organizador-submit-btn {
+  margin-top: 10px;
+  padding: 12px;
   border-radius: 12px;
-  padding: 14px;
-  font-weight: 700;
+  border: 2px solid var(--color-btn-yes-bg);
+  background: var(--color-btn-yes-bg);
+  color: white;
+  font-weight: bold;
   cursor: pointer;
+  transition: var(--transition-normal);
 }
 
-.no-eps,
-.no-eventos,
-.no-lugares {
-  background: #1b1b1b;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 20px;
-  color: rgba(255, 255, 255, 0.84);
+.organizador-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(34,197,94,0.3);
+  border-color: #16a34a;
 }
 
-.no-lugares p,
-.no-eventos p {
-  margin: 0;
+/* Estados vacíos */
+.organizador-no-eventos,
+.organizador-no-lugares {
+  text-align: center;
+  padding: 30px;
+  color: var(--color-text-muted);
 }
 
-@media (max-width: 768px) {
-  .modal {
-    width: 100%;
-    max-height: 95vh;
-    border-radius: 12px;
-  }
+/* Scroll bonito */
+.organizador-modal::-webkit-scrollbar {
+  width: 8px;
+}
 
-  .evento-poster-preview img {
-    height: 180px;
-  }
+.organizador-modal::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 10px;
+}
+
+/* Tag Suggestions */
+.tag-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: var(--shadow-sm);
+}
+
+.tag-suggestion-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-border);
+  transition: background var(--transition-fast);
+  color: var(--color-text);
+}
+
+.tag-suggestion-item:hover {
+  background: var(--color-bg-secondary);
+}
+
+.tag-suggestion-item:last-child {
+  border-bottom: none;
 }

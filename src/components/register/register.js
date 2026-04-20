@@ -10,7 +10,7 @@ import {
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 
-import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaPhone } from "react-icons/fa";
 
 /* 🔐 Seguridad PRO */
 const getPasswordStrength = (password) => {
@@ -30,6 +30,7 @@ const Register = ({ onClose, onSwitchToLogin }) => {
   const [form, setForm] = useState({
     name: "",
     email: "",
+    telefono: "",
     password: "",
     confirmPassword: "",
   });
@@ -37,11 +38,24 @@ const Register = ({ onClose, onSwitchToLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const formatPhone = (value) => {
+  // Remove all non-digits
+  const digits = value.replace(/\D/g, '');
+  // Limit to 10 digits
+  const limited = digits.slice(0, 10);
+  // Format as 3-3-2-2
+  if (limited.length <= 3) return limited;
+  if (limited.length <= 6) return `${limited.slice(0, 3)} ${limited.slice(3)}`;
+  if (limited.length <= 8) return `${limited.slice(0, 3)} ${limited.slice(3, 6)} ${limited.slice(6)}`;
+  return `${limited.slice(0, 3)} ${limited.slice(3, 6)} ${limited.slice(6, 8)} ${limited.slice(8)}`;
+};
+
   const handleChange = (e) => {
     let { name, value } = e.target;
 
     if (name === "name") value = value.toUpperCase();
     if (name === "email") value = value.toLowerCase();
+    if (name === "telefono") value = formatPhone(value);
 
     setForm({
       ...form,
@@ -52,10 +66,11 @@ const Register = ({ onClose, onSwitchToLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { name, email, password, confirmPassword } = form;
+    const { name, email, telefono, password, confirmPassword } = form;
 
     if (!name) return toast.error("Ingresa tu nombre");
     if (!email) return toast.error("Ingresa tu correo");
+    if (!telefono || telefono.replace(/\D/g, '').length !== 10) return toast.error("Ingresa un teléfono válido de 10 dígitos");
     if (password !== confirmPassword)
       return toast.error("Las contraseñas no coinciden");
     if (password.length < 10)
@@ -78,6 +93,7 @@ const Register = ({ onClose, onSwitchToLogin }) => {
       await setDoc(doc(db, "USUARIOS", userCredential.user.uid), {
         name: name,
         email: email,
+        telefono: telefono,
         rol: "USUARIO"
       });
 
@@ -147,6 +163,20 @@ const Register = ({ onClose, onSwitchToLogin }) => {
               required
             />
             <label>Correo electrónico</label>
+          </div>
+
+          {/* Telefono */}
+          <div className="input-group">
+            <FaPhone className="input-icon" />
+            <input
+              type="text"
+              name="telefono"
+              placeholder=" "
+              value={form.telefono}
+              onChange={handleChange}
+              required
+            />
+            <label>Teléfono (10 dígitos)</label>
           </div>
 
           {/* Password */}

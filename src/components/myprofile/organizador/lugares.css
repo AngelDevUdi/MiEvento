@@ -1,526 +1,398 @@
-﻿/* =========================
-   🔥 RESET
-========================= */
-* {
-  box-sizing: border-box;
-}
+﻿@import "../../../resources/colors/colors.css";
 
-body {
-  margin: 0;
-  font-family: sans-serif;
-}
-
-/* =========================
-   🔥 OVERLAY
-========================= */
-.overlay {
+/* Overlay */
+.organizador-crudlugares-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-
-  background: rgba(0,0,0,0.7);
+  inset: 0;
+  background: var(--color-overlay);
   backdrop-filter: blur(6px);
-
   display: flex;
-  justify-content: center;
   align-items: center;
-
-  padding: 15px;
+  justify-content: center;
   z-index: 9999;
 }
 
-/* =========================
-   🔥 MODAL
-========================= */
-.modal {
-  width: 100%;
-  max-width: 650px;
+/* Modal */
+.organizador-crudlugares-modal {
+  width: 95%;
+  max-width: 1000px;
   max-height: 90vh;
-
-  background: #121212;
-  color: white;
-
-  border-radius: 12px;
-  padding: 20px;
-
   overflow-y: auto;
-
-  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  background: var(--color-bg-primary);
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: var(--shadow-lg);
+  animation: fadeInScale 0.25s ease;
+  color: var(--color-text);
 }
 
-/* Scroll bonito */
-.modal::-webkit-scrollbar {
-  width: 6px;
-}
-.modal::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 10px;
-}
-
-/* =========================
-   🔥 HEADER
-========================= */
-.modal-header {
+/* Header */
+.organizador-crudlugares-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
 }
 
-.modal-header h3 {
-  margin: 0;
+.organizador-crudlugares-close-modal-btn {
+  background: var(--color-bg-secondary);
+  border: none;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
   font-size: 18px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  color: var(--color-text);
 }
 
-.section-switch {
+.organizador-crudlugares-close-modal-btn:hover {
+  background: var(--color-bg-tertiary);
+  transform: rotate(90deg);
+}
+
+/* Switch */
+.organizador-crudlugares-section-switch {
   display: flex;
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
-.switch-btn {
+h3 {
+  color: var(--color-text);
+}
+
+.organizador-crudlugares-switch-btn {
   flex: 1;
-  border: 1px solid #333;
-  border-radius: 999px;
-  padding: 10px 14px;
-  background: #171717;
-  color: #ddd;
-  cursor: pointer;
-  transition: 0.2s;
+  padding: 10px;
+  border-radius: 10px;
+  border: 2px solid var(--color-border);
+  background: var(--color-bg-secondary);
   font-weight: 600;
-}
-
-.switch-btn.active {
-  background: #00d4ff;
-  border-color: #00d4ff;
-  color: #121212;
-}
-
-.switch-btn:hover {
-  background: #0a95b5;
-}
-
-/* Botón cerrar */
-.close-modal-btn {
-  background: none;
-  border: none;
-  font-size: 26px;
-  color: #aaa;
   cursor: pointer;
-  transition: 0.2s;
+  transition: var(--transition-fast);
+  color: var(--color-text);
 }
 
-.close-modal-btn:hover {
+.organizador-crudlugares-switch-btn:hover {
+  background: var(--color-bg-tertiary);
+  border-color: var(--color-accent);
+}
+
+.organizador-crudlugares-active {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-btn-bg));
   color: white;
+  border-color: var(--color-accent);
 }
 
-/* =========================
-   🔥 FORMULARIO
-========================= */
-.lugar-form {
+/* FORM */
+.organizador-crudlugares-lugar-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
-
-  background: #1a1a1a;
-  padding: 15px;
-  border-radius: 10px;
 }
 
-/* Grupo */
-.form-group {
+.organizador-crudlugares-form-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-/* Labels */
-.form-group label {
-  font-size: 13px;
-  color: #bbb;
+.organizador-crudlugares-form-group label {
+  color: var(--color-text);
+  font-weight: 600;
 }
 
-/* Inputs uniformes */
-.form-group input,
-.form-group textarea {
-  width: 100%;
-  padding: 10px 12px;
+.organizador-crudlugares-form-group label {
+  color: var(--color-text);
+  font-weight: 600;
+}
 
-  border-radius: 8px;
-  border: 1px solid #333;
+.organizador-crudlugares-form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 15px;
+}
 
-  background: #0f0f0f;
-  color: white;
-
-  font-size: 14px;
+/* Inputs */
+.organizador-crudlugares-form-group input,
+.organizador-crudlugares-form-group textarea,
+.organizador-crudlugares-form-group select {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  transition: var(--transition-fast);
   outline: none;
+  background: var(--color-bg-secondary);
+  color: var(--color-text);
 }
 
-/* Focus */
-.form-group input:focus,
-.form-group textarea:focus {
-  border-color: #00d4ff;
+.organizador-crudlugares-form-group input:focus,
+.organizador-crudlugares-form-group textarea:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(162, 155, 254, 0.2);
 }
 
-/* Textarea */
-.form-group textarea {
-  resize: none;
-}
-
-/* =========================
-   🔥 ROW (capacidad + precio)
-========================= */
-.form-row {
-  display: flex;
-  gap: 10px;
-}
-
-.form-row .form-group {
-  flex: 1;
-}
-
-/* =========================
-   🔥 SERVICIOS
-========================= */
-.servicios-input {
+/* Servicios / inputs dinámicos */
+.organizador-crudlugares-servicios-input {
   display: flex;
   gap: 8px;
-  align-items: center;
   flex-wrap: wrap;
+  align-items: center;
 }
 
-/* Inputs internos */
-.servicios-input input {
-  flex: 1;
-  min-width: 120px;
-}
-
-/* Checkbox */
-.servicio-checkbox {
+.organizador-crudlugares-servicio-checkbox {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 12px;
-  white-space: nowrap;
+  font-size: 13px;
 }
 
-/* Botón agregar */
-.add-servicio-btn {
-  height: 38px;
-  padding: 0 12px;
-
+.organizador-crudlugares-add-servicio-btn {
+  background: var(--color-btn-yes-bg);
   border: none;
-  border-radius: 6px;
-
-  background: #00d4ff;
-  color: black;
-
-  font-weight: bold;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-/* Lista tags */
-.tags-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-/* Tag */
-.tag {
-  background: #222;
-  padding: 6px 10px;
-  border-radius: 20px;
-
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  font-size: 12px;
-}
-
-/* Botón eliminar tag */
-.tag button {
-  background: none;
-  border: none;
-  color: #ff4d4d;
-  cursor: pointer;
-}
-
-/* Tags display en card */
-.tags-display {
-  margin-top: 10px;
-}
-
-.tags-display p {
-  margin: 0 0 5px 0;
-  font-weight: bold;
-}
-
-.tag-display {
-  background: #007bff;
   color: white;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 11px;
-  display: inline-block;
-  margin-right: 5px;
-  margin-bottom: 5px;
-}
-
-/* Services Tag */
-.servicios-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.servicio-tag {
-  background: #222;
-  padding: 6px 10px;
-  border-radius: 20px;
-
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  font-size: 12px;
-}
-
-.servicio-tag button {
-  background: none;
-  border: none;
-  color: #ff4d4d;
-  cursor: pointer;
-}
-
-/* =========================
-   🔥 FOTOS (TU JSX ACTUAL)
-========================= */
-.fotos-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-/* Reutiliza servicio-tag */
-.fotos-list .servicio-tag {
-  background: #1f1f1f;
-  border: 1px solid #333;
-}
-
-/* Links */
-.fotos-list a {
-  color: #00d4ff;
-  text-decoration: none;
-  font-size: 12px;
-}
-
-.fotos-list a:hover {
-  text-decoration: underline;
-}
-
-/* =========================
-   🔥 CHECKBOX
-========================= */
-.checkbox-group {
-  display: flex;
-  align-items: center;
-}
-
-.checkbox-group label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* =========================
-   🔥 BOTONES
-========================= */
-.submit-btn,
-.cancel-btn {
-  width: 100%;
-  padding: 12px;
-
-  border: none;
+  padding: 6px 12px;
   border-radius: 8px;
-
-  font-weight: 600;
   cursor: pointer;
+  transition: var(--transition-fast);
 }
 
-/* Guardar */
-.submit-btn {
-  background: linear-gradient(135deg, #28a745, #1e7e34);
+.organizador-crudlugares-add-servicio-btn:hover {
+  background: var(--color-btn-yes-bg-hover);
+}
+
+/* Tags / chips */
+.organizador-crudlugares-servicio-tag,
+.organizador-crudlugares-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(162, 155, 254, 0.15);
+  color: var(--color-accent);
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  margin: 4px;
+}
+
+.organizador-crudlugares-servicio-tag button,
+.organizador-crudlugares-tag button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Fotos list */
+.organizador-crudlugares-fotos-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* Checkbox */
+.organizador-crudlugares-checkbox-group {
+  flex-direction: row;
+  align-items: center;
+}
+
+/* Botones */
+.organizador-crudlugares-submit-btn {
+  padding: 12px;
+  border-radius: 12px;
+  border: 2px solid var(--color-btn-yes-bg);
+  background: var(--color-btn-yes-bg);
   color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: var(--transition-normal);
 }
 
-/* Cancelar */
-.cancel-btn {
-  background: #444;
+.organizador-crudlugares-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(34,197,94,0.3);
+  border-color: #16a34a;
+}
+
+.organizador-crudlugares-cancel-btn {
+  margin-top: 10px;
+  background: var(--color-btn-no-bg);
   color: white;
+  border: 2px solid var(--color-btn-no-bg);
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: var(--transition-fast);
 }
 
-/* =========================
-   🔥 LISTA DE LUGARES
-========================= */
-.lugares-list {
-  margin-top: 20px;
+.organizador-crudlugares-cancel-btn:hover {
+  background: var(--color-btn-no-bg-hover);
+  border-color: var(--color-btn-no-bg-hover);
+}
 
+/* LISTADO */
+.organizador-crudlugares-lugares-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 15px;
 }
 
 /* Card */
-.lugar-card {
-  background: #1a1a1a;
-  border-radius: 10px;
-  padding: 15px;
-  max-width: 100%;
-  overflow: hidden;
-
-  box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-}
-
-.lugar-card h4 {
-  margin-top: 0;
-  word-break: break-word;
-}
-
-.image-slider {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  margin-bottom: 14px;
-  max-width: 100%;
-
-  /* 🔥 Ocultar scrollbar (Firefox) */
-  scrollbar-width: none;
-
-  /* 🔥 Ocultar scrollbar (IE/Edge antiguo) */
-  -ms-overflow-style: none;
-}
-
-/* 🔥 Ocultar scrollbar (Chrome, Safari, Edge moderno) */
-.image-slider::-webkit-scrollbar {
-  display: none;
-}
-
-.image-slide {
-  flex: 0 0 100%;
-  min-width: 100%;
-  height: 260px;
+.organizador-crudlugares-lugar-card {
+  background: var(--color-bg-secondary);
   border-radius: 14px;
-  overflow: hidden;
-  scroll-snap-align: center;
-  background: #111;
+  padding: 15px;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-fast);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
 }
 
-.image-slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+.organizador-crudlugares-lugar-card:hover {
+  transform: translateY(-4px);
 }
 
-.lugar-address,
-.lugar-description {
-  margin: 10px 0;
-  line-height: 1.5;
-}
-
-.lugar-description {
-  color: #ccc;
-}
-
-.servicios-list-card ul {
-  margin: 8px 0 0;
-  padding-left: 18px;
-  color: #ccc;
-}
-
-.servicio-item {
-  margin-bottom: 6px;
-  font-size: 13px;
-}
-
-/* Toggle */
-.toggle-btn {
-  background: #ffc107;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
+/* Imagen slider */
+.organizador-crudlugares-image-slider {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
   margin-bottom: 10px;
 }
 
+.organizador-crudlugares-image-slide img {
+  height: 120px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* Tags display */
+.organizador-crudlugares-tag-display {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--color-btn-bg);
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  margin: 4px;
+  display: inline-block;
+}
+
 /* Acciones */
-.lugar-actions {
+.organizador-crudlugares-lugar-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   margin-top: 10px;
 }
 
-.lugar-actions button {
-  min-width: 140px;
-}
-
-.toggle-btn,
-.edit-btn,
-.delete-btn {
-  flex: 1;
-  padding: 8px;
-
-  border: none;
-  border-radius: 6px;
-
-  color: white;
+.organizador-crudlugares-toggle-btn-publico {
+  background: var(--color-warning);
+  border: 2px solid var(--color-warning);
+  color: var(--color-text-inverse);
+  padding: 8px 10px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: var(--transition-fast);
 }
 
-.edit-btn {
-  background: #007cf0;
+.organizador-crudlugares-edit-btn {
+  background: var(--color-btn-bg);
+  border: 2px solid var(--color-btn-bg);
+  color: white;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition-fast);
 }
 
-.delete-btn {
-  background: #dc3545;
+.organizador-crudlugares-edit-btn:hover {
+  background: var(--color-btn-bg-hover);
+  border-color: var(--color-btn-bg-hover);
 }
 
-.toggle-btn-publico {
-  background: #28a745;
+.organizador-crudlugares-delete-btn {
+  background: var(--color-btn-no-bg);
+  border: 2px solid var(--color-btn-no-bg);
+  color: white;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition-fast);
 }
 
-/* =========================
-   📱 RESPONSIVE
-========================= */
-@media (max-width: 768px) {
+.organizador-crudlugares-delete-btn:hover {
+  background: var(--color-btn-no-bg-hover);
+  border-color: #dc2626;
+}
 
-  .modal {
-    max-width: 100%;
-    height: 95vh;
-    border-radius: 10px;
-  }
+/* Scroll */
+.organizador-crudlugares-modal::-webkit-scrollbar {
+  width: 8px;
+}
 
-  .form-row {
-    flex-direction: column;
-  }
+.organizador-crudlugares-modal::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 10px;
+}
+/* CONTENEDOR DEL SLIDER */
+.organizador-crudlugares-image-slider {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  gap: 0;
+  width: 100%;
+}
 
-  .servicios-input {
-    flex-direction: column;
-    align-items: stretch;
-  }
+/* OCULTAR SCROLL (opcional) */
+.organizador-crudlugares-image-slider::-webkit-scrollbar {
+  display: none;
+}
 
-  .servicios-input input {
-    width: 100%;
-  }
+/* CADA SLIDE */
+.organizador-crudlugares-image-slide {
+  min-width: 100%;
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  .add-servicio-btn {
-    width: 100%;
-  }
+/* CONTENEDOR opcional para centrar */
+.organizador-crudlugares-image-slide img {
+  max-width: 100%;
+  max-height: 300px; /* controla tamaño sin deformar */
+  width: auto;
+  height: auto;
+  object-fit: contain; /* mantiene proporción SIEMPRE */
+  border-radius: 10px;
+}
+
+/* Tag Suggestions */
+.tag-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tag-suggestion-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #e2e8f0;
+  transition: background 0.2s;
+}
+
+.tag-suggestion-item:hover {
+  background: #f1f5f9;
+}
+
+.tag-suggestion-item:last-child {
+  border-bottom: none;
 }

@@ -34,7 +34,7 @@ const HomePage = ({ onViewChange }) => {
   if (isLoading) {
     return (
       <>
-        <Navbar onViewChange={onViewChange} onChange={handleSectionChange} isLoading={true} currentSection={currentSection} />
+        <Navbar onViewChange={onViewChange} onLogoClick={handleBackToHome} onChange={handleSectionChange} isLoading={true} currentSection={currentSection} />
         <EventLoading text={currentSection === "eventos" ? "Cargando eventos..." : "Cargando lugares..."} />
       </>
     );
@@ -44,7 +44,7 @@ const HomePage = ({ onViewChange }) => {
   if (currentSection === "eventos") {
     return (
       <>
-        <Navbar onViewChange={onViewChange} onChange={handleSectionChange} currentSection={currentSection} />
+        <Navbar onViewChange={onViewChange} onLogoClick={handleBackToHome} onChange={handleSectionChange} currentSection={currentSection} />
         <EventosView onBack={handleBackToHome} />
       </>
     );
@@ -54,7 +54,7 @@ const HomePage = ({ onViewChange }) => {
   if (currentSection === "lugares") {
     return (
       <>
-        <Navbar onViewChange={onViewChange} onChange={handleSectionChange} currentSection={currentSection} />
+        <Navbar onViewChange={onViewChange} onLogoClick={handleBackToHome} onChange={handleSectionChange} currentSection={currentSection} />
         <LugaresView onBack={handleBackToHome} />
       </>
     );
@@ -64,7 +64,7 @@ const HomePage = ({ onViewChange }) => {
   return (
     <div className="homepage">
       {/* Navbar */}
-      <Navbar onViewChange={onViewChange} onChange={handleSectionChange} />
+      <Navbar onViewChange={onViewChange} onLogoClick={handleBackToHome} onChange={handleSectionChange} />
 
       {/* Slider de Eventos */}
       <section className="slider-section">

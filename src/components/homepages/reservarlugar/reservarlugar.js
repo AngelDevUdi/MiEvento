@@ -13,6 +13,7 @@ const ReservarLugar = ({ lugarId, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [lugarLoading, setLugarLoading] = useState(true);
   const [selectedServicios, setSelectedServicios] = useState([]);
+  const [blockedDates, setBlockedDates] = useState([]);
   const [formData, setFormData] = useState({
     diaReserva: "",
     metodoPagoId: "",
@@ -33,7 +34,22 @@ const ReservarLugar = ({ lugarId, onClose }) => {
       const lugarRef = doc(db, "LUGARES", lugarId);
       const lugarDoc = await getDoc(lugarRef);
       if (lugarDoc.exists()) {
-        setLugar({ id: lugarDoc.id, ...lugarDoc.data() });
+        const lugarData = { id: lugarDoc.id, ...lugarDoc.data() };
+        setLugar(lugarData);
+        
+        // Obtener fechas bloqueadas (reservas ACTIVADAS)
+        const reservasQuery = query(
+          collection(db, "RESERVAS"),
+          where("lugarId", "==", lugarId),
+          where("estado", "==", "ACTIVADA")
+        );
+        const reservasSnapshot = await getDocs(reservasQuery);
+        const blocked = reservasSnapshot.docs.map(doc => {
+          const data = doc.data();
+          const fecha = new Date(data.diaReserva);
+          return fecha.toISOString().split('T')[0];
+        });
+        setBlockedDates(blocked);
       }
     } catch (error) {
       console.error("Error fetching lugar:", error);
@@ -75,6 +91,12 @@ const ReservarLugar = ({ lugarId, onClose }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    if (name === "diaReserva" && blockedDates.includes(value)) {
+      toast.error("Este día ya está reservado. Selecciona otra fecha.");
+      return;
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value

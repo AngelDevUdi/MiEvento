@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import ReactDOM from "react-dom";
+import EventLoading from "../../../loading/EventLoading";
 import { db } from "../../../../api/api";
 import { collection, addDoc, getDocs, query, where, updateDoc, doc } from "firebase/firestore";
 import { toast } from "react-toastify";
@@ -18,10 +18,17 @@ const MetodosPagos = ({ userId, onClose }) => {
     banco: "",
     titular: ""
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchMetodos();
-  }, []);
+    const loadData = async () => {
+      setLoading(true);
+      await fetchMetodos();
+      setLoading(false);
+    };
+
+    loadData();
+  }, [userId]);
 
   const fetchMetodos = async () => {
     try {
@@ -100,15 +107,21 @@ const MetodosPagos = ({ userId, onClose }) => {
     }
   };
 
-  return ReactDOM.createPortal(
-    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>×</button>
+  if (loading) {
+    return (
+          <EventLoading text="Cargando métodos de pago..." />
+    );
+  }
+
+  return (
+    <div className="organizador-metodospay-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
+      <div className="organizador-metodospay-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="organizador-metodospay-close-btn" onClick={onClose}>×</button>
         <h3>Métodos de Pago</h3>
-        <div className="section-switch">
+        <div className="organizador-metodospay-section-switch">
           <button
             type="button"
-            className={`switch-btn ${activeSection === "editar" ? "active" : ""}`}
+            className={`organizador-metodospay-switch-btn ${activeSection === "editar" ? "organizador-metodospay-active" : ""}`}
             onClick={() => {
               setActiveSection("editar");
               resetForm();
@@ -118,7 +131,7 @@ const MetodosPagos = ({ userId, onClose }) => {
           </button>
           <button
             type="button"
-            className={`switch-btn ${activeSection === "crear" ? "active" : ""}`}
+            className={`organizador-metodospay-switch-btn ${activeSection === "crear" ? "organizador-metodospay-active" : ""}`}
             onClick={() => {
               resetForm();
               setActiveSection("crear");
@@ -129,22 +142,22 @@ const MetodosPagos = ({ userId, onClose }) => {
         </div>
 
         {activeSection === "editar" && metodos.length > 0 && (
-          <div className="metodos-list">
-            <h4>Métodos registrados</h4>
+          <div className="organizador-metodospay-metodos-list">
+            <h3>Métodos registrados</h3>
             {metodos.map(metodo => (
-              <div key={metodo.id} className="metodo-card">
-                <div className="metodo-card-header">
+              <div key={metodo.id} className="organizador-metodospay-metodo-card">
+                <div className="organizador-metodospay-metodo-card-header">
                   <strong>{metodo.nombre} ({metodo.tipo})</strong>
-                  <button type="button" onClick={() => handleEditMetodo(metodo)} className="edit-btn">Editar</button>
+                  <button type="button" onClick={() => handleEditMetodo(metodo)} className="organizador-metodospay-edit-btn">Editar</button>
                 </div>
                 <p>{metodo.descripcion}</p>
                 {metodo.tipo === "QR" && metodo.urlQr && (
-                  <div className="qr-preview">
+                  <div className="organizador-metodospay-qr-preview">
                     <img src={metodo.urlQr} alt="Código QR" />
                   </div>
                 )}
                 {metodo.tipo === "TRANSFERENCIA" && (
-                  <div className="transferencia-info">
+                  <div className="organizador-metodospay-transferencia-info">
                     <p><strong>Banco:</strong> {metodo.banco}</p>
                     <p><strong>Número de cuenta:</strong> {metodo.numeroCuenta}</p>
                     <p><strong>Titular:</strong> {metodo.titular}</p>
@@ -156,8 +169,8 @@ const MetodosPagos = ({ userId, onClose }) => {
         )}
 
         {activeSection === "crear" && (
-          <form onSubmit={handleSubmit} className="metodo-form">
-            <div className="form-group">
+          <form onSubmit={handleSubmit} className="organizador-metodospay-metodo-form">
+            <div className="organizador-metodospay-form-group">
               <label>Tipo de Método:</label>
             <select
               name="tipo"
@@ -170,7 +183,7 @@ const MetodosPagos = ({ userId, onClose }) => {
             </select>
           </div>
 
-          <div className="form-group">
+          <div className="organizador-metodospay-form-group">
             <label>Nombre del Método:</label>
             <input
               type="text"
@@ -182,7 +195,7 @@ const MetodosPagos = ({ userId, onClose }) => {
             />
           </div>
 
-          <div className="form-group">
+          <div className="organizador-metodospay-form-group">
             <label>Descripción:</label>
             <textarea
               name="descripcion"
@@ -194,7 +207,7 @@ const MetodosPagos = ({ userId, onClose }) => {
           </div>
 
           {formData.tipo === "QR" && (
-            <div className="form-group">
+            <div className="organizador-metodospay-form-group">
               <label>URL del Código QR:</label>
               <input
                 type="url"
@@ -208,7 +221,7 @@ const MetodosPagos = ({ userId, onClose }) => {
 
           {formData.tipo === "TRANSFERENCIA" && (
             <>
-              <div className="form-group">
+              <div className="organizador-metodospay-form-group">
                 <label>Banco:</label>
                 <input
                   type="text"
@@ -219,7 +232,7 @@ const MetodosPagos = ({ userId, onClose }) => {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="organizador-metodospay-form-group">
                 <label>Número de Cuenta:</label>
                 <input
                   type="text"
@@ -230,7 +243,7 @@ const MetodosPagos = ({ userId, onClose }) => {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="organizador-metodospay-form-group">
                 <label>Titular de la Cuenta:</label>
                 <input
                   type="text"
@@ -243,14 +256,13 @@ const MetodosPagos = ({ userId, onClose }) => {
             </>
           )}
 
-          <button type="submit" className="submit-btn">
+          <button type="submit" className="organizador-metodospay-submit-btn">
             {editingMetodoId ? "Actualizar Método" : "Crear Método"}
           </button>
         </form>
       )}
       </div>
-    </div>,
-    document.body
+    </div>
   );
 };
 

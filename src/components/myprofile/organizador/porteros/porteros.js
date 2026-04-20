@@ -4,6 +4,7 @@ import { db, auth } from "../../../../api/api";
 import { collection, getDocs, query, where, updateDoc, doc, deleteDoc, setDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-toastify";
+import EventLoading from "../../../loading/EventLoading";
 import "./porteros.css";
 
 const Porteros = ({ userId, onClose }) => {
@@ -11,6 +12,7 @@ const Porteros = ({ userId, onClose }) => {
   const [lugares, setLugares] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingPorteroId, setEditingPorteroId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,8 +20,19 @@ const Porteros = ({ userId, onClose }) => {
   });
 
   useEffect(() => {
-    fetchLugares();
-    fetchPorteros();
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        const lugaresData = await fetchLugares();
+        setLugares(lugaresData);
+        if (lugaresData.length > 0) {
+          await fetchPorteros(lugaresData);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadData();
   }, []);
 
   const fetchLugares = async () => {
@@ -28,16 +41,18 @@ const Porteros = ({ userId, onClose }) => {
       const querySnapshot = await getDocs(q);
       const lugaresData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setLugares(lugaresData);
+      return lugaresData;
     } catch (error) {
       console.error("Error fetching lugares:", error);
       toast.error("Error al cargar lugares");
+      return [];
     }
   };
 
-  const fetchPorteros = async () => {
+  const fetchPorteros = async (lugaresParam) => {
     try {
       // Obtener todos los porteros de los lugares del organizador
-      const porterosPromises = lugares.map(async (lugar) => {
+      const porterosPromises = lugaresParam.map(async (lugar) => {
         const q = query(collection(db, "USUARIOS"), where("rol", "==", "PORTERO"), where("establecimientoId", "==", lugar.id));
         const querySnapshot = await getDocs(q);
         return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), lugarNombre: lugar.nombre }));
@@ -51,12 +66,6 @@ const Porteros = ({ userId, onClose }) => {
       toast.error("Error al cargar porteros");
     }
   };
-
-  useEffect(() => {
-    if (lugares.length > 0) {
-      fetchPorteros();
-    }
-  }, [lugares]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -94,7 +103,7 @@ const Porteros = ({ userId, onClose }) => {
     try {
       await deleteDoc(doc(db, "USUARIOS", porteroId));
       toast.success("Portero eliminado exitosamente");
-      fetchPorteros();
+      fetchPorteros(lugares);
     } catch (error) {
       console.error("Error deleting portero:", error);
       toast.error("Error al eliminar portero");
@@ -137,7 +146,7 @@ const Porteros = ({ userId, onClose }) => {
       }
 
       resetForm();
-      fetchPorteros();
+      fetchPorteros(lugares);
     } catch (error) {
       console.error("Error saving portero:", error);
       
@@ -154,22 +163,35 @@ const Porteros = ({ userId, onClose }) => {
     }
   };
 
+  if (isLoading) {
+    return ReactDOM.createPortal(
+      <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
+        <div className="modal" onClick={(e) => e.stopPropagation()}>
+          <button className="close-btn" onClick={onClose}>×</button>
+          <h3>Solicitudes de Boletas</h3>
+          <EventLoading text="Cargando solicitudes de boletas..." />
+        </div>
+      </div>,
+      document.body
+    );
+  }
+
   return ReactDOM.createPortal(
-    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>×</button>
+    <div className="portero-componente-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
+      <div className="portero-componente-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="portero-componente-close-btn" onClick={onClose}>×</button>
         <h3>Gestión de Porteros</h3>
 
-        {porteros.length > 0 && (
-          <div className="porteros-list">
-            <h4>Porteros registrados</h4>
+        {porteros.length > 0 && !showForm && (
+          <div className="portero-componente-porteros-list">
+            <h3>Porteros registrados</h3>
             {porteros.map(portero => (
-              <div key={portero.id} className="portero-card">
-                <div className="portero-card-header">
+              <div key={portero.id} className="portero-componente-portero-card">
+                <div className="portero-componente-portero-card-header">
                   <strong>{portero.name}</strong>
-                  <div className="portero-actions">
-                    <button type="button" onClick={() => handleEditPortero(portero)} className="edit-btn">Editar</button>
-                    <button type="button" onClick={() => handleDeletePortero(portero.id)} className="delete-btn">Eliminar</button>
+                  <div className="portero-componente-portero-actions">
+                    <button type="button" onClick={() => handleEditPortero(portero)} className="portero-componente-edit-btn">Editar</button>
+                    <button type="button" onClick={() => handleDeletePortero(portero.id)} className="portero-componente-delete-btn">Eliminar</button>
                   </div>
                 </div>
                 <p><strong>Email:</strong> {portero.email}</p>
@@ -181,18 +203,18 @@ const Porteros = ({ userId, onClose }) => {
         )}
 
         {lugares.length === 0 ? (
-          <div className="no-lugares">
+          <div className="portero-componente-no-lugares">
             <p>No tienes lugares registrados. Crea un lugar primero para poder asignar porteros.</p>
           </div>
         ) : (
           <>
-            <button onClick={() => setShowForm(!showForm)} className="create-btn">
+            <button onClick={() => setShowForm(!showForm)} className="portero-componente-create-btn">
               {showForm ? "Cancelar" : "Agregar Portero"}
             </button>
 
             {showForm && (
-              <form onSubmit={handleSubmit} className="portero-form">
-                <div className="form-group">
+              <form onSubmit={handleSubmit} className="portero-componente-portero-form">
+                <div className="portero-componente-form-group">
                   <label>Nombre del Portero:</label>
                   <input
                     type="text"
@@ -203,7 +225,7 @@ const Porteros = ({ userId, onClose }) => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="portero-componente-form-group">
                   <label>Email del Portero:</label>
                   <input
                     type="email"
@@ -214,7 +236,7 @@ const Porteros = ({ userId, onClose }) => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="portero-componente-form-group">
                   <label>Establecimiento:</label>
                   <select
                     name="establecimientoId"
@@ -231,7 +253,7 @@ const Porteros = ({ userId, onClose }) => {
                   </select>
                 </div>
 
-                <button type="submit" className="submit-btn">
+                <button type="submit" className="portero-componente-submit-btn">
                   {editingPorteroId ? "Actualizar Portero" : "Crear Portero"}
                 </button>
               </form>

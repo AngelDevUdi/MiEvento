@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import QRCode from 'react-qr-code';
 import CryptoJS from 'crypto-js';
 import { db } from '../../../../api/api';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import './boleta.css';
 
 const BoletaModal = ({ isOpen, onClose, boleta, usuarioId }) => {
@@ -17,34 +17,34 @@ const BoletaModal = ({ isOpen, onClose, boleta, usuarioId }) => {
       return;
     }
 
-    let active = true;
+    let unsubscribe;
     const boleteriaRef = doc(db, "BOLETERIA", boleta.eventoId);
 
-    const fetchBoleteria = async () => {
-      try {
-        const docSnapshot = await getDoc(boleteriaRef);
-        if (!active || !docSnapshot.exists()) return;
-
-        const boleteriaData = docSnapshot.data();
-        const updatedBoleta = boleteriaData.boletas?.[boleta.id];
-        if (updatedBoleta) {
-          setBoletaData(prevData => ({
-            ...prevData,
-            ...updatedBoleta,
-            estado: updatedBoleta.estado,
-            ingresados: updatedBoleta.ingresados || 0,
-            faltantes: updatedBoleta.faltantes !== undefined ? updatedBoleta.faltantes : prevData.cantidad
-          }));
+    // Usar onSnapshot para monitorear cambios en tiempo real
+    unsubscribe = onSnapshot(
+      boleteriaRef,
+      (docSnapshot) => {
+        if (docSnapshot.exists()) {
+          const boleteriaData = docSnapshot.data();
+          const updatedBoleta = boleteriaData.boletas?.[boleta.id];
+          if (updatedBoleta) {
+            setBoletaData(prevData => ({
+              ...prevData,
+              ...updatedBoleta,
+              estado: updatedBoleta.estado,
+              ingresados: updatedBoleta.ingresados || 0,
+              faltantes: updatedBoleta.faltantes !== undefined ? updatedBoleta.faltantes : prevData.cantidad
+            }));
+          }
         }
-      } catch (error) {
+      },
+      (error) => {
         console.error("Error loading boleta data:", error);
       }
-    };
-
-    fetchBoleteria();
+    );
 
     return () => {
-      active = false;
+      if (unsubscribe) unsubscribe();
     };
   }, [isOpen, boleta?.eventoId, boleta?.id]);
 

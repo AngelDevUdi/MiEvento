@@ -1,6 +1,6 @@
 @import "../../../../resources/colors/colors.css";
 
-.boleta-modal-overlay {
+.reserva-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -13,7 +13,7 @@
   z-index: 1000;
 }
 
-.boleta-modal {
+.reserva-modal {
   background: white;
   padding: 20px;
   border-radius: 8px;
@@ -33,35 +33,29 @@
   cursor: pointer;
 }
 
-.boleta-modal-header {
+.reserva-modal-header {
   margin-bottom: 16px;
 }
 
-.boleta-modal-header h3 {
+.reserva-modal-header h3 {
   margin: 0;
   font-size: 1.25rem;
   color: var(--color-text-inverse);
 }
 
-.boleta-modal-subtitle {
-  margin: 8px 0 0;
-  color: var(--color-text-muted);
-  font-size: 0.95rem;
-}
-
-.boleta-details {
+.reserva-details {
   text-align: left;
   margin: 0 auto 20px;
   max-width: 320px;
 }
 
-.boleta-details p {
+.reserva-details p {
   margin: 6px 0;
   font-size: 0.95rem;
   color: var(--color-text-inverse);
 }
 
-.boleta-qrcode {
+.reserva-qrcode {
   display: flex;
   flex-direction: column;
   align-items: center;

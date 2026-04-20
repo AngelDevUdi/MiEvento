@@ -151,3 +151,26 @@
 .escanear-boletas::-webkit-scrollbar-thumb:hover {
   background: #475569;
 }
+
+/* Esto se aplica solo a celulares */
+@media (max-width: 768px) {
+  /* Si los elementos están uno al lado del otro, los ponemos en columna */
+  .container-perfil, .flex-layout { 
+    flex-direction: column !important;
+    padding: 10px;
+  }
+
+  /* Ajustamos los tamaños de fuente para que no se desborden */
+  h1 { font-size: 1.5rem; }
+  
+  /* Los botones deben ocupar casi todo el ancho para que sea fácil tocarlos */
+  button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  /* Si tienes tablas, mejor que tengan scroll horizontal */
+  .table-container {
+    overflow-x: auto;
+  }
+}
