@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import EventLoading from "../../loading/EventLoading";
 import { db } from "../../../api/api";
 import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
@@ -28,11 +29,17 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
   const [activeSection, setActiveSection] = useState("editar");
   const [allTags, setAllTags] = useState([]);
   const [tagSuggestions, setTagSuggestions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchLugares();
-    fetchAllTags();
-  }, []);
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchLugares(), fetchAllTags()]);
+      setLoading(false);
+    };
+
+    loadData();
+  }, [userId]);
 
   const formatNumberWithDots = (value) => {
     const digits = String(value).replace(/\D/g, "");
@@ -264,17 +271,23 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
     }
   };
 
+  if (!showForm) return null;
+
+  if (loading) {
+    return (
+      <EventLoading text="Cargando lugares..." />
+    );
+  }
+
   return (
-    <>
-      {showForm && (
-        <div className="organizador-crudlugares-overlay" onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            resetLugarForm();
-            setActiveSection("editar");
-            onClose();
-          }
-        }}>
-          <div className="organizador-crudlugares-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="organizador-crudlugares-overlay" onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          resetLugarForm();
+          setActiveSection("editar");
+          onClose();
+        }
+      }}>
+        <div className="organizador-crudlugares-modal" onClick={(e) => e.stopPropagation()}>
             <div className="organizador-crudlugares-modal-header">
               <h3>Gestión de lugares</h3>
               <button type="button" onClick={() => {
@@ -571,9 +584,7 @@ const Lugares = ({ userId, onClose, initialShowForm = false }) => {
             )}
           </div>
         </div>
-      )}
-    </>
-  );
+    );
 };
 
 export default Lugares;

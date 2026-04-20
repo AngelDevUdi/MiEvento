@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
+import EventLoading from "../../loading/EventLoading";
 import { db } from "../../../api/api";
 import { collection, addDoc, getDocs, query, where, updateDoc, doc } from "firebase/firestore";
 import { toast } from "react-toastify";
@@ -24,12 +25,17 @@ const Eventos = ({ userId, onClose }) => {
   });
   const [allTags, setAllTags] = useState([]);
   const [tagSuggestions, setTagSuggestions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchLugares();
-    fetchEventos();
-    fetchAllTags();
-  }, []);
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchLugares(), fetchEventos(), fetchAllTags()]);
+      setLoading(false);
+    };
+
+    loadData();
+  }, [userId]);
 
   const fetchLugares = async () => {
     try {
@@ -186,6 +192,12 @@ const Eventos = ({ userId, onClose }) => {
   };
 
   const selectedLugarCapacidad = lugares.find(lugar => lugar.id === formData.lugarId)?.capacidad;
+
+  if (loading) {
+    return (
+      <EventLoading text="Cargando eventos..." />
+    );
+  }
 
   return ReactDOM.createPortal(
     <div className="organizador-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>

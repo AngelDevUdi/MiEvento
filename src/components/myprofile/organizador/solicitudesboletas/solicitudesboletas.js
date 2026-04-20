@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
+import EventLoading from "../../../loading/EventLoading";
 import { db } from "../../../../api/api";
 import { collection, getDocs, query, where, updateDoc, doc, getDoc, setDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
@@ -151,7 +152,7 @@ const SolicitudesBoletas = ({ userId, onClose }) => {
         <div className="modal" onClick={(e) => e.stopPropagation()}>
           <button className="close-btn" onClick={onClose}>×</button>
           <h3>Solicitudes de Boletas</h3>
-          <p>Cargando solicitudes...</p>
+          <EventLoading text="Cargando solicitudes de boletas..." />
         </div>
       </div>,
       document.body
@@ -159,27 +160,27 @@ const SolicitudesBoletas = ({ userId, onClose }) => {
   }
 
   return ReactDOM.createPortal(
-    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>×</button>
+    <div className="organizador-solicitudesboletas-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
+      <div className="organizador-solicitudesboletas-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="organizador-solicitudesboletas-close-btn" onClick={onClose}>×</button>
         <h3>Solicitudes de Boletas</h3>
 
         {solicitudes.length === 0 ? (
-          <div className="no-solicitudes">
+          <div className="organizador-solicitudesboletas-no-solicitudes">
             <p>No hay solicitudes de boletas pendientes</p>
           </div>
         ) : (
-          <div className="solicitudes-list">
+          <div className="organizador-solicitudesboletas-list">
             {solicitudes.map(solicitud => (
-              <div key={solicitud.id} className="solicitud-card">
-                <div className="solicitud-header">
+              <div key={solicitud.id} className="organizador-solicitudesboletas-card">
+                <div className="organizador-solicitudesboletas-header">
                   <h4>{solicitud.eventoNombre}</h4>
-                  <span className={`estado-badge estado-${solicitud.estado?.toLowerCase() || 'pendiente'}`}>
+                  <span className={`organizador-solicitudesboletas-estado-badge organizador-solicitudesboletas-estado-${solicitud.estado?.toLowerCase() || 'pendiente'}`}>
                     {solicitud.estado || 'PENDIENTE'}
                   </span>
                 </div>
 
-                <div className="solicitud-info">
+                <div className="organizador-solicitudesboletas-info">
                   <p><strong>Usuario:</strong> {solicitud.usuarioNombre}</p>
                   <p><strong>Email:</strong> {solicitud.usuarioEmail}</p>
                   <p><strong>Lugar:</strong> {solicitud.lugarNombre}</p>
@@ -193,16 +194,16 @@ const SolicitudesBoletas = ({ userId, onClose }) => {
                 </div>
 
                 {solicitud.estado === 'PENDIENTE' && (
-                  <div className="solicitud-actions">
+                  <div className="organizador-solicitudesboletas-actions">
                     <button
                       onClick={() => handleEstadoChange(solicitud.id, 'ACTIVADA')}
-                      className="approve-btn"
+                      className="organizador-solicitudesboletas-approve-btn"
                     >
                       Aprobar
                     </button>
                     <button
                       onClick={() => handleEstadoChange(solicitud.id, 'RECHAZADA')}
-                      className="reject-btn"
+                      className="organizador-solicitudesboletas-reject-btn"
                     >
                       Rechazar
                     </button>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import ReactDOM from "react-dom";
+import EventLoading from "../../../loading/EventLoading";
 import { db } from "../../../../api/api";
 import { collection, addDoc, getDocs, query, where, updateDoc, doc } from "firebase/firestore";
 import { toast } from "react-toastify";
@@ -18,10 +18,17 @@ const MetodosPagos = ({ userId, onClose }) => {
     banco: "",
     titular: ""
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchMetodos();
-  }, []);
+    const loadData = async () => {
+      setLoading(true);
+      await fetchMetodos();
+      setLoading(false);
+    };
+
+    loadData();
+  }, [userId]);
 
   const fetchMetodos = async () => {
     try {
@@ -100,7 +107,13 @@ const MetodosPagos = ({ userId, onClose }) => {
     }
   };
 
-  return ReactDOM.createPortal(
+  if (loading) {
+    return (
+          <EventLoading text="Cargando métodos de pago..." />
+    );
+  }
+
+  return (
     <div className="organizador-metodospay-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
       <div className="organizador-metodospay-modal" onClick={(e) => e.stopPropagation()}>
         <button className="organizador-metodospay-close-btn" onClick={onClose}>×</button>
@@ -249,8 +262,7 @@ const MetodosPagos = ({ userId, onClose }) => {
         </form>
       )}
       </div>
-    </div>,
-    document.body
+    </div>
   );
 };
 

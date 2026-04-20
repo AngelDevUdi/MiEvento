@@ -133,14 +133,12 @@ const Reservas = ({ userId, onClose }) => {
   };
 
   if (loading) {
-    console.log("⏳ Aún cargando reservas...");
     return ReactDOM.createPortal(
       <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
         <div className="modal" onClick={(e) => e.stopPropagation()}>
           <button className="close-btn" onClick={onClose}>×</button>
-          <div style={{ padding: "40px 20px" }}>
-            <EventLoading text="Cargando solicitudes de reservas..." />
-          </div>
+          <h3>Solicitudes de Boletas</h3>
+          <EventLoading text="Cargando solicitudes de boletas..." />
         </div>
       </div>,
       document.body
@@ -148,36 +146,36 @@ const Reservas = ({ userId, onClose }) => {
   }
 
   return ReactDOM.createPortal(
-    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>×</button>
+    <div className="organizador-solicitudesdereserva-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) { onClose(); } }}>
+      <div className="organizador-solicitudesdereserva-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="organizador-solicitudesdereserva-close-btn" onClick={onClose}>×</button>
         <h3>Solicitudes de Reservas</h3>
-        <div className="filter-controls">
+        <div className="organizador-solicitudesdereserva-filter-controls">
           <input
             type="text"
             placeholder="Buscar por nombre de evento"
             value={searchEvento}
             onChange={(e) => setSearchEvento(e.target.value)}
-            className="search-input"
+            className="organizador-solicitudesdereserva-search-input"
           />
         </div>
 
         {reservas.filter(r => r.eventoNombre.toLowerCase().includes(searchEvento.toLowerCase())).length === 0 ? (
-          <div className="no-reservas">
+          <div className="organizador-solicitudesdereserva-no-reservas">
             <p>No hay solicitudes de reservas pendientes</p>
           </div>
         ) : (
-          <div className="reservas-list">
+          <div className="organizador-solicitudesdereserva-reservas-list">
             {reservas.filter(r => r.eventoNombre.toLowerCase().includes(searchEvento.toLowerCase())).map(reserva => (
-              <div key={reserva.id} className="reserva-card">
-                <div className="reserva-header">
+              <div key={reserva.id} className="organizador-solicitudesdereserva-reserva-card">
+                <div className="organizador-solicitudesdereserva-reserva-header">
                   <h4>{reserva.lugarNombre}</h4>
-                  <span className={`estado-badge estado-${reserva.estado?.toLowerCase() || 'pendiente'}`}>
+                  <span className={`organizador-solicitudesdereserva-estado-badge organizador-solicitudesdereserva-estado-${reserva.estado?.toLowerCase() || 'pendiente'}`}>
                     {reserva.estado || 'PENDIENTE'}
                   </span>
                 </div>
 
-                <div className="reserva-info">
+                <div className="organizador-solicitudesdereserva-reserva-info">
                   <p><strong>Usuario:</strong> {reserva.usuarioNombre}</p>
                   <p><strong>Email:</strong> {reserva.usuarioEmail}</p>
                   <p><strong>Teléfono:</strong> {reserva.usuarioTelefono ? <a href={`https://wa.me/${reserva.usuarioTelefono}`} target="_blank" rel="noopener noreferrer">{reserva.usuarioTelefono}</a> : 'No disponible'}</p>
@@ -187,7 +185,7 @@ const Reservas = ({ userId, onClose }) => {
                   <p><strong>Precio Base:</strong> ${reserva.precioBase?.toLocaleString() || '0'}</p>
                   
                   {reserva.servicios && reserva.servicios.length > 0 && (
-                    <div className="servicios-reserva">
+                    <div className="organizador-solicitudesdereserva-servicios-reserva">
                       <p><strong>Servicios Seleccionados:</strong></p>
                       <ul>
                         {reserva.servicios.map((servicio, index) => (
@@ -205,17 +203,17 @@ const Reservas = ({ userId, onClose }) => {
                 </div>
 
                 {reserva.estado === 'PENDIENTE' && (
-                  <div className="reserva-actions">
+                  <div className="organizador-solicitudesdereserva-reserva-actions">
                     <button
                       onClick={() => handleEstadoChange(reserva.id, 'CONFIRMADA')}
-                      className="approve-btn"
+                      className="organizador-solicitudesdereserva-approve-btn"
                       title="Confirmar el pago y activar la reserva"
                     >
                       Confirmar y Activar
                     </button>
                     <button
                       onClick={() => handleEstadoChange(reserva.id, 'RECHAZADA')}
-                      className="reject-btn"
+                      className="organizador-solicitudesdereserva-reject-btn"
                       title="Rechazar la solicitud de reserva"
                     >
                       Rechazar
@@ -223,13 +221,13 @@ const Reservas = ({ userId, onClose }) => {
                   </div>
                 )}
                 {(reserva.estado === 'ACTIVADA' || reserva.estado === 'CONFIRMADA') && (
-                  <div className="reserva-status-active">
-                    <p className="status-confirmed">✓ Reserva Activada</p>
+                  <div className="organizador-solicitudesdereserva-reserva-status-active">
+                    <p className="organizador-solicitudesdereserva-status-confirmed">✓ Reserva Activada</p>
                   </div>
                 )}
                 {reserva.estado === 'RECHAZADA' && (
-                  <div className="reserva-status-rejected">
-                    <p className="status-rejected">✗ Reserva Rechazada</p>
+                  <div className="organizador-solicitudesdereserva-reserva-status-rejected">
+                    <p className="organizador-solicitudesdereserva-status-rejected">✗ Reserva Rechazada</p>
                   </div>
                 )}
               </div>
