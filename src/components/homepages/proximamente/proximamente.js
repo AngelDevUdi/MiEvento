@@ -85,23 +85,20 @@ const Proximamente = ({ onVerMas }) => {
           <p>Reserva los espacios perfectos para tus eventos</p>
         </div>
 
-        {/* Filtros */}
-        <div className="filter-buttons">
-          <button
-            className={`filter-btn ${activeFilter === "todos" ? "active" : ""}`}
-            onClick={() => setActiveFilter("todos")}
+        {/* Filtro Select */}
+        <div className="filter-select-container">
+          <select
+            value={activeFilter}
+            onChange={(e) => setActiveFilter(e.target.value)}
+            className="filter-select"
           >
-            Todos los Lugares
-          </button>
-          {allTags.map(tag => (
-            <button
-              key={tag}
-              className={`filter-btn ${activeFilter === tag ? "active" : ""}`}
-              onClick={() => setActiveFilter(tag)}
-            >
-              {tag}
-            </button>
-          ))}
+            <option value="todos">Todos los Lugares</option>
+            {allTags.map(tag => (
+              <option key={tag} value={tag}>
+                {tag}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Grid de lugares */}
@@ -156,6 +153,7 @@ const Proximamente = ({ onVerMas }) => {
             </button>
           </div>
         )}
+
       </div>
 
       {showCompraModal && selectedLugarId && (

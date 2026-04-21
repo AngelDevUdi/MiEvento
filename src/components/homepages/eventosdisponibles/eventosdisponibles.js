@@ -104,20 +104,20 @@ const EventosDisponibles = ({ onVerMas }) => {
           <p>Reserva tus tickets ahora</p>
         </div>
 
-        {/* Filtros - simplificado por ahora */}
-        <div className="filter-buttons">
-          <button className={`filter-btn ${activeFilter === "todos" ? "active" : ""}`} onClick={() => setActiveFilter("todos")}>
-            Todos los Eventos
-          </button>
-          {allTags.map(tag => (
-            <button
-              key={tag}
-              className={`filter-btn ${activeFilter === tag ? "active" : ""}`}
-              onClick={() => setActiveFilter(tag)}
-            >
-              {tag}
-            </button>
-          ))}
+        {/* Filtro Select */}
+        <div className="filter-select-container">
+          <select
+            value={activeFilter}
+            onChange={(e) => setActiveFilter(e.target.value)}
+            className="filter-select"
+          >
+            <option value="todos">Todos los Eventos</option>
+            {allTags.map(tag => (
+              <option key={tag} value={tag}>
+                {tag}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Grid de eventos */}
