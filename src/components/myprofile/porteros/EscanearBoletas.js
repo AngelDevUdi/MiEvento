@@ -243,7 +243,7 @@ const EscanearBoletas = ({ userId }) => {
 
   return (
     <div className="escanear-boletas">
-      <h3>Escanear Boletas y Reservass</h3>
+      <h3>Escanear Boletas y Reservas</h3>
       <div id="reader">
         <div className="reader-quality-container">
           <div className="reader-quality-bar" style={{ width: `${scanQuality}%` }} />
