@@ -194,7 +194,7 @@ const Porteros = ({ userId, onClose }) => {
                     <button type="button" onClick={() => handleDeletePortero(portero.id)} className="portero-componente-delete-btn">Eliminar</button>
                   </div>
                 </div>
-                <p><strong>Email:</strong> {portero.email}</p>
+                <p><strong>Email:</strong> {portero.email?.toLowerCase()}</p>
                 <p><strong>Establecimiento:</strong> {portero.lugarNombre}</p>
                 <p><strong>Rol:</strong> {portero.rol}</p>
               </div>
@@ -228,12 +228,17 @@ const Porteros = ({ userId, onClose }) => {
                 <div className="portero-componente-form-group">
                   <label>Email del Portero:</label>
                   <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                  />
+  type="email"
+  name="email"
+  value={formData.email}
+  onChange={(e) =>
+    setFormData({
+      ...formData,
+      email: e.target.value.toLowerCase()
+    })
+  }
+  required
+/>
                 </div>
 
                 <div className="portero-componente-form-group">
