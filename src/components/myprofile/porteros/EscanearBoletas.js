@@ -1,16 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { db } from '../../../api/api';
-import { collection, query, where, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import CryptoJS from 'crypto-js';
 import './EscanearBoletas.css';
 
+// ✅ Caché en memoria (se limpia al recargar la página)
+const scanCache = new Map();
+
 const EscanearBoletas = ({ userId }) => {
   const [itemInfo, setItemInfo] = useState(null);
-  const [itemType, setItemType] = useState(null); // 'boleta' o 'reserva'
+  const [itemType, setItemType] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [scanQuality, setScanQuality] = useState(0);
+  const scanAttemptsRef = useRef([]);
+  const lastToastRef = useRef({});
   const scannerRef = useRef(null);
+  const processingRef = useRef(false); // ✅ ref para evitar doble procesamiento sin lag de estado
 
   useEffect(() => {
     const scanner = new Html5QrcodeScanner(
@@ -20,207 +28,234 @@ const EscanearBoletas = ({ userId }) => {
     );
     scanner.render(onScanSuccess, onScanFailure);
     scannerRef.current = scanner;
-
-    return () => {
-      scanner.clear().catch(console.error);
-    };
+    return () => { scanner.clear().catch(console.error); };
   }, []);
 
   const onScanSuccess = (decodedText) => {
-    try {
-      const secretKey = 'clave_secreta_porteros_2026';
-      const bytes = CryptoJS.AES.decrypt(decodedText, secretKey);
-      const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
-      if (!decryptedData) {
-        throw new Error('Descifrado fallido');
+    pushScanAttempt(true);
+    if (processingRef.current) return; // ✅ usar ref evita stale closure
+    processingRef.current = true;
+    setProcessing(true); // spinner inmediato
+
+    (async () => {
+      try {
+        const secretKey = 'clave_secreta_porteros_2026';
+        const bytes = CryptoJS.AES.decrypt(decodedText, secretKey);
+        const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+        if (!decryptedData) throw new Error('Descifrado fallido');
+        const data = JSON.parse(decryptedData);
+
+        if (data.boletaId && data.eventoId) {
+          const found = await fetchBoletaInfo(data.boletaId, data.usuarioId, data.eventoId, data.numeroBoleta);
+          if (!found) showToast('error', 'Boleta no encontrada');
+        } else if (data.reservaId) {
+          const found = await fetchReservaInfo(data.reservaId, data.usuarioId);
+          if (!found) showToast('error', 'Reserva no encontrada');
+        } else {
+          throw new Error('Tipo de código inválido');
+        }
+      } catch {
+        showToast('error', 'QR inválido o no autorizado');
+      } finally {
+        // ✅ Si no se mostró modal, liberar el lock
+        if (!showModal) resetProcessing();
       }
-      const data = JSON.parse(decryptedData);
-      
-      // Identificar si es boleta o reserva
-      if (data.boletaId && data.eventoId) {
-        // Es una boleta
-        setItemType('boleta');
-        fetchBoletaInfo(data.boletaId, data.usuarioId, data.eventoId, data.numeroBoleta);
-      } else if (data.reservaId) {
-        // Es una reserva
-        setItemType('reserva');
-        fetchReservaInfo(data.reservaId, data.usuarioId);
-      } else {
-        throw new Error('Tipo de código inválido');
-      }
-    } catch (error) {
-      toast.error('QR inválido o no autorizado');
-    }
+    })();
   };
 
-  const onScanFailure = (error) => {
-    // ignore
+  const resetProcessing = () => {
+    processingRef.current = false;
+    setProcessing(false);
   };
 
-  const fetchReservaInfo = async (reservaId, usuarioId) => {
-    try {
-      const reservaRef = doc(db, "RESERVAS", reservaId);
-      const reservaDoc = await getDoc(reservaRef);
+  const onScanFailure = () => { pushScanAttempt(false); };
 
-      if (!reservaDoc.exists()) {
-        toast.error('Reserva no encontrada');
-        return;
-      }
-
-      const reserva = reservaDoc.data();
-      
-      // Verificar que la reserva esté activa o confirmada
-      if (reserva.estado !== 'ACTIVADA' && reserva.estado !== 'CONFIRMADA') {
-        toast.error('Esta reserva no está disponible');
-        return;
-      }
-
-      setItemInfo({
-        ...reserva,
-        id: reservaId,
-        usuarioId: usuarioId,
-        tipo: 'reserva'
-      });
-      setShowModal(true);
-    } catch (error) {
-      console.error(error);
-      toast.error('Error al buscar reserva');
-    }
+  const pushScanAttempt = (success) => {
+    const arr = scanAttemptsRef.current;
+    arr.push(success ? 1 : 0);
+    if (arr.length > 20) arr.shift();
+    const quality = Math.round((arr.reduce((a, b) => a + b, 0) / arr.length) * 100);
+    setScanQuality(quality);
   };
 
+  const showToast = (type, message) => {
+    const now = Date.now();
+    if (now - (lastToastRef.current[message] || 0) < 3000) return;
+    lastToastRef.current[message] = now;
+    toast[type === 'error' ? 'error' : type === 'success' ? 'success' : 'info'](message);
+  };
+
+  // ✅ Consultas en paralelo con caché
   const fetchBoletaInfo = async (solicitudId, usuarioId, eventoId, numeroBoleta) => {
+    const cacheKey = `boleta_${solicitudId}`;
+    
     try {
-      const solicitudRef = doc(db, "SOLICITUDES_BOLETAS", solicitudId);
-      const solicitudDoc = await getDoc(solicitudRef);
+      // ✅ Lanzar las 3 consultas en paralelo
+      const [solicitudDoc, boleteriaDoc] = await Promise.all([
+        scanCache.has(`sol_${solicitudId}`)
+          ? { exists: () => true, data: () => scanCache.get(`sol_${solicitudId}`) }
+          : getDoc(doc(db, "SOLICITUDES_BOLETAS", solicitudId)),
+        scanCache.has(`bol_${eventoId}`)
+          ? { exists: () => true, data: () => scanCache.get(`bol_${eventoId}`) }
+          : getDoc(doc(db, "BOLETERIA", eventoId)),
+      ]);
 
-      if (!solicitudDoc.exists()) {
-        toast.error('Boleta no encontrada');
-        return;
-      }
-
+      if (!solicitudDoc.exists()) return false;
       const solicitud = solicitudDoc.data();
-      if (solicitud.usuarioId !== usuarioId || solicitud.estado !== 'ACTIVADA' || solicitud.eventoId !== eventoId) {
-        toast.error('Boleta no válida o no autorizada');
-        return;
+      scanCache.set(`sol_${solicitudId}`, solicitud); // guardar en caché
+
+      if (solicitud.usuarioId !== usuarioId || solicitud.estado !== 'ACTIVADA' || solicitud.eventoId !== eventoId) return false;
+
+      if (!boleteriaDoc.exists()) return false;
+      const bolerias = boleteriaDoc.data();
+      scanCache.set(`bol_${eventoId}`, bolerias);
+
+      const boleta = bolerias.boletas?.[solicitudId];
+      if (!boleta || boleta.numeroBoleta !== numeroBoleta || boleta.estado !== 'ACTIVA') return false;
+
+      // ✅ Consulta de evento: solo si no está en caché
+      let evento;
+      if (scanCache.has(`evt_${eventoId}`)) {
+        evento = scanCache.get(`evt_${eventoId}`);
+      } else {
+        const eventoDoc = await getDoc(doc(db, "EVENTOS", eventoId));
+        if (!eventoDoc.exists()) return false;
+        evento = eventoDoc.data();
+        scanCache.set(`evt_${eventoId}`, evento);
       }
 
-      const boleteriaRef = doc(db, "BOLETERIA", solicitud.eventoId);
-      const boleteriaDoc = await getDoc(boleteriaRef);
-
-      if (!boleteriaDoc.exists()) {
-        toast.error('Boleta no encontrada');
-        return;
-      }
-
-      const boleterias = boleteriaDoc.data().boletas;
-      const boleta = boleterias?.[solicitudId];
-      if (!boleta || boleta.numeroBoleta !== numeroBoleta || boleta.estado !== 'ACTIVA') {
-        toast.error('Boleta no encontrada');
-        return;
-      }
-
-      const eventoRef = doc(db, "EVENTOS", solicitud.eventoId);
-      const eventoDoc = await getDoc(eventoRef);
-      if (!eventoDoc.exists()) {
-        toast.error('Evento no encontrado');
-        return;
-      }
-
-      const evento = eventoDoc.data();
+      setItemType('boleta');
       setItemInfo({
         ...boleta,
-        solicitudId: solicitudId,
-        eventoId: solicitud.eventoId,
-        usuarioId: usuarioId,
+        solicitudId,
+        eventoId,
+        usuarioId,
         ingresados: boleta.ingresados || 0,
-        faltantes: boleta.faltantes !== undefined ? boleta.faltantes : boleta.cantidad,
+        faltantes: boleta.faltantes ?? boleta.cantidad,
         eventoNombre: evento.nombre,
         eventoFecha: evento.fecha?.toDate ? evento.fecha.toDate().toLocaleDateString('es-ES') : evento.fecha,
         tipo: 'boleta'
       });
       setShowModal(true);
+      processingRef.current = false; // no resetear spinner, modal está abierto
+      setProcessing(false);
+      return true;
     } catch (error) {
       console.error(error);
-      toast.error('Error al buscar boleta');
+      showToast('error', 'Error al buscar boleta');
+      return false;
+    }
+  };
+
+  const fetchReservaInfo = async (reservaId, usuarioId) => {
+    try {
+      let reserva;
+      if (scanCache.has(`res_${reservaId}`)) {
+        reserva = scanCache.get(`res_${reservaId}`);
+      } else {
+        const reservaDoc = await getDoc(doc(db, "RESERVAS", reservaId));
+        if (!reservaDoc.exists()) return false;
+        reserva = reservaDoc.data();
+        scanCache.set(`res_${reservaId}`, reserva);
+      }
+
+      if (reserva.estado !== 'ACTIVADA' && reserva.estado !== 'CONFIRMADA') {
+        showToast('error', 'Esta reserva no está disponible');
+        return false;
+      }
+
+      setItemType('reserva');
+      setItemInfo({ ...reserva, id: reservaId, usuarioId, tipo: 'reserva' });
+      setShowModal(true);
+      processingRef.current = false;
+      setProcessing(false);
+      return true;
+    } catch (error) {
+      console.error(error);
+      showToast('error', 'Error al buscar reserva');
+      return false;
     }
   };
 
   const handleEntrarTodos = async () => {
     if (!itemInfo || itemType !== 'boleta') return;
     try {
-      const boleteriaRef = doc(db, "BOLETERIA", itemInfo.eventoId);
-      await updateDoc(boleteriaRef, {
+      await updateDoc(doc(db, "BOLETERIA", itemInfo.eventoId), {
         [`boletas.${itemInfo.solicitudId}.estado`]: 'USADA',
         [`boletas.${itemInfo.solicitudId}.ingresados`]: itemInfo.cantidad,
         [`boletas.${itemInfo.solicitudId}.faltantes`]: 0,
         [`boletas.${itemInfo.solicitudId}.updatedAt`]: new Date()
       });
-      toast.success('Todos ingresados');
-      setShowModal(false);
-      setItemInfo(null);
-      setItemType(null);
-    } catch (error) {
-      console.error(error);
-      toast.error('Error al actualizar');
-    }
+      // ✅ Invalidar caché del evento para que el próximo escaneo sea fresco
+      scanCache.delete(`bol_${itemInfo.eventoId}`);
+      showToast('success', 'Todos ingresados');
+      closeModal();
+    } catch { showToast('error', 'Error al actualizar'); }
   };
 
   const handleEntrarParcial = async () => {
     if (itemType !== 'boleta') return;
-    const cantidadInput = document.getElementById('cantidadInput');
-    const cantidadIngresar = parseInt(cantidadInput.value);
+    const cantidadIngresar = parseInt(document.getElementById('cantidadInput').value);
     if (!itemInfo || isNaN(cantidadIngresar) || cantidadIngresar <= 0) return;
 
     const faltantes = itemInfo.faltantes || itemInfo.cantidad;
     if (cantidadIngresar > faltantes) {
-      toast.error('No puedes ingresar más personas de las que faltan');
+      showToast('error', 'No puedes ingresar más personas de las que faltan');
       return;
     }
 
     const nuevosIngresados = (itemInfo.ingresados || 0) + cantidadIngresar;
     const nuevosFaltantes = itemInfo.cantidad - nuevosIngresados;
-    const nuevoEstado = nuevosFaltantes <= 0 ? 'USADA' : itemInfo.estado;
 
     try {
-      const boleteriaRef = doc(db, "BOLETERIA", itemInfo.eventoId);
-      await updateDoc(boleteriaRef, {
-        [`boletas.${itemInfo.solicitudId}.estado`]: nuevoEstado,
+      await updateDoc(doc(db, "BOLETERIA", itemInfo.eventoId), {
+        [`boletas.${itemInfo.solicitudId}.estado`]: nuevosFaltantes <= 0 ? 'USADA' : itemInfo.estado,
         [`boletas.${itemInfo.solicitudId}.ingresados`]: nuevosIngresados,
         [`boletas.${itemInfo.solicitudId}.faltantes`]: nuevosFaltantes,
         [`boletas.${itemInfo.solicitudId}.updatedAt`]: new Date()
       });
-      toast.success(`${cantidadIngresar} persona(s) ingresada(s)`);
-      setShowModal(false);
-      setItemInfo(null);
-      setItemType(null);
-    } catch (error) {
-      console.error(error);
-      toast.error('Error al actualizar');
-    }
+      scanCache.delete(`bol_${itemInfo.eventoId}`);
+      showToast('success', `${cantidadIngresar} persona(s) ingresada(s)`);
+      closeModal();
+    } catch { showToast('error', 'Error al actualizar'); }
   };
 
   const handleConfirmarReserva = async () => {
     if (!itemInfo || itemType !== 'reserva') return;
     try {
-      const reservaRef = doc(db, "RESERVAS", itemInfo.id);
-      await updateDoc(reservaRef, {
+      await updateDoc(doc(db, "RESERVAS", itemInfo.id), {
         estado: 'USADA',
         updatedAt: new Date()
       });
-      toast.success('Reserva confirmada y marcada como usada');
-      setShowModal(false);
-      setItemInfo(null);
-      setItemType(null);
-    } catch (error) {
-      console.error(error);
-      toast.error('Error al confirmar reserva');
-    }
+      scanCache.delete(`res_${itemInfo.id}`); // ✅ invalidar caché
+      showToast('success', 'Reserva confirmada y marcada como usada');
+      closeModal();
+    } catch { showToast('error', 'Error al confirmar reserva'); }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setItemInfo(null);
+    setItemType(null);
+    processingRef.current = false;
+    setProcessing(false);
   };
 
   return (
     <div className="escanear-boletas">
-      <h3>Escanear Boletas y Reservas</h3>
-      <div id="reader"></div>
+      <h3>Escanear Boletas y Reservass</h3>
+      <div id="reader">
+        <div className="reader-quality-container">
+          <div className="reader-quality-bar" style={{ width: `${scanQuality}%` }} />
+          <div className="reader-quality-text">{scanQuality}%</div>
+        </div>
+        {processing && (
+          <div className="reader-loading-overlay">
+            <div className="reader-spinner" />
+          </div>
+        )}
+      </div>
+
       {showModal && itemInfo && (
         <div className="modal-overlay">
           <div className="modal">
@@ -254,11 +289,7 @@ const EscanearBoletas = ({ userId }) => {
                 <button onClick={handleConfirmarReserva}>Confirmar Reserva</button>
               </>
             )}
-            <button onClick={() => {
-              setShowModal(false);
-              setItemInfo(null);
-              setItemType(null);
-            }}>Cerrar</button>
+            <button onClick={closeModal}>Cerrar</button>
           </div>
         </div>
       )}
