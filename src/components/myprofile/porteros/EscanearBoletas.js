@@ -40,7 +40,7 @@ const EscanearBoletas = ({ userId }) => {
       if (data.boletaId && data.eventoId) {
         // Es una boleta
         setItemType('boleta');
-        fetchBoletaInfo(data.numeroBoleta, data.usuarioId);
+        fetchBoletaInfo(data.boletaId, data.usuarioId, data.eventoId, data.numeroBoleta);
       } else if (data.reservaId) {
         // Es una reserva
         setItemType('reserva');
@@ -88,43 +88,57 @@ const EscanearBoletas = ({ userId }) => {
     }
   };
 
-  const fetchBoletaInfo = async (numeroBoleta, usuarioId) => {
+  const fetchBoletaInfo = async (solicitudId, usuarioId, eventoId, numeroBoleta) => {
     try {
-      const solicitudesQuery = query(collection(db, "SOLICITUDES_BOLETAS"), where("usuarioId", "==", usuarioId), where("estado", "==", "ACTIVADA"));
-      const solicitudesSnapshot = await getDocs(solicitudesQuery);
+      const solicitudRef = doc(db, "SOLICITUDES_BOLETAS", solicitudId);
+      const solicitudDoc = await getDoc(solicitudRef);
 
-      for (const solicitudDoc of solicitudesSnapshot.docs) {
-        const solicitud = solicitudDoc.data();
-        const boleteriaRef = doc(db, "BOLETERIA", solicitud.eventoId);
-        const boleteriaDoc = await getDoc(boleteriaRef);
-
-        if (boleteriaDoc.exists()) {
-          const boleterias = boleteriaDoc.data().boletas;
-          const boleta = boleterias?.[solicitudDoc.id];
-          if (boleta && boleta.numeroBoleta === numeroBoleta && boleta.estado === 'ACTIVA') {
-            // Obtener información del evento
-            const eventoRef = doc(db, "EVENTOS", solicitud.eventoId);
-            const eventoDoc = await getDoc(eventoRef);
-            if (eventoDoc.exists()) {
-              const evento = eventoDoc.data();
-              setItemInfo({ 
-                ...boleta, 
-                solicitudId: solicitudDoc.id, 
-                eventoId: solicitud.eventoId, 
-                usuarioId: usuarioId,
-                ingresados: boleta.ingresados || 0, 
-                faltantes: boleta.faltantes !== undefined ? boleta.faltantes : boleta.cantidad,
-                eventoNombre: evento.nombre,
-                eventoFecha: evento.fecha?.toDate ? evento.fecha.toDate().toLocaleDateString('es-ES') : evento.fecha,
-                tipo: 'boleta'
-              });
-              setShowModal(true);
-              return;
-            }
-          }
-        }
+      if (!solicitudDoc.exists()) {
+        toast.error('Boleta no encontrada');
+        return;
       }
-      toast.error('Boleta no encontrada');
+
+      const solicitud = solicitudDoc.data();
+      if (solicitud.usuarioId !== usuarioId || solicitud.estado !== 'ACTIVADA' || solicitud.eventoId !== eventoId) {
+        toast.error('Boleta no válida o no autorizada');
+        return;
+      }
+
+      const boleteriaRef = doc(db, "BOLETERIA", solicitud.eventoId);
+      const boleteriaDoc = await getDoc(boleteriaRef);
+
+      if (!boleteriaDoc.exists()) {
+        toast.error('Boleta no encontrada');
+        return;
+      }
+
+      const boleterias = boleteriaDoc.data().boletas;
+      const boleta = boleterias?.[solicitudId];
+      if (!boleta || boleta.numeroBoleta !== numeroBoleta || boleta.estado !== 'ACTIVA') {
+        toast.error('Boleta no encontrada');
+        return;
+      }
+
+      const eventoRef = doc(db, "EVENTOS", solicitud.eventoId);
+      const eventoDoc = await getDoc(eventoRef);
+      if (!eventoDoc.exists()) {
+        toast.error('Evento no encontrado');
+        return;
+      }
+
+      const evento = eventoDoc.data();
+      setItemInfo({
+        ...boleta,
+        solicitudId: solicitudId,
+        eventoId: solicitud.eventoId,
+        usuarioId: usuarioId,
+        ingresados: boleta.ingresados || 0,
+        faltantes: boleta.faltantes !== undefined ? boleta.faltantes : boleta.cantidad,
+        eventoNombre: evento.nombre,
+        eventoFecha: evento.fecha?.toDate ? evento.fecha.toDate().toLocaleDateString('es-ES') : evento.fecha,
+        tipo: 'boleta'
+      });
+      setShowModal(true);
     } catch (error) {
       console.error(error);
       toast.error('Error al buscar boleta');
