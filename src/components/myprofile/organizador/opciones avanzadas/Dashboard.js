@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { db } from "../../../../api/api";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where, doc, getDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import "./dashboard.css";
 import { FaTicketAlt, FaUserCheck, FaChartBar } from "react-icons/fa";
@@ -53,15 +53,18 @@ const Dashboard = ({ userId, onClose }) => {
       const boletasSnapshot = await getDocs(boletasQuery);
       const boletas = boletasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      // Sumar cantidad de boletas vendidas (estado ACTIVADA)
+      // Sumar cantidad de boletas vendidas (solicitudes activadas / vendidas)
       const boletasVendidas = boletas.reduce((sum, b) => {
-        const isActivated = (b.estado === "ACTIVADA" || b.estado === "ACTIVA");
+        const isActivated = (b.estado === "ACTIVADA" || b.estado === "ACTIVA" || b.estado === "USADA");
         return sum + (isActivated ? (b.cantidad || 1) : 0);
       }, 0);
 
-      // Sumar personas que entraron (estado ESCANEADA) — usar cantidad si está presente
-      const personasEntradas = boletas.reduce((sum, b) => {
-        return sum + (b.estado === "ESCANEADA" ? (b.cantidad || 1) : 0);
+      // Contar boletas usadas / personas que entraron desde la boletería
+      const boleteriaRef = doc(db, "BOLETERIA", evento.id);
+      const boleteriaDoc = await getDoc(boleteriaRef);
+      const boleteriaData = boleteriaDoc.exists() ? boleteriaDoc.data().boletas || {} : {};
+      const personasEntradas = Object.values(boleteriaData).reduce((sum, b) => {
+        return sum + (Number(b.ingresados || 0));
       }, 0);
 
       // El campo evento.stockBoletas se actualiza al activar una solicitud,
@@ -159,7 +162,7 @@ const Dashboard = ({ userId, onClose }) => {
               <div className="card-content">
                 <h4>Personas Entraron</h4>
                 <p className="card-value">{estadisticas.personasEntradas}</p>
-                <p className="card-subtitle">boletas escaneadas</p>
+                <p className="card-subtitle">boletas usadas / ingresadas</p>
               </div>
             </div>
 
