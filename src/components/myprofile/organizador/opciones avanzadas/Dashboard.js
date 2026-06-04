@@ -53,15 +53,21 @@ const Dashboard = ({ userId, onClose }) => {
       const boletasSnapshot = await getDocs(boletasQuery);
       const boletas = boletasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-      // Contar boletas vendidas (estado ACTIVADA)
-      const boletasVendidas = boletas.filter(b => b.estado === "ACTIVADA").length;
-      
-      // Contar personas que entraron (estado ESCANEADA)
-      const personasEntradas = boletas.filter(b => b.estado === "ESCANEADA").length;
-      
-      // Calcular boletas disponibles
-      const boletasDisponibles = Math.max(0, (evento.stockBoletas || 0) - boletasVendidas);
-      
+      // Sumar cantidad de boletas vendidas (estado ACTIVADA)
+      const boletasVendidas = boletas.reduce((sum, b) => {
+        const isActivated = (b.estado === "ACTIVADA" || b.estado === "ACTIVA");
+        return sum + (isActivated ? (b.cantidad || 1) : 0);
+      }, 0);
+
+      // Sumar personas que entraron (estado ESCANEADA) — usar cantidad si está presente
+      const personasEntradas = boletas.reduce((sum, b) => {
+        return sum + (b.estado === "ESCANEADA" ? (b.cantidad || 1) : 0);
+      }, 0);
+
+      // El campo evento.stockBoletas se actualiza al activar una solicitud,
+      // por lo que representa el stock actual disponible. Usarlo directamente.
+      const boletasDisponibles = evento.stockBoletas || 0;
+
       // Calcular ingreso total (boletas vendidas * precio)
       const ingresoTotal = boletasVendidas * (evento.precio || 0);
 
@@ -142,7 +148,7 @@ const Dashboard = ({ userId, onClose }) => {
               <div className="card-content">
                 <h4>Boletas Vendidas</h4>
                 <p className="card-value">{estadisticas.boletasVendidas}</p>
-                <p className="card-subtitle">de {selectedEvento.stockBoletas || 0} disponibles</p>
+                  <p className="card-subtitle">de {(selectedEvento.stockBoletas || 0) + estadisticas.boletasVendidas} totales</p>
               </div>
             </div>
 
@@ -184,11 +190,11 @@ const Dashboard = ({ userId, onClose }) => {
             <h4>Resumen</h4>
             <div className="summary-item">
               <span>Capacidad total:</span>
-              <strong>{selectedEvento.stockBoletas || 0} personas</strong>
+              <strong>{((selectedEvento.stockBoletas || 0) + estadisticas.boletasVendidas)} personas</strong>
             </div>
             <div className="summary-item">
               <span>Ocupación:</span>
-              <strong>{Math.round((estadisticas.boletasVendidas / (selectedEvento.stockBoletas || 1)) * 100)}%</strong>
+              <strong>{Math.round((estadisticas.boletasVendidas / (((selectedEvento.stockBoletas || 0) + estadisticas.boletasVendidas) || 1)) * 100)}%</strong>
             </div>
             <div className="summary-item">
               <span>Tasa de entrada:</span>
